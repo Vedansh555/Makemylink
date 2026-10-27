@@ -46,6 +46,10 @@ export function AutoScrollRow({ children, className = "" }: { children: React.Re
   let startScroll = 0;
 
   function onPointerDown(e: React.PointerEvent) {
+    // If user clicked an interactive anchor or button, do not capture or prevent default navigation
+    if ((e.target as HTMLElement).closest("a, button")) {
+      return;
+    }
     const el = ref.current;
     if (!el) return;
     dragging.current = true;

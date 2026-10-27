@@ -111,9 +111,20 @@ export function ThemeGallery() {
                       <h3 className="font-display text-[26px] italic leading-none">{def.label}</h3>
                       <p className="mt-1.5 text-[13px] text-fg/50">{families[def.family].label} style</p>
                     </div>
-                    <Link href={`/${p.handle}`} className="inline-flex items-center gap-1 rounded-lg border border-fg/15 px-3 py-1.5 text-[12px] text-fg/70 hover:border-fg/40 hover:text-fg">
-                      Open <ArrowUpRight className="h-3.5 w-3.5" />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/create?theme=${p.theme}`}
+                        className="inline-flex items-center gap-1 rounded-lg bg-fg px-3 py-1.5 text-[12px] font-medium text-bg hover:bg-[#ff5b37] hover:text-[#111] transition"
+                      >
+                        Customize
+                      </Link>
+                      <Link
+                        href={`/${p.handle}`}
+                        className="inline-flex items-center gap-1 rounded-lg border border-fg/15 px-3 py-1.5 text-[12px] text-fg/70 hover:border-fg/40 hover:text-fg transition"
+                      >
+                        Open <ArrowUpRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -139,11 +150,19 @@ function StylePlayground() {
     <div className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
       <Reveal>
         <div className="grid items-start gap-10 rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-8 lg:grid-cols-[auto_1fr]">
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-4">
             <PhoneFrame profile={{ ...base, theme }} scale={0.6} />
-            <p className="text-[13px] text-fg/55">
-              {def.label} · {families[def.family].label}
-            </p>
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-[13px] text-fg/55">
+                {def.label} · {families[def.family].label}
+              </p>
+              <Link
+                href={`/create?theme=${theme}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-fg px-5 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
+              >
+                Use this style in Editor <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
           <div className="min-w-0">
             <h3 className="font-display text-[clamp(32px,4vw,52px)] leading-none">Try them all.</h3>

@@ -113,12 +113,26 @@ export function Editor() {
       .catch(() => {});
   }, []);
 
-  // Load the draft once, on the client.
+  // Load the draft once, on the client, or initialize with selected theme / handle
   useEffect(() => {
     const handle = params.get("handle");
+    const themeParam = params.get("theme");
     const draft = loadDraft();
-    if (draft && !handle) return setP((prev) => prev ?? draft);
-    setP((prev) => prev ?? (handle ? { ...blankProfile, handle, name: handle.charAt(0).toUpperCase() + handle.slice(1) } : draft ?? blankProfile));
+
+    let initial: Profile;
+    if (draft && !handle) {
+      initial = { ...draft };
+    } else {
+      initial = handle
+        ? { ...blankProfile, handle, name: handle.charAt(0).toUpperCase() + handle.slice(1) }
+        : draft ?? { ...blankProfile };
+    }
+
+    if (themeParam) {
+      initial.theme = themeParam;
+    }
+
+    setP((prev) => (themeParam ? { ...(prev ?? initial), theme: themeParam } : prev ?? initial));
   }, [params]);
 
   // Autosave locally.
