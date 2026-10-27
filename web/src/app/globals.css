@@ -127,22 +127,24 @@ body {
   to { background-position: -200% 50%; }
 }
 .chrome-text {
-  /* A dark, legible silver sweep — chrome themes may override --c1/--c2/--c3, but never past these darker fallbacks. */
+  /* Rich silver metallic liquid chrome gradient */
   background: linear-gradient(
-    100deg,
-    var(--c2, #5a5e66) 0%,
-    var(--c1, #26282c) 18%,
-    var(--c2, #6b7079) 32%,
-    var(--c1, #1c1d20) 48%,
-    var(--c3, #0d0e10) 64%,
-    var(--c1, #26282c) 80%,
-    var(--c2, #5a5e66) 100%
+    115deg,
+    #7a808c 0%,
+    #a8aebb 14%,
+    #e8ebf0 28%,
+    #585e68 44%,
+    #dbe0ea 58%,
+    #8d94a2 72%,
+    #ffffff 84%,
+    #7a808c 100%
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shine 9s linear infinite;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.18));
+  animation: shine 7s linear infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
