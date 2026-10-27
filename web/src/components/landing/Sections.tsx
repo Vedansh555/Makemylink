@@ -5,7 +5,7 @@ import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Check, Minus, Plus } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, Download, ExternalLink, Minus, Plus } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
 import { families, getTheme, themeList } from "@/lib/themes";
 import { LookArt } from "../bio/LookArt";
@@ -186,6 +186,43 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 }
 
 export function Features() {
+  const router = useRouter();
+  const [importInput, setImportInput] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState("₹ INR");
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [folderOpen, setFolderOpen] = useState(true);
+  const [activeBar, setActiveBar] = useState<number | null>(7);
+  const [boughtProduct, setBoughtProduct] = useState<string | null>(null);
+
+  const statsData = [
+    { label: "Mon", visitors: 340 },
+    { label: "Tue", visitors: 580 },
+    { label: "Wed", visitors: 460 },
+    { label: "Thu", visitors: 780 },
+    { label: "Fri", visitors: 650 },
+    { label: "Sat", visitors: 940 },
+    { label: "Sun", visitors: 820 },
+    { label: "Mon", visitors: 1120 },
+    { label: "Tue", visitors: 990 },
+    { label: "Wed", visitors: 730 },
+    { label: "Thu", visitors: 890 },
+    { label: "Today", visitors: 1250 },
+  ];
+
+  const handleImport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!importInput.trim()) {
+      router.push("/create");
+      return;
+    }
+    setImporting(true);
+    setTimeout(() => {
+      const cleanHandle = importInput.trim().replace(/^.*linktr\.ee\//, "").replace(/[^a-zA-Z0-9._]/g, "");
+      router.push(`/create?handle=${cleanHandle || "creator"}`);
+    }, 400);
+  };
+
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
       <Reveal>
@@ -194,29 +231,57 @@ export function Features() {
       </Reveal>
 
       <div className="mt-14 grid gap-5 md:grid-cols-6">
+        {/* Sell or recommend products */}
         <Reveal className="md:col-span-4">
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">Sell or recommend products</h3>
-            <p className="mt-2 max-w-[44ch] text-fg/55">
-              Show your merch, your shop, or things you love with affiliate links from Amazon, LTK, Myntra and more. Each one is a tap away.
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-[22px] font-semibold">Sell or recommend products</h3>
+                <p className="mt-2 max-w-[44ch] text-fg/55">
+                  Show your merch, your shop, or things you love with affiliate links from Amazon, LTK, Myntra and more. Each one is a tap away.
+                </p>
+              </div>
+              <Link
+                href="/create"
+                className="hidden shrink-0 items-center gap-1.5 rounded-full border border-fg/15 bg-fg/[0.03] px-3.5 py-1.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg sm:inline-flex"
+              >
+                Try in editor <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
             <div className="mt-8 grid grid-cols-3 gap-4 [perspective:1000px]">
               {(
                 [
-                  ["vinyl", 20, "Own store", "$25"],
-                  ["dress", 340, "Amazon", "$74"],
-                  ["cup", 28, "Own store", "₹450"],
+                  ["vinyl", 20, "Own store", "$25", "Special Edition Vinyl EP", "https://shopmy.us"],
+                  ["dress", 340, "Amazon", "$74", "Satin Midi Slip Dress", "https://amazon.com"],
+                  ["cup", 28, "Own store", "₹450", "Ceramic Artisan Coffee Mug", "https://myntra.com"],
                 ] as const
-              ).map(([art, hue, store, price], i) => (
+              ).map(([art, hue, store, price, title, url], i) => (
                 <Tilt key={art} max={14} className="rounded-2xl">
-                  <div className="overflow-hidden rounded-2xl border border-fg/10 bg-bg/30" style={{ transform: `translateY(${i % 2 ? 16 : 0}px)` }}>
-                    <div className="relative aspect-[4/5]">
+                  <div className="group overflow-hidden rounded-2xl border border-fg/10 bg-bg/30 transition hover:border-fg/30 hover:shadow-lg" style={{ transform: `translateY(${i % 2 ? 16 : 0}px)` }}>
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <LookArt kind={art} hue={hue} />
-                      <span className="absolute left-2 top-2 rounded-full bg-bg/60 px-2 py-1 text-[9px] uppercase tracking-[0.18em] backdrop-blur">{store}</span>
+                      <span className="absolute left-2 top-2 rounded-full bg-bg/70 px-2 py-1 text-[9px] uppercase tracking-[0.18em] backdrop-blur font-medium">{store}</span>
                     </div>
-                    <div className="flex justify-between p-3 text-[13px]">
-                      <span className="text-fg/70">Buy</span>
-                      <span>{price}</span>
+                    <div className="p-3">
+                      <p className="truncate text-[12px] font-medium text-fg/75">{title}</p>
+                      <div className="mt-2 flex items-center justify-between text-[13px]">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBoughtProduct(title);
+                            setTimeout(() => setBoughtProduct(null), 2500);
+                          }}
+                          className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+                            boughtProduct === title
+                              ? "bg-emerald-500 text-white"
+                              : "bg-fg text-bg hover:bg-[#ff5b37] hover:text-[#111]"
+                          }`}
+                        >
+                          {boughtProduct === title ? "Added ✓" : "Buy"}
+                        </button>
+                        <span className="font-semibold text-fg">{price}</span>
+                      </div>
                     </div>
                   </div>
                 </Tilt>
@@ -225,116 +290,245 @@ export function Features() {
           </Card>
         </Reveal>
 
+        {/* We never take a cut */}
         <Reveal className="md:col-span-2" delay={0.08}>
           <Card className="flex h-full flex-col justify-between bg-[radial-gradient(circle_at_70%_20%,rgba(255,91,55,.18),transparent_60%)]">
             <div>
-              <h3 className="text-[22px] font-semibold">We never take a cut</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-[22px] font-semibold">We never take a cut</h3>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">Always 0%</span>
+              </div>
               <p className="mt-2 text-fg/55">Some tools keep up to 12% of every sale on their cheaper plans. With us, every rupee and dollar is yours.</p>
             </div>
-            <div className="chrome-text mt-6 font-syne text-[120px] font-extrabold leading-[0.8]">0%</div>
+            <div className="flex items-end justify-between mt-6">
+              <div className="chrome-text font-syne text-[100px] sm:text-[120px] font-extrabold leading-[0.8]">0%</div>
+              <Link
+                href="/create"
+                className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-fg/80 underline decoration-fg/30 underline-offset-4 hover:text-[#ff5b37] hover:decoration-[#ff5b37] transition"
+              >
+                Start free <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </Card>
         </Reveal>
 
+        {/* Media kit for brands */}
         <Reveal className="md:col-span-2" delay={0.04}>
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">Media kit for brands</h3>
-            <p className="mt-2 text-fg/55">Show your numbers and past work, so brands can say yes faster.</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-[22px] font-semibold">Media kit for brands</h3>
+                <p className="mt-2 text-fg/55">Show your numbers and past work, so brands can say yes faster.</p>
+              </div>
+            </div>
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
               {[
                 ["184K", "followers"],
                 ["6.2%", "engage"],
                 ["92K", "avg views"],
               ].map(([v, l]) => (
-                <div key={l} className="rounded-2xl border border-fg/10 bg-bg/30 p-3">
-                  <div className="font-display text-[26px] italic leading-none">{v}</div>
+                <div key={l} className="group rounded-2xl border border-fg/10 bg-bg/30 p-3 transition hover:border-[#ff5b37]/40 hover:bg-fg/[0.03]">
+                  <div className="font-display text-[26px] italic leading-none group-hover:text-[#ff5b37] transition-colors">{v}</div>
                   <div className="mt-1 text-[10px] uppercase tracking-[0.15em] text-fg/45">{l}</div>
                 </div>
               ))}
             </div>
+            <Link
+              href="/create"
+              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-fg/12 bg-fg/[0.03] py-2 text-[12px] font-medium text-fg/70 hover:border-fg/30 hover:text-fg transition"
+            >
+              Add media kit to your bio <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </Card>
         </Reveal>
 
+        {/* Import from Linktree */}
         <Reveal className="md:col-span-2" delay={0.08}>
           <Card className="h-full">
             <h3 className="text-[22px] font-semibold">Import from Linktree</h3>
             <p className="mt-2 text-fg/55">Paste your old link and we copy your links and socials over for you.</p>
-            <div className="mt-6 flex flex-col gap-2 text-[14px]">
-              <div className="rounded-full border border-fg/10 bg-bg/30 px-4 py-3 text-fg/45 line-through">linktr.ee/you</div>
-              <div className="flex items-center justify-between rounded-full bg-fg px-4 py-3 font-medium text-bg">
-                makemylink.co/you <ArrowRight className="h-4 w-4" />
+            <form onSubmit={handleImport} className="mt-6 flex flex-col gap-2.5 text-[14px]">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="linktr.ee/yourname"
+                  value={importInput}
+                  onChange={(e) => setImportInput(e.target.value)}
+                  className="w-full rounded-full border border-fg/15 bg-bg/60 px-4 py-3 text-[13px] text-fg placeholder:text-fg/40 outline-none focus:border-[#ff5b37] transition"
+                />
               </div>
-            </div>
+              <button
+                type="submit"
+                disabled={importing}
+                className="flex items-center justify-between rounded-full bg-fg px-5 py-3 font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
+              >
+                <span>{importing ? "Importing…" : "Convert to Makemylink"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
           </Card>
         </Reveal>
 
+        {/* Pay your way */}
         <Reveal className="md:col-span-2" delay={0.12}>
           <Card className="h-full">
             <h3 className="text-[22px] font-semibold">Pay your way</h3>
             <p className="mt-2 text-fg/55">Get paid with UPI in India, and cards or wallets everywhere else.</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {["UPI", "Cards", "Apple Pay", "Google Pay", "Netbanking", "₹ INR", "$ USD"].map((c) => (
-                <span key={c} className="rounded-full border border-fg/15 px-3 py-1.5 text-[12px] text-fg/75">
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setSelectedCurrency(c)}
+                  className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition cursor-pointer ${
+                    selectedCurrency === c
+                      ? "border border-[#ff5b37] bg-[#ff5b37]/10 text-fg font-semibold"
+                      : "border border-fg/15 text-fg/75 hover:border-fg/40"
+                  }`}
+                >
                   {c}
-                </span>
+                </button>
               ))}
             </div>
+            <p className="mt-4 text-[12px] text-fg/45">
+              Zero platform fee on {selectedCurrency} transactions worldwide.
+            </p>
           </Card>
         </Reveal>
 
+        {/* See what works */}
         <Reveal className="md:col-span-3" delay={0.04}>
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">See what works</h3>
-            <p className="mt-2 text-fg/55">How many people visit, what they tap, and where they come from.</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-[22px] font-semibold">See what works</h3>
+                <p className="mt-2 text-fg/55">How many people visit, what they tap, and where they come from.</p>
+              </div>
+              {activeBar !== null && (
+                <div className="rounded-xl border border-fg/10 bg-fg/[0.04] px-3 py-1 text-right">
+                  <p className="text-[14px] font-bold text-fg">{statsData[activeBar].visitors} views</p>
+                  <p className="text-[10px] text-fg/50">{statsData[activeBar].label}</p>
+                </div>
+              )}
+            </div>
             <div className="mt-8 flex h-28 items-end gap-2">
               {[30, 52, 41, 68, 57, 84, 72, 96, 88, 64, 78, 100].map((h, i) => (
-                <motion.div
+                <motion.button
                   key={i}
+                  type="button"
+                  onMouseEnter={() => setActiveBar(i)}
+                  onClick={() => setActiveBar(i)}
                   initial={{ height: 0 }}
                   whileInView={{ height: `${h}%` }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.9, delay: i * 0.05, ease: [0.2, 0.7, 0.2, 1] }}
-                  className="flex-1 rounded-t-md bg-gradient-to-t from-[#c9b8ff]/30 to-[#c9b8ff]"
+                  className={`flex-1 rounded-t-md transition-all cursor-pointer ${
+                    activeBar === i
+                      ? "bg-[#ff5b37] shadow-[0_0_12px_rgba(255,91,55,0.4)]"
+                      : "bg-gradient-to-t from-[#c9b8ff]/30 to-[#c9b8ff] hover:brightness-110"
+                  }`}
                 />
               ))}
             </div>
           </Card>
         </Reveal>
 
+        {/* Use your own domain */}
         <Reveal className="md:col-span-3" delay={0.08}>
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">Use your own domain</h3>
-            <p className="mt-2 text-fg/55">Free on Pro. If you ever leave, the domain stays yours.</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-[22px] font-semibold">Use your own domain</h3>
+                <p className="mt-2 text-fg/55">Free on Pro. If you ever leave, the domain stays yours.</p>
+              </div>
+              <Link
+                href="/create"
+                className="hidden shrink-0 items-center gap-1 text-[12px] font-semibold text-fg/70 hover:text-fg sm:inline-flex"
+              >
+                Connect domain <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
             <div className="mt-8 flex items-center gap-3 rounded-2xl border border-fg/10 bg-bg/40 p-4 font-mono text-[14px]">
-              <span className="h-3 w-3 rounded-full bg-[#ff5b37]" />
+              <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-fg/40">https://</span>
-              <span className="text-fg">aria.studio</span>
-              <span className="ml-auto rounded-full bg-fg/10 px-2 py-0.5 text-[11px] text-fg/60">SSL ✓</span>
+              <span className="text-fg font-semibold">aria.studio</span>
+              <span className="ml-auto rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600">SSL Active ✓</span>
             </div>
           </Card>
         </Reveal>
 
+        {/* A QR code, built in */}
         <Reveal className="md:col-span-3" delay={0.04}>
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">A QR code, built in</h3>
-            <p className="mt-2 text-fg/55">Every page gets one automatically — print it on a menu, a flyer or a business card.</p>
-            <div className="mt-8 flex justify-center">
-              <QRCodeCanvas text="https://makemylink.co/you" size={108} />
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-[22px] font-semibold">A QR code, built in</h3>
+                <p className="mt-2 text-fg/55">Every page gets one automatically — print it on a menu, a flyer or a business card.</p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-6">
+              <div className="rounded-2xl border border-fg/10 bg-white p-3 shadow-md">
+                <QRCodeCanvas text="https://makemylink.co/aria" size={100} />
+              </div>
+              <div className="flex flex-col gap-2 text-center sm:text-left">
+                <p className="text-[13px] font-semibold text-fg">makemylink.co/aria</p>
+                <p className="text-[11px] text-fg/50">Point phone camera to test instant bio scan</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText("https://makemylink.co/aria");
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2000);
+                  }}
+                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-fg/15 bg-fg/[0.04] px-4 py-1.5 text-[12px] font-medium text-fg hover:border-fg/35 transition cursor-pointer"
+                >
+                  {copiedLink ? "Copied to clipboard ✓" : "Copy link"}
+                </button>
+              </div>
             </div>
           </Card>
         </Reveal>
 
+        {/* Group links into folders */}
         <Reveal className="md:col-span-3" delay={0.08}>
           <Card className="h-full">
             <h3 className="text-[22px] font-semibold">Group links into folders</h3>
             <p className="mt-2 text-fg/55">Long list of links? Tuck related ones under a heading that opens with a tap.</p>
-            <div className="mt-8 flex flex-col gap-2">
-              <div className="flex items-center justify-between rounded-xl border border-fg/10 bg-bg/40 px-4 py-3 text-[14px]">
-                Shop my picks <span className="text-fg/40">▾</span>
-              </div>
-              <div className="ml-4 flex flex-col gap-2 text-[13px] text-fg/55">
-                <div className="rounded-lg border border-fg/10 bg-bg/20 px-3 py-2">LTK shop</div>
-                <div className="rounded-lg border border-fg/10 bg-bg/20 px-3 py-2">Amazon storefront</div>
-              </div>
+            <div className="mt-6 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setFolderOpen((prev) => !prev)}
+                className="flex items-center justify-between rounded-xl border border-fg/15 bg-bg/60 px-4 py-3 text-[14px] font-medium text-fg hover:border-fg/30 transition text-left cursor-pointer"
+              >
+                <span>Shop my picks</span>
+                <ChevronDown className={`h-4 w-4 text-fg/50 transition-transform duration-200 ${folderOpen ? "rotate-180" : ""}`} />
+              </button>
+              {folderOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="ml-4 flex flex-col gap-2 text-[13px]"
+                >
+                  <a
+                    href="https://ltk.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-lg border border-fg/10 bg-bg/30 px-3.5 py-2 text-fg/75 hover:border-fg/30 hover:text-fg transition"
+                  >
+                    <span>LTK shop</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
+                  </a>
+                  <a
+                    href="https://amazon.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-lg border border-fg/10 bg-bg/30 px-3.5 py-2 text-fg/75 hover:border-fg/30 hover:text-fg transition"
+                  >
+                    <span>Amazon storefront</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
+                  </a>
+                </motion.div>
+              )}
             </div>
           </Card>
         </Reveal>
