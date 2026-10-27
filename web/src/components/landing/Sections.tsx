@@ -55,7 +55,7 @@ export function HowItWorks() {
     ["3", "Put it in your bio", "Copy your Makemylink link into Instagram, TikTok or YouTube. See who visits and what they tap."],
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
+    <section className="mx-auto max-w-6xl px-4 pb-14 pt-28 sm:px-6">
       <div className="grid gap-12 md:grid-cols-[1fr_1.4fr]">
         <Reveal>
           <Eyebrow>How it works</Eyebrow>
@@ -82,7 +82,7 @@ export function HowItWorks() {
 
 export function ThemeGallery() {
   return (
-    <section id="themes" className="relative py-28">
+    <section id="themes" className="relative pb-28 pt-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>

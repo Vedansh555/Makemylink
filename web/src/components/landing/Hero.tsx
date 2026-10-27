@@ -20,8 +20,8 @@ export function Hero() {
   return (
     <section className="relative isolate overflow-hidden pt-32 sm:pt-36">
       {/* 3D scene, big and alive — it starts below the menu bar so nothing slides under it.
-          Faded on all four sides so the canvas's own rectangle never shows as a hard edge. */}
-      <div className="hero-3d-fade pointer-events-none absolute inset-x-0 top-[70px] -z-20 mx-auto h-[820px] max-w-[1300px]">
+          Fully visible, no fade — the decorations are kept well inside this box so nothing gets clipped at the edge. */}
+      <div className="pointer-events-none absolute inset-x-0 top-[70px] -z-20 mx-auto h-[820px] max-w-[1300px]">
         <ChromeScene variant="hero" />
       </div>
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
