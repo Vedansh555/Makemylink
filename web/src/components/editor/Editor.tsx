@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowDown, ArrowUp, Eye, ImagePlus, Pencil, Plus, Sparkles, Star, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Eye, ImagePlus, Pencil, Plus, Sparkles, Star, Trash2, X } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
 import { loadDraft, readImage, saveDraft, uid } from "@/lib/draft";
 import { getTheme, themeList } from "@/lib/themes";
@@ -93,6 +93,20 @@ export function Editor() {
   const [user, setUser] = useState<{ id: string; email: string; handle?: string } | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
+  const [examplesOpen, setExamplesOpen] = useState(false);
+  const examplesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (examplesRef.current && !examplesRef.current.contains(e.target as Node)) {
+        setExamplesOpen(false);
+      }
+    }
+    if (examplesOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [examplesOpen]);
 
   // Check auth and load profile from DB if logged in
   useEffect(() => {
@@ -227,27 +241,62 @@ export function Editor() {
               <h1 className="font-display text-[48px] italic leading-none">Your page</h1>
               <p className="mt-2 text-[14px] text-fg/50">Changes show up in the phone right away.</p>
             </div>
-            <div className="relative">
-              <select
-                className="w-full sm:w-64 appearance-none rounded-2xl border border-fg/15 bg-fg/[0.04] py-3 pl-4 pr-10 text-[13px] font-medium text-fg shadow-sm outline-none transition hover:border-fg/30 focus:border-fg/50 focus:bg-fg/[0.07] cursor-pointer"
-                value=""
-                onChange={(e) => {
-                  const demo = demoProfiles.find((d) => d.handle === e.target.value);
-                  if (demo) setP(structuredClone(demo));
-                }}
+            <div ref={examplesRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setExamplesOpen((prev) => !prev)}
+                className="flex w-full sm:w-72 items-center justify-between gap-3 rounded-2xl border border-fg/15 bg-fg/[0.04] px-4 py-2.5 text-[13px] font-semibold text-fg shadow-sm transition hover:border-fg/35 hover:bg-fg/[0.07] focus:outline-none"
               >
-                <option value="" disabled className="text-fg/50 bg-bg">
-                  ✦ Load a creator example…
-                </option>
-                {demoProfiles.map((d) => (
-                  <option key={d.handle} value={d.handle} className="bg-bg text-fg py-2">
-                    {d.name} ({getTheme(d.theme).def.label})
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-fg/40">
-                <ArrowDown className="h-4 w-4" />
-              </div>
+                <span className="flex items-center gap-2 truncate">
+                  <Sparkles className="h-4 w-4 text-[#ff5b37]" />
+                  <span>Load a creator example</span>
+                </span>
+                <ChevronDown className={`h-4 w-4 text-fg/40 transition-transform duration-200 ${examplesOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence>
+                {examplesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                    transition={{ duration: 0.16 }}
+                    className="absolute right-0 top-full z-50 mt-2 w-80 max-h-[380px] overflow-y-auto rounded-2xl border border-fg/12 bg-bg/95 p-2 shadow-2xl backdrop-blur-xl"
+                  >
+                    <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-fg/40">
+                      Popular Creator Profiles
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {demoProfiles.map((d) => {
+                        const themeDef = getTheme(d.theme).def;
+                        return (
+                          <button
+                            key={d.handle}
+                            type="button"
+                            onClick={() => {
+                              setP(structuredClone(d));
+                              setExamplesOpen(false);
+                            }}
+                            className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-fg/5"
+                          >
+                            <div className="min-w-0">
+                              <p className="truncate text-[13px] font-semibold text-fg group-hover:text-[#ff5b37] transition-colors">
+                                {d.name}
+                              </p>
+                              <p className="truncate text-[11px] text-fg/50">
+                                @{d.handle} · {d.location || "Creator"}
+                              </p>
+                            </div>
+                            <span className="shrink-0 rounded-full border border-fg/10 bg-fg/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-fg/60">
+                              {themeDef.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
