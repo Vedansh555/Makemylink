@@ -91,8 +91,29 @@ function ChromeKnot({ position }: { position: [number, number, number] }) {
   );
 }
 
-export default function ChromeScene({ variant = "bio", color = "#eceef2" }: { variant?: "hero" | "bio"; color?: string }) {
+function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, number, number]; color?: string }) {
+  return (
+    <Float speed={2.2} rotationIntensity={1.5} floatIntensity={1.5}>
+      <mesh position={position} rotation={[0.8, 0.5, 0.2]} scale={0.75}>
+        <torusGeometry args={[0.7, 0.32, 32, 64]} />
+        <meshPhysicalMaterial color={color} roughness={0.15} transmission={0.2} clearcoat={1} clearcoatRoughness={0.1} />
+      </mesh>
+    </Float>
+  );
+}
+
+export default function ChromeScene({
+  variant = "bio",
+  color = "#eceef2",
+  accentColor = "#ff758c",
+}: {
+  variant?: "hero" | "bio" | "bakes" | "clay";
+  color?: string;
+  accentColor?: string;
+}) {
   const hero = variant === "hero";
+  const isBakes = variant === "bakes";
+  const isClay = variant === "clay";
   // A darker base tone reads clearly against the page's white background.
   const ballColor = hero ? "#aeb2ba" : color;
   return (
@@ -121,6 +142,19 @@ export default function ChromeScene({ variant = "bio", color = "#eceef2" }: { va
             <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
             <Pearl position={[-1.7, -1.55, 0.5]} scale={0.17} color="#ff5b37" />
             <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />
+          </>
+        )}
+        {isBakes && (
+          <>
+            <PastelDonut position={[-1.8, 1.6, -0.5]} color="#ffd23f" />
+            <Pearl position={[1.8, -1.2, -0.2]} scale={0.45} color={accentColor} />
+            <Pearl position={[-1.4, -1.6, 0.2]} scale={0.28} color="#ffffff" />
+          </>
+        )}
+        {isClay && (
+          <>
+            <Pearl position={[1.7, 1.4, -0.3]} scale={0.5} color={accentColor} />
+            <Pearl position={[-1.6, -1.2, 0.1]} scale={0.35} color="#ded9cc" />
           </>
         )}
       </PointerRig>

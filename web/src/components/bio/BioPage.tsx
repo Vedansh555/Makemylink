@@ -133,19 +133,28 @@ function Background({ theme }: { theme: ResolvedTheme }) {
           <div className="absolute -bottom-16 left-1/2 h-72 w-[480px] -translate-x-1/2 rounded-t-full border-t border-t-accent/15 bg-t-accent/5" />
         </div>
       );
-    case "clay":
-      return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-t-accent opacity-15 blur-3xl" />
-          <div className="absolute -left-20 bottom-32 h-80 w-80 rounded-full bg-t-accent2 opacity-20 blur-3xl" />
-        </div>
-      );
     case "bakes":
       return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent" />
-          <div className="absolute -top-32 left-1/2 h-80 w-[600px] -translate-x-1/2 rounded-full bg-white/30 blur-2xl" />
-        </div>
+        <>
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/50 via-transparent to-transparent" />
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[380px]">
+            <ChromeScene variant="bakes" color="#fef8ea" accentColor={def.accent} />
+          </div>
+        </>
+      );
+    case "clay":
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-t-accent opacity-15 blur-3xl" />
+            <div className="absolute -left-20 bottom-32 h-80 w-80 rounded-full bg-t-accent2 opacity-20 blur-3xl" />
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[360px]">
+            <ChromeScene variant="clay" color={def.bg} accentColor={def.accent} />
+          </div>
+        </>
       );
     case "lavender":
       return (
