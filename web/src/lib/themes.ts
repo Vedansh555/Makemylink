@@ -440,7 +440,7 @@ export const families: Record<Family, FamilyDef> = {
   },
   deco: {
     label: "Deco",
-    font: "unbounded",
+    font: "bodoni",
     centered: true,
     numbered: false,
     tokens: {
@@ -524,7 +524,7 @@ export const families: Record<Family, FamilyDef> = {
   },
   duotone: {
     label: "Duotone",
-    font: "unbounded",
+    font: "syne",
     centered: false,
     numbered: true,
     tokens: {
@@ -608,7 +608,7 @@ export const families: Record<Family, FamilyDef> = {
   },
   poster: {
     label: "Poster",
-    font: "unbounded",
+    font: "syne",
     centered: true,
     numbered: false,
     tokens: {
@@ -664,7 +664,7 @@ export const families: Record<Family, FamilyDef> = {
   },
   ribbon: {
     label: "Ribbon",
-    font: "unbounded",
+    font: "display",
     centered: true,
     numbered: false,
     tokens: {
@@ -832,7 +832,7 @@ export const families: Record<Family, FamilyDef> = {
   },
   carnival: {
     label: "Carnival",
-    font: "unbounded",
+    font: "syne",
     centered: true,
     numbered: false,
     tokens: {

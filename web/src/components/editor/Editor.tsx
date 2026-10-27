@@ -247,10 +247,7 @@ export function Editor() {
                 onClick={() => setExamplesOpen((prev) => !prev)}
                 className="flex w-full sm:w-72 items-center justify-between gap-3 rounded-2xl border border-fg/15 bg-fg/[0.04] px-4 py-2.5 text-[13px] font-semibold text-fg shadow-sm transition hover:border-fg/35 hover:bg-fg/[0.07] focus:outline-none"
               >
-                <span className="flex items-center gap-2 truncate">
-                  <Sparkles className="h-4 w-4 text-[#ff5b37]" />
-                  <span>Load a creator example</span>
-                </span>
+                <span className="truncate">Load a creator example</span>
                 <ChevronDown className={`h-4 w-4 text-fg/40 transition-transform duration-200 ${examplesOpen ? "rotate-180" : ""}`} />
               </button>
 
