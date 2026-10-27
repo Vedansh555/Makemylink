@@ -31,7 +31,7 @@ export function Hero() {
           <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
             One link for
             <br />
-            everything <em className="chrome-text not-italic [text-shadow:none]">you do.</em>
+            everything <span className="chrome-text [text-shadow:none]">you do.</span>
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
