@@ -143,10 +143,10 @@ export default function ChromeScene({
                 <Blob scale={1.35} color={ballColor} />
               </group>
             </Float>
-            <GlassRing position={[-3.1, 1.05, 0.1]} />
-            <ChromeKnot position={[-2.7, -1.15, -0.1]} />
+            <GlassRing position={[-2.8, 1.05, 0.1]} />
+            <ChromeKnot position={[-2.4, -0.65, -0.1]} />
             <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
-            <Pearl position={[-1.7, -1.55, 0.5]} scale={0.17} color="#ff5b37" />
+            <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />
             <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />
           </>
         )}
