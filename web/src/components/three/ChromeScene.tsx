@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, MeshDistortMaterial } from "@react-three/drei";
+import { Environment, Float, Lightformer, MeshDistortMaterial } from "@react-three/drei";
 import { useRef } from "react";
 import type { Group } from "three";
 
@@ -12,11 +12,14 @@ import type { Group } from "three";
  */
 function Studio() {
   return (
-    <>
-      <directionalLight position={[5, 8, 4]} intensity={2.8} />
-      <directionalLight position={[-5, -4, 2]} intensity={0.9} color="#ffd2c4" />
-      <pointLight position={[0, 4, 3]} intensity={1.5} color="#ffffff" />
-    </>
+    <Environment resolution={256}>
+      <color attach="background" args={["#2b2d33"]} />
+      <Lightformer form="rect" intensity={4} position={[0, 6, -2]} scale={[16, 2.5, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+      <Lightformer form="rect" intensity={1.2} position={[0, -6, 2]} scale={[16, 3, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+      <Lightformer form="rect" intensity={3} position={[-7, 0, 3]} scale={[1.5, 14, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+      <Lightformer form="rect" color="#ffd2c4" intensity={2} position={[7, 1, 3]} scale={[1.2, 14, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+      <Lightformer form="rect" color="#cfd6ff" intensity={1.5} position={[-5, 5, 5]} scale={[8, 1, 1]} rotation-z={0.6} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+    </Environment>
   );
 }
 
@@ -48,8 +51,8 @@ function Blob({ scale = 1.6, color = "#d6d9df" }: { scale?: number; color?: stri
   return (
     <group ref={ref}>
       <mesh scale={scale}>
-        <icosahedronGeometry args={[1, 24]} />
-        <MeshDistortMaterial color={color} metalness={1} roughness={0.1} distort={0.35} speed={1.2} envMapIntensity={1.3} />
+        <icosahedronGeometry args={[1, 48]} />
+        <MeshDistortMaterial color={color} metalness={1} roughness={0.1} distort={0.4} speed={1.4} envMapIntensity={1.3} />
       </mesh>
     </group>
   );
@@ -59,7 +62,7 @@ function GlassRing({ position }: { position: [number, number, number] }) {
   return (
     <Float speed={1.8} rotationIntensity={1.2} floatIntensity={1.2}>
       <mesh position={position} rotation={[0.9, 0.4, 0]} scale={1.15}>
-        <torusGeometry args={[0.62, 0.2, 24, 48]} />
+        <torusGeometry args={[0.62, 0.2, 48, 128]} />
         <meshPhysicalMaterial color="#ffffff" transmission={1} roughness={0.03} thickness={1.2} ior={1.5} iridescence={0.6} />
       </mesh>
     </Float>
@@ -70,7 +73,7 @@ function Pearl({ position, scale, color }: { position: [number, number, number];
   return (
     <Float speed={2.4} floatIntensity={2} rotationIntensity={0.6}>
       <mesh position={position} scale={scale}>
-        <sphereGeometry args={[1, 32, 32]} />
+        <sphereGeometry args={[1, 64, 64]} />
         <meshPhysicalMaterial color={color} metalness={0.2} roughness={0.18} clearcoat={1} />
       </mesh>
     </Float>
@@ -81,7 +84,7 @@ function ChromeKnot({ position }: { position: [number, number, number] }) {
   return (
     <Float speed={1.4} rotationIntensity={2} floatIntensity={1}>
       <mesh position={position} scale={0.4}>
-        <torusKnotGeometry args={[1, 0.32, 96, 24]} />
+        <torusKnotGeometry args={[1, 0.32, 220, 32]} />
         <meshStandardMaterial color="#e9ebef" metalness={1} roughness={0.12} />
       </mesh>
     </Float>
@@ -92,7 +95,7 @@ function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, numbe
   return (
     <Float speed={2} rotationIntensity={1.2} floatIntensity={1.2}>
       <mesh position={position} rotation={[0.8, 0.5, 0.2]} scale={0.42}>
-        <torusGeometry args={[0.55, 0.24, 20, 36]} />
+        <torusGeometry args={[0.55, 0.24, 32, 64]} />
         <meshPhysicalMaterial color={color} roughness={0.15} transmission={0.1} clearcoat={1} clearcoatRoughness={0.1} />
       </mesh>
     </Float>
@@ -115,9 +118,9 @@ export default function ChromeScene({
   const ballColor = hero ? "#aeb2ba" : color;
   return (
     <Canvas
-      dpr={[1, 1.25]}
+      dpr={[1, 1.75]}
       camera={{ position: [0, 0, hero ? 6.4 : 5.4], fov: 38 }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      gl={{ antialias: true, alpha: true }}
       style={{ background: "transparent" }}
       // Track the pointer across the whole page, even when content sits on top of the canvas.
       eventSource={typeof document !== "undefined" ? document.body : undefined}
