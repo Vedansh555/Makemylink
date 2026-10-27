@@ -130,9 +130,9 @@ export default function ChromeScene({
       <Studio />
       <PointerRig fitWidth={hero ? 5.2 : 3}>
         {!hero && !isBakes && !isClay && (
-          <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
-            <group position={[0, 0, 0]}>
-              <Blob scale={1.3} color={ballColor} />
+          <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.6}>
+            <group position={[0, 0.4, 0]}>
+              <Blob scale={0.72} color={ballColor} />
             </group>
           </Float>
         )}

@@ -18,7 +18,6 @@ export const demoProfiles: Profile[] = [
     ],
     shopTitle: "Shop my looks",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    coverImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
     looks: [
       {
         id: "k1",
@@ -85,7 +84,6 @@ export const demoProfiles: Profile[] = [
     ],
     shopTitle: "Merch",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80",
-    coverImage: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
     looks: [
       {
         id: "k1",
@@ -152,7 +150,6 @@ export const demoProfiles: Profile[] = [
     ],
     shopTitle: "In my kit",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-    coverImage: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80",
     looks: [
       {
         id: "k1",
@@ -247,7 +244,6 @@ export const demoProfiles: Profile[] = [
     ],
     shopTitle: "My faves",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
-    coverImage: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=1200&q=80",
     looks: [
       {
         id: "k1",

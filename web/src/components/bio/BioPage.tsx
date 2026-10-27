@@ -25,7 +25,7 @@ function Background({ theme }: { theme: ResolvedTheme }) {
       return (
         <>
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,var(--c2)_30%,transparent),transparent_60%)]" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[380px]">
+          <div className="pointer-events-none absolute inset-x-0 top-2 h-[210px]">
             <ChromeScene color={def.blob} />
           </div>
         </>
@@ -232,7 +232,7 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
       <motion.main
         initial="hidden"
         animate="show"
-        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 ${family === "chrome" ? "pt-[230px]" : "pt-12"}`}
+        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 ${family === "chrome" ? "pt-24" : "pt-12"}`}
       >
         {/* Cover photo — a real photo behind the header, the one thing every real creator page has that a generated theme can't fake. */}
         {profile.coverImage && (
