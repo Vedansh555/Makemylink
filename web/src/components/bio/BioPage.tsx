@@ -126,6 +126,34 @@ function Background({ theme }: { theme: ResolvedTheme }) {
           <div className="absolute inset-0 bg-[linear-gradient(var(--t-fg)_1px,transparent_1px)] [background-size:100%_32px]" />
         </div>
       );
+    case "arch":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 -top-20 h-96 w-96 -translate-x-1/2 rounded-full border border-t-accent/20 bg-t-accent/5 opacity-60 blur-sm" />
+          <div className="absolute -bottom-16 left-1/2 h-72 w-[480px] -translate-x-1/2 rounded-t-full border-t border-t-accent/15 bg-t-accent/5" />
+        </div>
+      );
+    case "clay":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-t-accent opacity-15 blur-3xl" />
+          <div className="absolute -left-20 bottom-32 h-80 w-80 rounded-full bg-t-accent2 opacity-20 blur-3xl" />
+        </div>
+      );
+    case "bakes":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent" />
+          <div className="absolute -top-32 left-1/2 h-80 w-[600px] -translate-x-1/2 rounded-full bg-white/30 blur-2xl" />
+        </div>
+      );
+    case "lavender":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-t-accent/10 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_color-mix(in_srgb,var(--t-accent)_8%,transparent)_0%,_transparent_60%)]" />
+        </div>
+      );
     default:
       return (
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--t-fg)_5%,transparent)_1px,transparent_1px)] [background-size:25%_100%]" />

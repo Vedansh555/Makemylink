@@ -35,7 +35,11 @@ export type Family =
   | "zine"
   | "stamp"
   | "carnival"
-  | "catalog";
+  | "catalog"
+  | "arch"
+  | "clay"
+  | "bakes"
+  | "lavender";
 export type FontKey = "bodoni" | "display" | "syne" | "unbounded" | "grotesk" | "sans";
 
 export interface ThemeTokens {
@@ -882,6 +886,118 @@ export const families: Record<Family, FamilyDef> = {
       badge: "text-t-fg/45",
     },
   },
+  arch: {
+    label: "Arch Studio",
+    font: "display",
+    centered: true,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[32px] italic leading-[1.05] tracking-tight",
+      bio: "text-[13px] font-medium leading-relaxed text-t-fg/70 max-w-[34ch]",
+      meta: "text-[11px] uppercase tracking-[0.18em] text-t-fg/50",
+      section: "text-[15px] italic font-semibold text-t-fg",
+      link: "group flex items-center gap-4 rounded-t-[36px] rounded-b-2xl border border-t-fg/15 bg-t-bg/90 px-5 py-4 text-[14px] font-medium shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)]",
+      featured: "group flex items-center gap-4 rounded-t-[36px] rounded-b-2xl border-2 border-t-accent bg-t-accent px-5 py-5 text-[15px] font-bold text-t-on-accent shadow-[0_8px_24px_rgba(0,0,0,0.14)]",
+      lookCard: "overflow-hidden rounded-t-[44px] rounded-b-2xl border border-t-fg/15 bg-t-bg shadow-[0_4px_16px_rgba(0,0,0,0.06)]",
+      lookTitle: "text-[13px] italic font-medium pt-1",
+      lookMeta: "text-[11px] text-t-fg/60",
+      tag: "rounded-full bg-t-fg/80 px-2 py-0.5 text-[9px] uppercase text-t-bg",
+      stat: "rounded-t-3xl rounded-b-xl border border-t-fg/15 p-3 text-center shadow-sm",
+      statValue: "text-[22px] italic leading-none text-t-accent",
+      chip: "rounded-full border border-t-fg/20 px-3 py-1 text-[11px]",
+      input: "w-full rounded-2xl border border-t-fg/20 bg-t-bg px-4 py-3 text-sm outline-none",
+      button: "rounded-full bg-t-fg px-6 py-3 text-sm font-medium text-t-bg",
+      social: "grid h-10 w-10 place-items-center rounded-full border border-t-fg/20 transition hover:bg-t-fg hover:text-t-bg",
+      avatar: "h-24 w-24 rounded-t-full rounded-b-2xl border-2 border-t-accent object-cover shadow-[0_8px_20px_rgba(0,0,0,0.12)]",
+      monogram: "rounded-t-full rounded-b-2xl border-2 border-t-accent bg-t-accent italic font-bold text-t-on-accent shadow-sm",
+      badge: "text-t-fg/45",
+    },
+  },
+  clay: {
+    label: "Soft Clay",
+    font: "sans",
+    centered: true,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[28px] font-bold tracking-tight text-t-fg",
+      bio: "text-[13px] leading-relaxed text-t-fg/70",
+      meta: "text-[11px] font-semibold uppercase tracking-[0.12em] text-t-fg/50",
+      section: "text-[13px] font-bold tracking-wide uppercase text-t-fg/60",
+      link: "group flex items-center gap-4 rounded-[26px] bg-t-bg px-5 py-4 text-[14px] font-semibold text-t-fg shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_20px_rgba(0,0,0,0.06)] border border-t-fg/8 transition hover:translate-y-[-1px] hover:shadow-[0_12px_24px_rgba(0,0,0,0.09)]",
+      featured: "group flex items-center gap-4 rounded-[26px] bg-t-accent px-5 py-5 text-[15px] font-bold text-t-on-accent shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_28px_rgba(0,0,0,0.15)]",
+      lookCard: "overflow-hidden rounded-[26px] bg-t-bg shadow-[0_8px_20px_rgba(0,0,0,0.07)] border border-t-fg/8",
+      lookTitle: "text-[13px] font-bold",
+      lookMeta: "text-[11px] font-medium text-t-fg/55",
+      tag: "rounded-full bg-t-fg/10 px-2.5 py-0.5 text-[9px] font-bold uppercase text-t-fg",
+      stat: "rounded-[22px] bg-t-bg p-3.5 text-center shadow-[0_6px_16px_rgba(0,0,0,0.05)] border border-t-fg/6",
+      statValue: "text-[22px] font-black leading-none text-t-fg",
+      chip: "rounded-full bg-t-fg/8 px-3.5 py-1 text-[11px] font-semibold",
+      input: "w-full rounded-[20px] border border-t-fg/12 bg-t-bg px-4 py-3 text-sm font-medium outline-none shadow-inner",
+      button: "rounded-full bg-t-fg px-6 py-3 text-sm font-bold text-t-bg shadow-md",
+      social: "grid h-10 w-10 place-items-center rounded-full bg-t-bg shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-t-fg/6 transition hover:scale-105",
+      avatar: "h-24 w-24 rounded-[30px] border-4 border-t-bg object-cover shadow-[0_10px_26px_rgba(0,0,0,0.12)]",
+      monogram: "rounded-[30px] border-4 border-t-bg bg-t-accent font-bold text-t-on-accent shadow-[0_10px_26px_rgba(0,0,0,0.12)]",
+      badge: "text-t-fg/45",
+    },
+  },
+  bakes: {
+    label: "Bobby Bakes",
+    font: "unbounded",
+    centered: false,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[38px] font-black uppercase leading-[0.9] tracking-[-0.03em] drop-shadow-[0_2px_0_rgba(0,0,0,0.2)]",
+      bio: "text-[14px] font-semibold text-t-fg/85",
+      meta: "text-[11px] font-black uppercase tracking-[0.14em] text-t-accent",
+      section: "text-[14px] font-black uppercase tracking-[0.1em] text-t-fg",
+      link: "group flex items-center gap-4 rounded-3xl border-2 border-t-fg/15 bg-white/90 backdrop-blur-md px-5 py-4 text-[15px] font-bold text-t-fg shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition hover:border-t-accent hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]",
+      featured: "group flex items-center gap-4 rounded-3xl border-2 border-t-fg bg-t-fg px-5 py-5 text-[16px] font-black text-t-bg shadow-[0_12px_32px_rgba(0,0,0,0.16)]",
+      lookCard: "overflow-hidden rounded-3xl border-2 border-t-fg/12 bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.08)]",
+      lookTitle: "text-[14px] font-bold",
+      lookMeta: "text-[12px] font-semibold text-t-accent",
+      tag: "rounded-full bg-t-accent px-2.5 py-0.5 text-[9px] font-black uppercase text-t-on-accent",
+      stat: "rounded-3xl border border-t-fg/15 bg-white/80 p-3.5 text-center shadow-sm",
+      statValue: "text-[24px] font-black leading-none text-t-accent",
+      chip: "rounded-full border border-t-fg/20 px-3 py-1 text-[11px] font-bold",
+      input: "w-full rounded-2xl border-2 border-t-fg/15 bg-white px-4 py-3 text-sm font-semibold outline-none",
+      button: "rounded-full bg-t-accent px-6 py-3 text-sm font-black text-t-on-accent shadow-md",
+      social: "grid h-11 w-11 place-items-center rounded-2xl bg-t-accent text-t-on-accent shadow-md transition hover:scale-110",
+      avatar: "h-28 w-28 rounded-3xl border-[3px] border-white object-cover shadow-[0_12px_32px_rgba(0,0,0,0.18)] rotate-1",
+      monogram: "rounded-3xl border-[3px] border-white bg-t-accent font-black text-t-on-accent shadow-[0_12px_32px_rgba(0,0,0,0.18)] rotate-1",
+      badge: "font-black text-t-fg/50",
+    },
+  },
+  lavender: {
+    label: "Lavender Farm",
+    font: "bodoni",
+    centered: true,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[32px] italic leading-[1.08] text-t-fg",
+      bio: "text-[13px] leading-relaxed text-t-fg/70 max-w-[34ch]",
+      meta: "text-[11px] uppercase tracking-[0.2em] text-t-fg/45",
+      section: "text-[13px] uppercase tracking-[0.18em] font-semibold text-t-accent",
+      link: "group flex items-center gap-4 rounded-xl border border-t-accent/25 bg-t-accent/5 px-5 py-4 text-[14px] font-medium text-t-fg transition hover:bg-t-accent/10 hover:border-t-accent/40",
+      featured: "group flex items-center gap-4 rounded-xl border-2 border-t-accent bg-t-accent px-5 py-5 text-[15px] font-semibold text-t-on-accent shadow-[0_6px_20px_rgba(0,0,0,0.08)]",
+      lookCard: "overflow-hidden rounded-xl border border-t-accent/20 bg-t-bg shadow-sm",
+      lookTitle: "text-[13px] italic font-medium pt-0.5",
+      lookMeta: "text-[11px] text-t-fg/55",
+      tag: "rounded-full bg-t-accent px-2.5 py-0.5 text-[9px] uppercase tracking-wider text-t-on-accent",
+      stat: "rounded-xl border border-t-accent/20 p-3 text-center",
+      statValue: "text-[22px] italic leading-none text-t-accent",
+      chip: "rounded-full border border-t-accent/30 px-3 py-1 text-[11px]",
+      input: "w-full rounded-xl border border-t-accent/30 bg-t-bg px-4 py-3 text-sm outline-none",
+      button: "rounded-xl bg-t-accent px-6 py-3 text-sm font-medium text-t-on-accent",
+      social: "grid h-10 w-10 place-items-center rounded-full border border-t-accent/30 text-t-fg transition hover:bg-t-accent hover:text-t-on-accent",
+      avatar: "h-24 w-24 rounded-full border-2 border-t-accent object-cover p-1 shadow-md",
+      monogram: "rounded-full border-2 border-t-accent bg-t-accent italic font-bold text-t-on-accent shadow-md",
+      badge: "italic text-t-fg/40",
+    },
+  },
 };
 
 const T = (
@@ -1093,6 +1209,26 @@ export const themeList: ThemeDef[] = [
 
   T("catalog-slate", "Catalog Slate", "catalog", ["#f7f8f9", "#171a1f", "#3a5a8c", "#e2e6ea", "#ffffff"]),
   T("catalog-clay", "Catalog Clay", "catalog", ["#faf6f1", "#241c12", "#a9623c", "#e9ddcf", "#ffffff"]),
+
+  // Arch Studio: Mediterranean rounded arches, terracotta, warm sandstone
+  T("arch-terracotta", "Arch Terracotta", "arch", ["#fdf7f2", "#2d1b15", "#c85a38", "#eddcd2", "#ffffff"]),
+  T("arch-olive", "Arch Olive", "arch", ["#f8f9f4", "#1e2419", "#566848", "#dfe5d5", "#ffffff"]),
+  T("arch-sandstone", "Arch Sandstone", "arch", ["#fcf9f2", "#28231c", "#b08958", "#ebdcc7", "#ffffff"]),
+
+  // Soft Clay: Neomorphic tactile pill buttons, buttery pastels, gentle shadows
+  T("clay-cream", "Clay Cream", "clay", ["#f6f4ee", "#26231e", "#38332c", "#ded9cc", "#ffffff"]),
+  T("clay-peach", "Clay Peach", "clay", ["#fdf5f2", "#2d1f1c", "#e67862", "#f6d8d0", "#ffffff"]),
+  T("clay-sky", "Clay Sky", "clay", ["#f2f7fc", "#18222d", "#4b8ad1", "#d0e2f5", "#ffffff"]),
+
+  // Bobby Bakes: Y2K bold puffy titles, bakery aesthetic, periwinkle & royal blue
+  T("bakes-sky", "Bobby Bakes", "bakes", ["#bdd5ea", "#0a1931", "#150050", "#ffffff", "#ffffff"]),
+  T("bakes-vanilla", "Bakes Vanilla", "bakes", ["#fef8ea", "#22190f", "#f38ba0", "#ffd5cd", "#ffffff"]),
+  T("bakes-berry", "Bakes Berry", "bakes", ["#fdeff4", "#2c0e1e", "#c72c68", "#f7c5d7", "#ffffff"]),
+
+  // Lavender Farm: British cottagecore, deep royal navy, English botanical
+  T("lavender-bloom", "Lavender Farm", "lavender", ["#f9f7fc", "#1b1933", "#232b5d", "#d8d3e8", "#ffffff"]),
+  T("lavender-sage", "Lavender Sage", "lavender", ["#f5f8f5", "#142318", "#2c4835", "#cee2d2", "#ffffff"]),
+  T("lavender-dusk", "Lavender Dusk", "lavender", ["#131422", "#f1f0f8", "#786eb8", "#333552", "#ffffff"]),
 ];
 
 export const familyOrder: Family[] = [
@@ -1124,6 +1260,10 @@ export const familyOrder: Family[] = [
   "stamp",
   "carnival",
   "catalog",
+  "arch",
+  "clay",
+  "bakes",
+  "lavender",
 ];
 
 const byId = new Map(themeList.map((t) => [t.id, t]));
