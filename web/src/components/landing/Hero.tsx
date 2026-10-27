@@ -19,8 +19,8 @@ export function Hero() {
 
   return (
     <section className="relative isolate pt-32 sm:pt-36">
-      {/* 3D scene, big and alive — layers naturally without overflow clipping */}
-      <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 mx-auto h-[820px] max-w-[1300px]">
+      {/* 3D scene, big and alive — full width across screen, no boundary cuts */}
+      <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 h-[850px] w-full">
         <ChromeScene variant="hero" />
       </div>
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
