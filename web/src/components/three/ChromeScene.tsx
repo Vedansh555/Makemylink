@@ -116,11 +116,16 @@ export default function ChromeScene({ variant = "bio", color = "#eceef2" }: { va
         </Float>
         {hero && (
           <>
-            <GlassRing position={[-2.5, 0.85, 0.1]} />
-            <ChromeKnot position={[-2.15, -0.95, -0.1]} />
-            <Pearl position={[2.85, 1.2, -0.4]} scale={0.22} color="#ffb7a5" />
+            {/* Left side 3D elements */}
+            <GlassRing position={[-2.4, 0.85, 0.1]} />
+            <ChromeKnot position={[-2.1, -0.95, -0.1]} />
             <Pearl position={[-1.3, -1.35, 0.5]} scale={0.16} color="#ff5b37" />
-            <Pearl position={[1.25, -1.45, -1]} scale={0.13} color="#c9b8ff" />
+
+            {/* Right side 3D elements (balanced on both sides) */}
+            <GlassRing position={[2.4, -0.9, 0.1]} />
+            <ChromeKnot position={[2.2, 0.95, -0.2]} />
+            <Pearl position={[2.85, 1.25, -0.4]} scale={0.22} color="#ffb7a5" />
+            <Pearl position={[1.25, -1.45, -0.8]} scale={0.14} color="#c9b8ff" />
           </>
         )}
       </PointerRig>
