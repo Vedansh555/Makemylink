@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Float, Lightformer, MeshDistortMaterial } from "@react-three/drei";
+import { Float, MeshDistortMaterial } from "@react-three/drei";
 import { useRef } from "react";
 import type { Group } from "three";
 
@@ -12,13 +12,11 @@ import type { Group } from "three";
  */
 function Studio() {
   return (
-    <Environment resolution={64}>
-      <color attach="background" args={["#2b2d33"]} />
-      <Lightformer form="rect" intensity={3.5} position={[0, 6, -2]} scale={[16, 2.5, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-      <Lightformer form="rect" intensity={1} position={[0, -6, 2]} scale={[16, 3, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-      <Lightformer form="rect" intensity={2.5} position={[-7, 0, 3]} scale={[1.5, 14, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-      <Lightformer form="rect" color="#ffd2c4" intensity={1.8} position={[7, 1, 3]} scale={[1.2, 14, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-    </Environment>
+    <>
+      <directionalLight position={[5, 8, 4]} intensity={2.8} />
+      <directionalLight position={[-5, -4, 2]} intensity={0.9} color="#ffd2c4" />
+      <pointLight position={[0, 4, 3]} intensity={1.5} color="#ffffff" />
+    </>
   );
 }
 
