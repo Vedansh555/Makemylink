@@ -91,7 +91,8 @@ function Background({ theme }: { theme: ResolvedTheme }) {
     case "luxury":
       return (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-4 border border-t-fg/10" />
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-t-accent/10 to-transparent" />
+          <div className="absolute -right-20 top-32 h-64 w-64 rounded-full bg-t-accent/5 blur-3xl" />
         </div>
       );
     case "ticket":
@@ -109,8 +110,8 @@ function Background({ theme }: { theme: ResolvedTheme }) {
     case "deco":
       return (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-3 border-2 border-t-accent/15" />
-          <div className="absolute inset-6 border border-t-accent/15" />
+          <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-t-accent/10 blur-3xl" />
+          <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-t-accent/10 blur-3xl" />
         </div>
       );
     case "organic":
@@ -165,7 +166,9 @@ function Background({ theme }: { theme: ResolvedTheme }) {
       );
     default:
       return (
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--t-fg)_5%,transparent)_1px,transparent_1px)] [background-size:25%_100%]" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_color-mix(in_srgb,var(--t-accent)_8%,transparent),transparent_70%)]" />
+        </div>
       );
   }
 }
