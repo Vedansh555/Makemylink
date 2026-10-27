@@ -227,23 +227,28 @@ export function Editor() {
               <h1 className="font-display text-[48px] italic leading-none">Your page</h1>
               <p className="mt-2 text-[14px] text-fg/50">Changes show up in the phone right away.</p>
             </div>
-            <select
-              className={`${inputCls} sm:w-56`}
-              value=""
-              onChange={(e) => {
-                const demo = demoProfiles.find((d) => d.handle === e.target.value);
-                if (demo) setP(structuredClone(demo));
-              }}
-            >
-              <option value="" disabled>
-                ✦ Start from an example…
-              </option>
-              {demoProfiles.map((d) => (
-                <option key={d.handle} value={d.handle} className="bg-bg">
-                  {d.name} · {getTheme(d.theme).def.label}
+            <div className="relative">
+              <select
+                className="w-full sm:w-64 appearance-none rounded-2xl border border-fg/15 bg-fg/[0.04] py-3 pl-4 pr-10 text-[13px] font-medium text-fg shadow-sm outline-none transition hover:border-fg/30 focus:border-fg/50 focus:bg-fg/[0.07] cursor-pointer"
+                value=""
+                onChange={(e) => {
+                  const demo = demoProfiles.find((d) => d.handle === e.target.value);
+                  if (demo) setP(structuredClone(demo));
+                }}
+              >
+                <option value="" disabled className="text-fg/50 bg-bg">
+                  ✦ Load a creator example…
                 </option>
-              ))}
-            </select>
+                {demoProfiles.map((d) => (
+                  <option key={d.handle} value={d.handle} className="bg-bg text-fg py-2">
+                    {d.name} ({getTheme(d.theme).def.label})
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-fg/40">
+                <ArrowDown className="h-4 w-4" />
+              </div>
+            </div>
           </div>
 
           <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
