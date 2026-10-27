@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-instrument);
+  --font-syne: var(--font-syne);
+  --font-bodoni: var(--font-bodoni);
+  --font-unbounded: var(--font-unbounded);
+  --font-grotesk: var(--font-grotesk);
+
+  --color-accent: #ff5b37;
+
+  /* Site colours: flip between light and dark mode. */
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+
+  /* Creator page colours: set per theme on the page root. */
+  --color-t-bg: var(--t-bg);
+  --color-t-fg: var(--t-fg);
+  --color-t-accent: var(--t-accent);
+  --color-t-accent2: var(--t-accent2);
+  --color-t-on-accent: var(--t-on-accent);
+}
+
+/* Dark is the default. Light follows the system, unless the visitor picked a mode. */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0b0b0c;
+  --fg: #f4f2ee;
+  --hero-glow: rgba(11, 11, 12, 0.5);
+  --hero-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 4px 30px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #ffffff;
+    --fg: #121212;
+    --hero-glow: rgba(245, 244, 241, 0.6);
+    --hero-shadow: 0 1px 1px rgba(255, 255, 255, 0.7), 0 4px 30px rgba(245, 244, 241, 0.95);
+  --c1: #3a3d44;
+  --c2: #9aa0aa;
+  --c3: #1c1d21;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #121212;
+  --hero-glow: rgba(245, 244, 241, 0.6);
+  --hero-shadow: 0 1px 1px rgba(255, 255, 255, 0.7), 0 4px 30px rgba(245, 244, 241, 0.95);
+  --c1: #3a3d44;
+  --c2: #9aa0aa;
+  --c3: #1c1d21;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+::selection {
+  background: #ff5b37;
+  color: #0b0b0c;
+}
+
+/* Film grain overlay */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.55'/></svg>");
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  animation: grain 1.2s steps(6) infinite;
+  z-index: 1;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 32s linear infinite;
+}
+.phone-marquee {
+  animation: marquee 70s linear infinite;
+}
+.phone-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Entrance animation that runs without waiting for JavaScript. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(36px); }
+  to { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes mesh {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8%, -6%) scale(1.15); }
+  66% { transform: translate(-6%, 8%) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+.mesh-blob {
+  animation: mesh 16s ease-in-out infinite;
+}
+
+@keyframes shine {
+  from { background-position: 200% 50%; }
+  to { background-position: -200% 50%; }
+}
+.chrome-text {
+  /* Silver by default; chrome themes override --c1 (light), --c2 (mid), --c3 (dark). */
+  background: linear-gradient(
+    100deg,
+    var(--c2, #8a8f99) 0%,
+    var(--c1, #ffffff) 18%,
+    var(--c2, #9aa0aa) 32%,
+    var(--c1, #f2f3f5) 48%,
+    var(--c3, #6f747d) 64%,
+    var(--c1, #ffffff) 80%,
+    var(--c2, #8a8f99) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 9s linear infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
