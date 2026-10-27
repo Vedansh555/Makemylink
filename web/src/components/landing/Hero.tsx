@@ -18,16 +18,15 @@ export function Hero() {
   const right = getDemoProfile("bubbles")!;
 
   return (
-    <section className="relative isolate overflow-hidden pt-32 sm:pt-36">
-      {/* 3D scene, big and alive — it starts below the menu bar so nothing slides under it.
-          Fully visible, no fade — the decorations are kept well inside this box so nothing gets clipped at the edge. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[70px] -z-20 mx-auto h-[820px] max-w-[1300px]">
+    <section className="relative isolate pt-32 sm:pt-36">
+      {/* 3D scene, big and alive — layers naturally without overflow clipping */}
+      <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 mx-auto h-[820px] max-w-[1300px]">
         <ChromeScene variant="hero" />
       </div>
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
       <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[620px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)]" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6 [text-shadow:var(--hero-shadow)]">
+      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6 [text-shadow:var(--hero-shadow)]">
         <div>
           <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg">
             One link for
