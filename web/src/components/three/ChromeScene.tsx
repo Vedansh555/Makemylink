@@ -24,12 +24,12 @@ function Studio() {
 }
 
 /** Follows the pointer with a soft lag, and shrinks the scene to fit its box. */
-function PointerRig({ children, fitWidth }: { children: React.ReactNode; fitWidth: number }) {
+function PointerRig({ children, fitWidth, isHero = false }: { children: React.ReactNode; fitWidth: number; isHero?: boolean }) {
   const ref = useRef<Group>(null);
   const width = useThree((s) => s.viewport.width);
   const scale = Math.min(1, width / fitWidth);
-  // On phones the scene shrinks, so lift it up to stay behind the headline.
-  const lift = (1 - scale) * 1.3;
+  // Only the hero 3D scene needs the upward lift to stay behind the headline when shrinking
+  const lift = isHero ? (1 - scale) * 1.3 : 0;
   useFrame((state, delta) => {
     if (!ref.current) return;
     const { x, y } = state.pointer;
@@ -128,10 +128,10 @@ export default function ChromeScene({
     >
       <ambientLight intensity={0.4} />
       <Studio />
-      <PointerRig fitWidth={hero ? 5.2 : 3}>
+      <PointerRig fitWidth={hero ? 5.2 : 3} isHero={hero}>
         {!hero && !isBakes && !isClay && (
           <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.6}>
-            <group position={[0, 0.4, 0]}>
+            <group position={[0, 0, 0]}>
               <Blob scale={0.72} color={ballColor} />
             </group>
           </Float>
@@ -152,17 +152,17 @@ export default function ChromeScene({
         )}
         {isBakes && (
           <>
-            {/* Positioned delicately on the outer side margins, scaled small, zero overlap with name/avatar */}
-            <PastelDonut position={[-2.2, 1.5, -0.5]} color="#ffd23f" />
-            <Pearl position={[2.1, 1.6, -0.3]} scale={0.22} color={accentColor} />
-            <Pearl position={[-1.9, -0.5, 0.2]} scale={0.16} color="#ffffff" />
+            {/* Kept within the viewport and clear of the top speaker notch and text */}
+            <PastelDonut position={[-1.4, 0.8, -0.4]} color="#ffd23f" />
+            <Pearl position={[1.3, 0.9, -0.3]} scale={0.18} color={accentColor} />
+            <Pearl position={[-1.3, -0.7, 0.2]} scale={0.13} color="#ffffff" />
           </>
         )}
         {isClay && (
           <>
-            {/* Soft decorative spheres tucked in the margins outside the avatar */}
-            <Pearl position={[2.2, 1.6, -0.3]} scale={0.24} color={accentColor} />
-            <Pearl position={[-2.1, 1.4, 0.1]} scale={0.18} color="#ded9cc" />
+            {/* Clear of the top bezel notch */}
+            <Pearl position={[1.3, 0.9, -0.3]} scale={0.18} color={accentColor} />
+            <Pearl position={[-1.3, 0.7, 0.1]} scale={0.15} color="#ded9cc" />
           </>
         )}
       </PointerRig>
