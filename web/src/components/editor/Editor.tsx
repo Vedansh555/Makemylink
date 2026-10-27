@@ -570,8 +570,8 @@ export function Editor() {
         <div className={`${mobileView === "edit" ? "hidden lg:block" : "flex justify-center"}`}>
           <div className="sticky top-24 flex flex-col items-center gap-4">
             <PhoneFrame profile={p} scale={0.78} />
-            <p className="flex items-center gap-1.5 text-[12px] text-fg/40">
-              <Sparkles className="h-3.5 w-3.5" /> makemylink.co/{p.handle}
+            <p className="text-[12px] text-fg/40 font-medium">
+              makemylink.co/{p.handle}
             </p>
           </div>
         </div>
@@ -618,7 +618,7 @@ export function Editor() {
                 </>
               ) : !user ? (
                 <>
-                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✦</div>
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[38px] italic leading-none">Ready to publish?</h3>
                   <p className="mt-3 text-fg/60">Create a free account to claim your handle and publish your live page.</p>
                   <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
@@ -636,7 +636,7 @@ export function Editor() {
                 </>
               ) : (
                 <>
-                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✦</div>
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Looking good.</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
                   <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
