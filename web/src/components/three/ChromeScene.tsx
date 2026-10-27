@@ -93,10 +93,10 @@ function ChromeKnot({ position }: { position: [number, number, number] }) {
 
 function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, number, number]; color?: string }) {
   return (
-    <Float speed={2.2} rotationIntensity={1.5} floatIntensity={1.5}>
-      <mesh position={position} rotation={[0.8, 0.5, 0.2]} scale={0.75}>
-        <torusGeometry args={[0.7, 0.32, 32, 64]} />
-        <meshPhysicalMaterial color={color} roughness={0.15} transmission={0.2} clearcoat={1} clearcoatRoughness={0.1} />
+    <Float speed={2} rotationIntensity={1.2} floatIntensity={1.2}>
+      <mesh position={position} rotation={[0.8, 0.5, 0.2]} scale={0.42}>
+        <torusGeometry args={[0.55, 0.24, 32, 64]} />
+        <meshPhysicalMaterial color={color} roughness={0.15} transmission={0.1} clearcoat={1} clearcoatRoughness={0.1} />
       </mesh>
     </Float>
   );
@@ -129,14 +129,20 @@ export default function ChromeScene({
       <ambientLight intensity={0.4} />
       <Studio />
       <PointerRig fitWidth={hero ? 5.2 : 3}>
-        <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
-          {/* In the hero the ball sits to the right of the headline, big and alive, not behind the words. */}
-          <group position={hero ? [2.85, -0.35, -0.6] : [0, 0, 0]}>
-            <Blob scale={hero ? 1.35 : 1.3} color={ballColor} />
-          </group>
-        </Float>
+        {!hero && !isBakes && !isClay && (
+          <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
+            <group position={[0, 0, 0]}>
+              <Blob scale={1.3} color={ballColor} />
+            </group>
+          </Float>
+        )}
         {hero && (
           <>
+            <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
+              <group position={[2.85, -0.35, -0.6]}>
+                <Blob scale={1.35} color={ballColor} />
+              </group>
+            </Float>
             <GlassRing position={[-3.1, 1.05, 0.1]} />
             <ChromeKnot position={[-2.7, -1.15, -0.1]} />
             <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
@@ -146,15 +152,17 @@ export default function ChromeScene({
         )}
         {isBakes && (
           <>
-            <PastelDonut position={[-1.8, 1.6, -0.5]} color="#ffd23f" />
-            <Pearl position={[1.8, -1.2, -0.2]} scale={0.45} color={accentColor} />
-            <Pearl position={[-1.4, -1.6, 0.2]} scale={0.28} color="#ffffff" />
+            {/* Positioned delicately on the outer side margins, scaled small, zero overlap with name/avatar */}
+            <PastelDonut position={[-2.2, 1.5, -0.5]} color="#ffd23f" />
+            <Pearl position={[2.1, 1.6, -0.3]} scale={0.22} color={accentColor} />
+            <Pearl position={[-1.9, -0.5, 0.2]} scale={0.16} color="#ffffff" />
           </>
         )}
         {isClay && (
           <>
-            <Pearl position={[1.7, 1.4, -0.3]} scale={0.5} color={accentColor} />
-            <Pearl position={[-1.6, -1.2, 0.1]} scale={0.35} color="#ded9cc" />
+            {/* Soft decorative spheres tucked in the margins outside the avatar */}
+            <Pearl position={[2.2, 1.6, -0.3]} scale={0.24} color={accentColor} />
+            <Pearl position={[-2.1, 1.4, 0.1]} scale={0.18} color="#ded9cc" />
           </>
         )}
       </PointerRig>
