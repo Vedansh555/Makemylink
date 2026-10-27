@@ -14,7 +14,7 @@ const uses = ["Creators", "Musicians", "Artists", "Coaches", "Shops", "Salons", 
 
 export function Hero() {
   const left = getDemoProfile("kai")!;
-  const center = getDemoProfile("aria")!;
+  const center = { ...getDemoProfile("aria")!, theme: "mint-glass" };
   const right = getDemoProfile("bubbles")!;
 
   return (
