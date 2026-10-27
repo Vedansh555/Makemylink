@@ -4,12 +4,13 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
+import { ArrowUpRight, ChevronDown, MapPin, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { fontClass, getTheme, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
 import { SocialIcon, socialUrl, type SocialKey } from "./SocialIcon";
 import { Tilt } from "../ui/Tilt";
+import { QRCodeCanvas } from "../ui/QRCodeCanvas";
 
 const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
 
@@ -214,6 +215,7 @@ function safeUrl(input?: string): string {
 }
 
 export function BioPage({ profile, embedded = false }: { profile: Profile; embedded?: boolean }) {
+  const [qrOpen, setQrOpen] = useState(false);
   const theme = getTheme(profile.theme);
   const t = theme.tokens;
   const family = theme.def.family;
@@ -421,12 +423,49 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
           </motion.section>
         )}
 
-        <motion.footer variants={rise} custom={i++} className="pt-4 text-center">
+        <motion.footer variants={rise} custom={i++} className="pt-4 flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setQrOpen(true)}
+            className={`${t.badge} inline-flex items-center gap-2 rounded-full border border-t-fg/15 bg-t-fg/[0.04] px-4 py-1.5 text-[11px] uppercase tracking-[0.2em] transition hover:border-t-fg/40 hover:bg-t-fg/10 cursor-pointer`}
+          >
+            <QrCode className="h-3.5 w-3.5" />
+            <span>Show QR code</span>
+          </button>
           <Link href="/" className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
             Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span> ✦
           </Link>
         </motion.footer>
       </motion.main>
+
+      {/* Interactive QR Code Modal */}
+      {qrOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setQrOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-xs rounded-3xl border border-white/15 bg-[#141518] p-6 text-center text-white shadow-2xl"
+          >
+            <button
+              type="button"
+              onClick={() => setQrOpen(false)}
+              className="absolute right-4 top-4 rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="mx-auto rounded-2xl bg-white p-3.5 shadow-inner inline-block">
+              <QRCodeCanvas text={`https://makemylink.co/${profile.handle}`} size={160} />
+            </div>
+            <p className="mt-4 text-[16px] font-bold">@{profile.handle}</p>
+            <p className="mt-1 text-[12px] text-white/50">makemylink.co/{profile.handle}</p>
+            <p className="mt-3 text-[11px] text-white/40">Point your phone camera to scan</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
