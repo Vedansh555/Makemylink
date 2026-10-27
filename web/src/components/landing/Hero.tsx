@@ -26,12 +26,12 @@ export function Hero() {
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
       <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[620px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)]" />
 
-      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6 [text-shadow:var(--hero-shadow)]">
+      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6">
         <div>
-          <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg">
+          <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
             One link for
             <br />
-            everything <em className="chrome-text not-italic">you do.</em>
+            everything <em className="chrome-text not-italic [text-shadow:none]">you do.</em>
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
