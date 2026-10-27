@@ -127,28 +127,36 @@ body {
   to { background-position: -200% 50%; }
 }
 .chrome-text {
-  /* Solid metallic silver chrome with specular luster and depth */
+  /* True cast 3D metallic chrome silver with specular ridges and cast reflection */
   background: linear-gradient(
-    135deg,
-    #181a1f 0%,
-    #4a4f58 12%,
-    #9aa0ab 26%,
-    #ffffff 42%,
-    #eef1f6 50%,
-    #7d838e 62%,
-    #1d1f24 74%,
-    #9fa5b0 86%,
-    #ffffff 94%,
-    #2c2f36 100%
+    180deg,
+    #ffffff 0%,
+    #eef2f7 18%,
+    #d1d7e2 38%,
+    #9aa2b0 48%,
+    #4a505b 51%,
+    #1c1f24 53%,
+    #3b4049 57%,
+    #7a8291 68%,
+    #b8c0cc 82%,
+    #e8edf4 92%,
+    #ffffff 100%
   );
-  background-size: 240% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45)) drop-shadow(0 1px 2px rgba(255, 255, 255, 0.35));
-  animation: shine 8s linear infinite;
+  /* Deep extruded bevel & shiny metallic rim */
+  filter: 
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.95))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.8))
+    drop-shadow(1px 2px 0 #4a505c)
+    drop-shadow(2px 4px 1px #22262d)
+    drop-shadow(3px 8px 12px rgba(0, 0, 0, 0.55));
   display: inline-block;
+  padding-right: 0.08em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
