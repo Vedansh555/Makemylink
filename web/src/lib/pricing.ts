@@ -37,7 +37,7 @@ export const plans: Plan[] = [
       "Sell products and bookings, 0% fee",
       "Media kit for brands",
       "Free custom domain, yours to keep",
-      "Remove the Linkss badge",
+      "Remove the Makemylink badge",
       "Help from a real person",
     ],
     highlight: true,

@@ -383,7 +383,7 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
 
         <motion.footer variants={rise} custom={i++} className="pt-4 text-center">
           <Link href="/" className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
-            Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Linkss</span> ✦
+            Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span> ✦
           </Link>
         </motion.footer>
       </motion.main>

@@ -29,7 +29,7 @@ function getProfile(handle: string): Profile | null {
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
   const { handle } = await params;
   const profile = getProfile(handle);
-  return profile ? { title: `${profile.name} (@${profile.handle}) · Linkss`, description: profile.bio } : {};
+  return profile ? { title: `${profile.name} (@${profile.handle}) · Makemylink`, description: profile.bio } : {};
 }
 
 export default async function CreatorPage({ params }: { params: Promise<{ handle: string }> }) {

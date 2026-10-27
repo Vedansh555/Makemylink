@@ -20,7 +20,6 @@ const fontOptions: [string, string][] = [
 import type { ArtKind, BioLink, Look, Profile, Store } from "@/lib/types";
 import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
-import { ModeToggle } from "../landing/ModeToggle";
 import { Logo } from "../landing/Nav";
 import { PhoneFrame } from "../landing/PhoneFrame";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
@@ -184,7 +183,6 @@ export function Editor() {
             <Link href="/preview" target="_blank" className="hidden items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[13px] text-fg/80 hover:border-fg/40 sm:flex">
               <Eye className="h-4 w-4" /> Full preview
             </Link>
-            <ModeToggle />
             <button
               onClick={handlePublish}
               disabled={publishing}
@@ -319,7 +317,7 @@ export function Editor() {
               </Field>
               <Field label="Handle">
                 <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 text-[14px] focus-within:border-fg/35">
-                  <span className="text-fg/35">linkss.co/</span>
+                  <span className="text-fg/35">makemylink.co/</span>
                   <input
                     className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 outline-none"
                     value={p.handle}
@@ -508,7 +506,7 @@ export function Editor() {
           <div className="sticky top-24 flex flex-col items-center gap-4">
             <PhoneFrame profile={p} scale={0.78} />
             <p className="flex items-center gap-1.5 text-[12px] text-fg/40">
-              <Sparkles className="h-3.5 w-3.5" /> linkss.co/{p.handle}
+              <Sparkles className="h-3.5 w-3.5" /> makemylink.co/{p.handle}
             </p>
           </div>
         </div>
@@ -538,8 +536,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Published!</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">linkss.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://linkss.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
+                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <p className="mt-2 text-[12px] text-fg/45">Scan to open your page — handy for prints, menus and business cards.</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Saved directly to database for account {user.email}.
@@ -558,7 +556,7 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✦</div>
                   <h3 className="mt-6 font-display text-[38px] italic leading-none">Ready to publish?</h3>
                   <p className="mt-3 text-fg/60">Create a free account to claim your handle and publish your live page.</p>
-                  <p className="mt-1 text-[18px] font-medium">linkss.co/{p.handle}</p>
+                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Your current edits are temporarily saved in this browser. Sign up or log in to make your page permanent.
                   </p>
@@ -576,8 +574,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✦</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Looking good.</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">linkss.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://linkss.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
+                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <div className="mt-7 flex flex-col gap-2">
                     <Link href={`/${p.handle}`} target="_blank" className="rounded-full bg-[#ff5b37] py-3.5 font-semibold text-[#111] hover:brightness-110">
                       View live page

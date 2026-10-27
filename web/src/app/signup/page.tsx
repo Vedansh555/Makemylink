@@ -68,7 +68,7 @@ export default function SignupPage() {
           <label className="flex flex-col gap-1.5">
             <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Handle</span>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[14px] text-fg/40 select-none">linkss.co/</span>
+              <span className="absolute left-3.5 text-[14px] text-fg/40 select-none">makemylink.co/</span>
               <input
                 type="text"
                 required

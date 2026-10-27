@@ -15,7 +15,7 @@ export function getDb(): Database.Database {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  const dbPath = path.join(dataDir, "linkss.db");
+  const dbPath = path.join(dataDir, "makemylink.db");
   const db = new Database(dbPath);
 
   // WAL mode for improved concurrent read/write performance

@@ -1,6 +1,6 @@
 import type { Profile } from "./types";
 
-const KEY = "linkss:draft";
+const KEY = "makemylink:draft";
 
 export function loadDraft(): Profile | null {
   try {

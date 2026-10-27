@@ -2,39 +2,18 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Lightformer, MeshDistortMaterial } from "@react-three/drei";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { Group } from "three";
-
-/** True once the page is in light mode, so the chrome can stay visible against white. */
-function useLightMode() {
-  const [light, setLight] = useState(false);
-  useEffect(() => {
-    const read = () => {
-      const set = document.documentElement.dataset.theme;
-      setLight(set === "light" || (set !== "dark" && window.matchMedia("(prefers-color-scheme: light)").matches));
-    };
-    read();
-    const mo = new MutationObserver(read);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    const mq = window.matchMedia("(prefers-color-scheme: light)");
-    mq.addEventListener("change", read);
-    return () => {
-      mo.disconnect();
-      mq.removeEventListener("change", read);
-    };
-  }, []);
-  return light;
-}
 
 /**
  * Studio lighting built from soft light strips, so no HDR files are downloaded.
  * Long strips give clean chrome streaks; round lights read as odd shapes on the blob.
+ * Tuned dark so the chrome reads clearly against the site's white background.
  */
-function Studio({ light }: { light: boolean }) {
+function Studio() {
   return (
     <Environment resolution={256}>
-      {/* Darker reflections in light mode keep the chrome from washing into a white page. */}
-      <color attach="background" args={[light ? "#2b2d33" : "#62666f"]} />
+      <color attach="background" args={["#2b2d33"]} />
       <Lightformer form="rect" intensity={4} position={[0, 6, -2]} scale={[16, 2.5, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
       <Lightformer form="rect" intensity={1.2} position={[0, -6, 2]} scale={[16, 3, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
       <Lightformer form="rect" intensity={3} position={[-7, 0, 3]} scale={[1.5, 14, 1]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
@@ -114,9 +93,8 @@ function ChromeKnot({ position }: { position: [number, number, number] }) {
 
 export default function ChromeScene({ variant = "bio", color = "#eceef2" }: { variant?: "hero" | "bio"; color?: string }) {
   const hero = variant === "hero";
-  const light = useLightMode();
-  // A darker base tone reads clearly on a white page; untouched on dark pages.
-  const ballColor = light ? "#aeb2ba" : color;
+  // A darker base tone reads clearly against the page's white background.
+  const ballColor = hero ? "#aeb2ba" : color;
   return (
     <Canvas
       dpr={[1, 1.75]}
@@ -128,7 +106,7 @@ export default function ChromeScene({ variant = "bio", color = "#eceef2" }: { va
       eventPrefix="client"
     >
       <ambientLight intensity={0.4} />
-      <Studio light={light} />
+      <Studio />
       <PointerRig fitWidth={hero ? 5.2 : 3}>
         <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
           {/* In the hero the ball sits to the right of the headline, big and alive, not behind the words. */}

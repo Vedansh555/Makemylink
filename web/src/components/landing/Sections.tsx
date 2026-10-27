@@ -52,7 +52,7 @@ export function HowItWorks() {
   const steps = [
     ["1", "Pick a style", "Choose one of our designs. Change the colours, fonts and photo until it feels like you."],
     ["2", "Add your things", "Links, products, videos, bookings, your email list. Moving from Linktree? Paste your link and we copy everything over."],
-    ["3", "Put it in your bio", "Copy your Linkss link into Instagram, TikTok or YouTube. See who visits and what they tap."],
+    ["3", "Put it in your bio", "Copy your Makemylink link into Instagram, TikTok or YouTube. See who visits and what they tap."],
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
@@ -242,7 +242,7 @@ export function Features() {
             <div className="mt-6 flex flex-col gap-2 text-[14px]">
               <div className="rounded-full border border-fg/10 bg-bg/30 px-4 py-3 text-fg/45 line-through">linktr.ee/you</div>
               <div className="flex items-center justify-between rounded-full bg-fg px-4 py-3 font-medium text-bg">
-                linkss.co/you <ArrowRight className="h-4 w-4" />
+                makemylink.co/you <ArrowRight className="h-4 w-4" />
               </div>
             </div>
           </Card>
@@ -299,7 +299,7 @@ export function Features() {
             <h3 className="text-[22px] font-semibold">A QR code, built in</h3>
             <p className="mt-2 text-fg/55">Every page gets one automatically — print it on a menu, a flyer or a business card.</p>
             <div className="mt-8 flex justify-center">
-              <QRCodeCanvas text="https://linkss.co/you" size={108} />
+              <QRCodeCanvas text="https://makemylink.co/you" size={108} />
             </div>
           </Card>
         </Reveal>
@@ -347,7 +347,7 @@ export function Compare() {
             <thead>
               <tr className="border-b border-fg/10 text-fg/50">
                 <th className="p-5 font-normal" />
-                <th className="bg-fg/[0.06] p-5 text-center font-display text-[22px] italic text-fg">Linkss</th>
+                <th className="bg-fg/[0.06] p-5 text-center font-display text-[22px] italic text-fg">Makemylink</th>
                 <th className="p-5 text-center font-normal">Linktree</th>
                 <th className="p-5 text-center font-normal">Stan</th>
                 <th className="p-5 text-center font-normal">Beacons</th>
@@ -376,7 +376,7 @@ export function Compare() {
 }
 
 const faqs: [string, string][] = [
-  ["Who is Linkss for?", "Anyone with a bio to fill. Creators, musicians, artists, coaches, photographers, salons, cafés and small shops all use it."],
+  ["Who is Makemylink for?", "Anyone with a bio to fill. Creators, musicians, artists, coaches, photographers, salons, cafés and small shops all use it."],
   ["Can you set it up for me?", "Yes. Send us your handle and we'll build a first version of your page for free. You can change anything after."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
   ["Do you take a cut of my sales?", "No. We charge 0% on everything you sell. You only pay the normal fee of the payment company."],
@@ -423,17 +423,17 @@ export function FinalCTA() {
                 e.preventDefault();
                 router.push(`/create${handle ? `?handle=${encodeURIComponent(handle.replace(/^@/, ""))}` : ""}`);
               }}
-              className="mx-auto mt-10 flex max-w-md items-center gap-2 rounded-xl bg-fg p-2"
+              className="mx-auto mt-10 flex max-w-md items-center gap-2 rounded-xl bg-white p-2 shadow-[0_8px_24px_-8px_rgba(0,0,0,.3)]"
             >
-              <span className="pl-4 text-[#141414]/40">linkss.co/</span>
+              <span className="pl-4 text-[#141414]/40">makemylink.co/</span>
               <input
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
                 placeholder="yourname"
                 aria-label="Your handle"
-                className="min-w-0 flex-1 bg-transparent py-2 text-[16px] outline-none"
+                className="min-w-0 flex-1 bg-transparent py-2 text-[16px] text-[#141414] outline-none placeholder:text-[#141414]/35"
               />
-              <button className="rounded-lg bg-[#141414] px-5 py-3 text-[14px] font-semibold text-fg">Start free</button>
+              <button className="rounded-lg bg-[#141414] px-5 py-3 text-[14px] font-semibold text-white">Start free</button>
             </form>
             <p className="mt-4 text-[13px] text-[#141414]/70">Free for 14 days. No card needed.</p>
           </div>
@@ -452,7 +452,7 @@ export function Footer() {
         <a href="#pricing" className="hover:text-fg">Pricing</a>
         <Link href="/create" className="hover:text-fg">Create</Link>
       </div>
-      <p>© {new Date().getFullYear()} Linkss. One link for everything.</p>
+      <p>© {new Date().getFullYear()} Makemylink. One link for everything.</p>
     </footer>
   );
 }

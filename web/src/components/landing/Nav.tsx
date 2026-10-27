@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ModeToggle } from "./ModeToggle";
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
@@ -7,7 +6,7 @@ export function Logo({ className = "" }: { className?: string }) {
       <span className="grid h-8 w-8 place-items-center rounded-full bg-[conic-gradient(from_200deg,#8a8f99,#fff,#6f747d,#e9ebef,#8a8f99)] text-[15px] font-black text-[#111]">
         ✦
       </span>
-      <span className="font-display text-[26px] italic leading-none">Linkss</span>
+      <span className="font-display text-[26px] italic leading-none">Makemylink</span>
     </Link>
   );
 }
@@ -24,7 +23,6 @@ export function Nav() {
           <a href="#faq" className="hover:text-fg">FAQ</a>
         </div>
         <div className="flex items-center gap-2">
-          <ModeToggle />
           <Link href="/create" className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
             Create<span className="hidden sm:inline"> your page</span>
           </Link>

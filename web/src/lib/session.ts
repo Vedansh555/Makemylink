@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 
-export const SESSION_COOKIE_NAME = "linkss_session";
+export const SESSION_COOKIE_NAME = "makemylink_session";
 
 function getSecret(): string {
   const secret = process.env.SESSION_SECRET;
@@ -10,7 +10,7 @@ function getSecret(): string {
       throw new Error("SESSION_SECRET environment variable is missing");
     }
     // Fallback development secret if not provided
-    return "dev_linkss_session_secret_default_key_32_bytes_min";
+    return "dev_makemylink_session_secret_default_key_32_bytes_min";
   }
   return secret;
 }
