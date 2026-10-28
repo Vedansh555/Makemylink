@@ -25,6 +25,7 @@ export const plans: Plan[] = [
       "Collect emails from visitors",
       "Visits and clicks analytics",
       "Import from Linktree",
+      "5% fee on sales (payment fees extra)",
     ],
   },
   {

@@ -34,7 +34,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function Marquee() {
-  const words = ["Links", "Products", "Bookings", "Music", "Videos", "Email list", "Media kit", "0% fees", "Your own domain", "UPI & cards"];
+  const words = ["Links", "Products", "Bookings", "Music", "Videos", "Email list", "Media kit", "0% fees on Pro", "Your own domain", "UPI & cards"];
   return (
     <div className="relative z-20 -mt-8 -rotate-2 sm:mt-0 border-y border-fg/10 bg-[#ff5b37] py-4 text-[#111]">
       <div className="marquee flex w-max gap-10 whitespace-nowrap">
@@ -296,15 +296,15 @@ export function Features() {
           </Card>
         </Reveal>
 
-        {/* We never take a cut */}
+        {/* Keep more of every sale */}
         <Reveal className="md:col-span-2" delay={0.08}>
           <Card className="flex h-full flex-col justify-between bg-[radial-gradient(circle_at_70%_20%,rgba(255,91,55,.18),transparent_60%)]">
             <div>
               <div className="flex items-center justify-between">
-                <h3 className="text-[22px] font-semibold">We never take a cut</h3>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">Always 0%</span>
+                <h3 className="text-[22px] font-semibold">Keep more of every sale</h3>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">0% on Pro</span>
               </div>
-              <p className="mt-2 text-fg/55">Some tools keep up to 12% of every sale on their cheaper plans. With us, every rupee and dollar is yours.</p>
+              <p className="mt-2 text-fg/55">Other tools keep up to 12% of every sale on their cheaper plans. We take just 5% on Starter, and nothing on Pro.</p>
             </div>
             <div className="flex items-end justify-between mt-6">
               <div className="chrome-text font-syne text-[100px] sm:text-[120px] font-extrabold leading-[0.8]">0%</div>
@@ -397,7 +397,7 @@ export function Features() {
               ))}
             </div>
             <p className="mt-4 text-[12px] text-fg/45">
-              Zero platform fee on {selectedCurrency} transactions worldwide.
+              Pro: zero platform fee on {selectedCurrency} transactions worldwide. Starter: 5%.
             </p>
           </Card>
         </Reveal>
@@ -548,7 +548,7 @@ export function Compare() {
   const no = <Minus className="mx-auto h-5 w-5 text-fg/25" />;
   const rows: [string, React.ReactNode, React.ReactNode, React.ReactNode, React.ReactNode][] = [
     ["Paid plans from", "$6 · ₹149", "$8", "$29", "~$10"],
-    ["Fee on your sales", <b key="f" className="text-[#ff5b37]">0%, always</b>, "Up to 12%*", "0%", "Up to 9%*"],
+    ["Fee on your sales", <b key="f" className="text-[#ff5b37]">5% Starter · 0% Pro</b>, "Up to 12%*", "0%", "Up to 9%*"],
     ["UPI & rupee pricing", yes, no, no, no],
     ["Free setup by our team", yes, no, no, no],
     ["Designer themes with 3D", yes, no, no, no],
@@ -598,7 +598,7 @@ const faqs: [string, string][] = [
   ["Who is Makemylink for?", "Anyone with a bio to fill. Creators, musicians, artists, coaches, photographers, salons, cafés and small shops all use it."],
   ["Can you set it up for me?", "Yes. Send us your handle and we'll build a first version of your page for free. You can change anything after."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
-  ["Do you take a cut of my sales?", "No. We charge 0% on everything you sell. You only pay the normal fee of the payment company."],
+  ["Do you take a cut of my sales?", "On Pro, no: 0%. On Starter we take 5% of each sale. On both plans the payment company also charges its normal processing fee (about 2% to 3%)."],
   ["Can I move from Linktree?", "Yes. Paste your Linktree link and we copy your links and socials over."],
   ["What happens after the free trial?", "You choose Starter or Pro. If you don't, your page goes offline. We never charge you without asking."],
 ];
