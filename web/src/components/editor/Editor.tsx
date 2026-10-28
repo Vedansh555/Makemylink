@@ -9,7 +9,6 @@ import {
   ArrowUp,
   ChevronDown,
   Eye,
-  FolderOpen,
   Globe,
   ImagePlus,
   Layout,
@@ -18,11 +17,9 @@ import {
   Pencil,
   Plus,
   ShoppingBag,
-  Sparkles,
   Star,
   Trash2,
   User,
-  Users,
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";

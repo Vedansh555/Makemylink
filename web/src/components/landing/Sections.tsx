@@ -5,7 +5,7 @@ import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, Download, ExternalLink, Minus, Plus } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, Minus, Plus } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
 import { families, getTheme, themeList } from "@/lib/themes";
 import { LookArt } from "../bio/LookArt";
