@@ -24,8 +24,8 @@ export function Hero() {
     return () => mq.removeEventListener("change", update);
   }, []);
   const left = getDemoProfile("kai")!;
-  const center = { ...getDemoProfile("aria")!, theme: "mint-glass" };
-  const right = getDemoProfile("bubbles")!;
+  const center = getDemoProfile("bubbles")!;
+  const right = { ...getDemoProfile("aria")!, theme: "mint-glass" };
 
   return (
     <section className="relative isolate pt-32 sm:pt-36">
@@ -73,7 +73,7 @@ export function Hero() {
       )}
 
       {/* Phones with real pages */}
-      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 sm:gap-6 [perspective:1600px] sm:mt-20">
+      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 pb-14 sm:pb-0 sm:gap-6 [perspective:1600px] sm:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 80, rotateY: 30 }}
           animate={{ opacity: 1, y: 0, rotateY: 16 }}
@@ -102,7 +102,7 @@ export function Hero() {
           </div>
         </motion.div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:h-40 bg-gradient-to-t from-bg to-transparent" />
     </section>
   );
 }
