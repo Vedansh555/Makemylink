@@ -372,7 +372,7 @@ export function Editor() {
           {/* Mobile: live preview pinned above the theme list so a style can be tapped and seen at once */}
           {mobileTab === "theme" && (
             <div className="sticky top-[107px] z-20 -mx-4 flex items-center gap-4 border-b border-fg/10 bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
-              <PhoneFrame profile={p} scale={0.3} />
+              <PhoneFrame profile={p} scale={0.2} />
               <div className="min-w-0">
                 <p className="truncate text-[14px] font-semibold">{getTheme(p.theme).def.label}</p>
                 <p className="mt-0.5 text-[12px] text-fg/50">Tap a style below to try it.</p>

@@ -73,32 +73,32 @@ export function Hero() {
       )}
 
       {/* Phones with real pages */}
-      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center gap-6 px-4 [perspective:1600px] sm:mt-20">
+      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 sm:gap-6 [perspective:1600px] sm:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 80, rotateY: 30 }}
           animate={{ opacity: 1, y: 0, rotateY: 16 }}
           transition={{ duration: 1.2, delay: 0.3, ease }}
-          className="hidden translate-y-10 md:block"
+          className="-mr-12 translate-y-6 sm:mr-0 sm:translate-y-10"
           style={{ transformStyle: "preserve-3d" }}
         >
           <div className="[animation:float_7s_ease-in-out_infinite]">
-            <PhoneFrame profile={left} scale={0.56} />
+            <PhoneFrame profile={left} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10">
           <div className="[animation:float_6s_ease-in-out_-2s_infinite]">
-            <PhoneFrame profile={center} scale={0.66} />
+            <PhoneFrame profile={center} scale={wide ? 0.66 : 0.5} />
           </div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 80, rotateY: -30 }}
           animate={{ opacity: 1, y: 0, rotateY: -16 }}
           transition={{ duration: 1.2, delay: 0.4, ease }}
-          className="hidden translate-y-10 md:block"
+          className="-ml-12 translate-y-6 sm:ml-0 sm:translate-y-10"
           style={{ transformStyle: "preserve-3d" }}
         >
           <div className="[animation:float_7s_ease-in-out_-3.5s_infinite]">
-            <PhoneFrame profile={right} scale={0.56} />
+            <PhoneFrame profile={right} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
       </div>

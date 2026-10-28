@@ -153,7 +153,7 @@ function StylePlayground() {
             {/* Phone preview: pinned under the nav on mobile so styles can be tapped and seen together */}
             <div className="sticky top-[76px] z-20 -mx-2 mb-3 flex items-center gap-4 rounded-2xl bg-bg/90 p-2 backdrop-blur-xl lg:static lg:mx-0 lg:mb-0 lg:flex-col lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
               <div className="lg:hidden">
-                <PhoneFrame profile={{ ...base, theme }} scale={0.34} />
+                <PhoneFrame profile={{ ...base, theme }} scale={0.28} />
               </div>
               <div className="hidden lg:block">
                 <PhoneFrame profile={{ ...base, theme }} scale={0.56} />
