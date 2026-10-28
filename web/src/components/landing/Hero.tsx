@@ -73,7 +73,7 @@ export function Hero() {
       )}
 
       {/* Phones with real pages */}
-      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 pb-3 sm:pb-0 sm:gap-6 [perspective:1600px] sm:mt-20">
+      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 sm:gap-6 [perspective:1600px] sm:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 80, rotateY: 30 }}
           animate={{ opacity: 1, y: 0, rotateY: 16 }}
@@ -85,7 +85,7 @@ export function Hero() {
             <PhoneFrame profile={left} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10">
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10 translate-y-6 sm:translate-y-0">
           <div className="[animation:float_6s_ease-in-out_-2s_infinite]">
             <PhoneFrame profile={center} scale={wide ? 0.66 : 0.5} />
           </div>
@@ -102,7 +102,7 @@ export function Hero() {
           </div>
         </motion.div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:h-40 bg-gradient-to-t from-bg to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t sm:block from-bg to-transparent" />
     </section>
   );
 }
