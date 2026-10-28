@@ -4,18 +4,21 @@ import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/db";
 import { setSessionCookie } from "@/lib/session";
 import { blankProfile } from "@/lib/demo";
+import { RESERVED_HANDLES, clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 
 export async function POST(req: Request) {
+  const blocked = sameOriginOnly(req) ?? rateLimit(`signup:${clientIp(req)}`, 5, 60 * 60 * 1000);
+  if (blocked) return blocked;
   try {
     const body = await req.json();
     const { email, password, handle } = body ?? {};
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
       return NextResponse.json({ error: "A valid email is required" }, { status: 400 });
     }
 
-    if (!password || typeof password !== "string" || password.length < 6) {
-      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    if (!password || typeof password !== "string" || password.length < 8 || password.length > 72) {
+      return NextResponse.json({ error: "Password must be 8-72 characters" }, { status: 400 });
     }
 
     if (!handle || typeof handle !== "string" || !/^[a-zA-Z0-9_-]{2,30}$/.test(handle)) {
@@ -23,6 +26,9 @@ export async function POST(req: Request) {
     }
 
     const cleanHandle = handle.toLowerCase();
+    if (RESERVED_HANDLES.has(cleanHandle)) {
+      return NextResponse.json({ error: "That handle is reserved" }, { status: 400 });
+    }
     const cleanEmail = email.toLowerCase().trim();
 
     const db = getDb();
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
     const userId = crypto.randomUUID();
     const pageId = crypto.randomUUID();
     const now = Date.now();
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
 
     const initialProfile = {
       ...blankProfile,

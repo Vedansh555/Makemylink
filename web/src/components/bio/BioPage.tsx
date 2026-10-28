@@ -8,6 +8,7 @@ import { ArrowUpRight, ChevronDown, MapPin, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { fontClass, getTheme, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
+import { safeHref } from "@/lib/security";
 import { SocialIcon, socialUrl, type SocialKey } from "./SocialIcon";
 import { Tilt } from "../ui/Tilt";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
@@ -207,11 +208,7 @@ function Subscribe({ t }: { t: ThemeTokens }) {
 }
 
 function safeUrl(input?: string): string {
-  if (!input) return "#";
-  const trimmed = input.trim();
-  if (!trimmed) return "#";
-  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
+  return safeHref(input);
 }
 
 export function BioPage({ profile, embedded = false }: { profile: Profile; embedded?: boolean }) {

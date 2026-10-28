@@ -73,7 +73,7 @@ export function Hero() {
       )}
 
       {/* Phones with real pages */}
-      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 pb-14 sm:pb-0 sm:gap-6 [perspective:1600px] sm:mt-20">
+      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 pb-3 sm:pb-0 sm:gap-6 [perspective:1600px] sm:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 80, rotateY: 30 }}
           animate={{ opacity: 1, y: 0, rotateY: 16 }}

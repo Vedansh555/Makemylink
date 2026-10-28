@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/db";
 import { setSessionCookie } from "@/lib/session";
+import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
+
+// Compared against when the email is unknown, so response time does not reveal which emails exist.
+const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 12);
 
 export async function POST(req: Request) {
+  const blocked = sameOriginOnly(req) ?? rateLimit(`login:${clientIp(req)}`, 10, 15 * 60 * 1000);
+  if (blocked) return blocked;
   try {
     const body = await req.json();
     const { email, password } = body ?? {};
@@ -20,6 +26,7 @@ export async function POST(req: Request) {
       | undefined;
 
     if (!user) {
+      await bcrypt.compare(String(password), DUMMY_HASH);
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 

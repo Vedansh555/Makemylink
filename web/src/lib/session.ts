@@ -12,15 +12,20 @@ function getSecret(): string {
     // Fallback development secret if not provided
     return "dev_makemylink_session_secret_default_key_32_bytes_min";
   }
+  if (secret.length < 32) throw new Error("SESSION_SECRET must be at least 32 characters");
   return secret;
 }
 
 export interface SessionPayload {
   userId: string;
+  /** Expiry, ms since epoch. */
+  exp?: number;
 }
 
+const MAX_AGE_S = 60 * 60 * 24 * 30;
+
 export function sign(payload: SessionPayload): string {
-  const json = JSON.stringify(payload);
+  const json = JSON.stringify({ ...payload, exp: Date.now() + MAX_AGE_S * 1000 });
   const base64 = Buffer.from(json, "utf-8").toString("base64url");
   const hmac = crypto.createHmac("sha256", getSecret()).update(base64).digest("base64url");
   return `${base64}.${hmac}`;
@@ -43,7 +48,9 @@ export function verify(cookieValue: string): SessionPayload | null {
 
   try {
     const json = Buffer.from(base64, "base64url").toString("utf-8");
-    return JSON.parse(json) as SessionPayload;
+    const data = JSON.parse(json) as SessionPayload;
+    if (typeof data.exp !== "number" || data.exp < Date.now()) return null;
+    return data;
   } catch {
     return null;
   }
@@ -64,7 +71,7 @@ export async function setSessionCookie(payload: SessionPayload) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: MAX_AGE_S,
   });
 }
 

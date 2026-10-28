@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { getDb } from "@/lib/db";
 import type { Profile } from "@/lib/types";
+import { rateLimit, sameOriginOnly, sanitizeProfile } from "@/lib/security";
 
 // GET /api/page — return the logged-in user's saved Profile JSON
 export async function GET() {
@@ -34,9 +35,15 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const blocked = sameOriginOnly(req) ?? rateLimit(`save:${session.userId}`, 60, 60 * 1000);
+  if (blocked) return blocked;
+
   try {
-    const body = await req.json();
-    const { profile } = body ?? {};
+    const raw = await req.text();
+    if (raw.length > 6_000_000) {
+      return NextResponse.json({ error: "Page is too large (try smaller images)" }, { status: 413 });
+    }
+    const { profile } = JSON.parse(raw) ?? {};
 
     if (!profile || typeof profile !== "object") {
       return NextResponse.json({ error: "Profile object is required" }, { status: 400 });
@@ -52,7 +59,13 @@ export async function PUT(req: Request) {
     }
 
     const now = Date.now();
-    const profileJson = JSON.stringify(profile);
+    let clean: Profile;
+    try {
+      clean = sanitizeProfile(profile, existing.handle);
+    } catch {
+      return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
+    }
+    const profileJson = JSON.stringify(clean);
 
     db.prepare(`
       UPDATE pages
