@@ -25,7 +25,7 @@ export function Hero() {
   }, []);
   const left = getDemoProfile("kai")!;
   const center = getDemoProfile("bubbles")!;
-  const right = { ...getDemoProfile("aria")!, theme: "mint-glass" };
+  const right = { ...getDemoProfile("aria")!, theme: "violet-mist" };
 
   return (
     <section className="relative isolate pt-32 sm:pt-36">
@@ -100,7 +100,7 @@ export function Hero() {
           style={{ transformStyle: "preserve-3d" }}
         >
           <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
-            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#6fe0b0" }} />
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#b38aff" }} />
             <PhoneFrame profile={right} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
