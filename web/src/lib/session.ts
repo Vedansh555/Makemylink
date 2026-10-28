@@ -22,7 +22,7 @@ export interface SessionPayload {
   exp?: number;
 }
 
-const MAX_AGE_S = 60 * 60 * 24 * 30;
+const MAX_AGE_S = 60 * 60 * 24 * 365; // sliding: renewed on every visit to the editor
 
 export function sign(payload: SessionPayload): string {
   const json = JSON.stringify({ ...payload, exp: Date.now() + MAX_AGE_S * 1000 });

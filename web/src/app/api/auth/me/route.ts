@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/session";
+import { getSession, setSessionCookie } from "@/lib/session";
 import { getDb } from "@/lib/db";
 
 export async function GET() {
@@ -7,6 +7,9 @@ export async function GET() {
   if (!session?.userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Sliding session: each visit renews the cookie, so active users are never logged out.
+  await setSessionCookie({ userId: session.userId });
 
   const db = getDb();
   const user = db.prepare("SELECT id, email, created_at FROM users WHERE id = ?").get(session.userId) as
