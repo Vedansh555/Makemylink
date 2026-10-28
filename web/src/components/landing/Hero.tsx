@@ -19,12 +19,12 @@ export function Hero() {
 
   return (
     <section className="relative isolate pt-32 sm:pt-36">
-      {/* 3D scene, big and alive — full width across screen, no boundary cuts */}
-      <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 h-[850px] w-full">
+      {/* 3D scene, responsive scaling & positioning so it never crowds text on mobile */}
+      <div className="pointer-events-none absolute inset-x-0 top-[110px] sm:top-[70px] z-0 h-[680px] sm:h-[850px] w-full overflow-hidden">
         <ChromeScene variant="hero" />
       </div>
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
-      <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[620px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[500px] sm:h-[620px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)] opacity-90 sm:opacity-100" />
 
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6">
         <div>

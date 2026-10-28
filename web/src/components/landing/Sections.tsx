@@ -149,26 +149,33 @@ function StylePlayground() {
   return (
     <div className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
       <Reveal>
-        <div className="grid items-start gap-10 rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-8 lg:grid-cols-[auto_1fr]">
-          <div className="flex flex-col items-center gap-4">
-            <PhoneFrame profile={{ ...base, theme }} scale={0.6} />
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-[13px] text-fg/55">
+        <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-8 lg:grid lg:grid-cols-[auto_1fr] lg:items-start lg:gap-10">
+          {/* Sticky preview area on mobile so phone is ALWAYS visible when tapping styles */}
+          <div className="sticky top-16 z-20 -mx-5 -mt-5 mb-6 flex flex-col items-center border-b border-fg/10 bg-bg/95 p-4 backdrop-blur-xl sm:-mx-8 sm:-mt-8 sm:mb-8 lg:static lg:m-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+            {/* On mobile: compact scale 0.44 so it takes minimal vertical room, on desktop scale 0.6 */}
+            <div className="block lg:hidden">
+              <PhoneFrame profile={{ ...base, theme }} scale={0.46} />
+            </div>
+            <div className="hidden lg:block">
+              <PhoneFrame profile={{ ...base, theme }} scale={0.6} />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+              <span className="rounded-full border border-fg/10 bg-fg/5 px-3 py-1 text-[12px] font-medium text-fg/75">
                 {def.label} · {families[def.family].label}
-              </p>
+              </span>
               <Link
                 href={`/create?theme=${theme}`}
-                className="inline-flex items-center gap-1.5 rounded-full bg-fg px-5 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
+                className="inline-flex items-center gap-1 rounded-full bg-fg px-3.5 py-1 text-[12px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
               >
-                Use this style in Editor <ArrowUpRight className="h-4 w-4" />
+                Use this style <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
           <div className="min-w-0">
-            <h3 className="font-display text-[clamp(32px,4vw,52px)] leading-none">Try them all.</h3>
-            <p className="mt-3 max-w-[46ch] text-fg/55">Tap a style and the phone changes right away. You can switch any time, your links stay the same.</p>
-            <div className="mt-7">
-              <ThemePicker value={theme} onChange={setTheme} maxHeight="max-h-[520px]" />
+            <h3 className="font-display text-[clamp(28px,4vw,52px)] leading-none">Try them all.</h3>
+            <p className="mt-2.5 max-w-[46ch] text-[14px] sm:text-[15px] text-fg/55">Tap any style below and watch the preview update immediately.</p>
+            <div className="mt-6">
+              <ThemePicker value={theme} onChange={setTheme} maxHeight="max-h-[440px] sm:max-h-[520px]" />
             </div>
           </div>
         </div>

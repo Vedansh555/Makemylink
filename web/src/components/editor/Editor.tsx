@@ -222,18 +222,45 @@ export function Editor() {
         </div>
       </header>
 
-      {/* Mobile toggle */}
-      <div className="sticky top-[61px] z-30 flex justify-center bg-bg/85 py-2 backdrop-blur lg:hidden">
-        <div className="flex rounded-full border border-fg/10 bg-fg/5 p-1 text-[13px]">
-          {(["edit", "preview"] as const).map((v) => (
-            <button key={v} onClick={() => setMobileView(v)} className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 capitalize ${mobileView === v ? "bg-fg text-bg" : "text-fg/60"}`}>
-              {v === "edit" ? <Pencil className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />} {v}
-            </button>
-          ))}
+      {/* Mobile Sticky Bottom Floating Action Bar */}
+      <div className="fixed bottom-4 inset-x-4 z-40 flex items-center justify-between gap-3 rounded-full border border-fg/15 bg-bg/90 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
+        <div className="flex rounded-full bg-fg/10 p-1 text-[13px]">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileView("edit");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
+              mobileView === "edit" ? "bg-fg text-bg shadow-sm" : "text-fg/70"
+            }`}
+          >
+            <Pencil className="h-3.5 w-3.5" /> Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMobileView("preview");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
+              mobileView === "preview" ? "bg-fg text-bg shadow-sm" : "text-fg/70"
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" /> Preview
+          </button>
         </div>
+
+        <button
+          onClick={handlePublish}
+          disabled={publishing}
+          className="flex items-center gap-1.5 rounded-full bg-[#ff5b37] px-4 py-2 text-[13px] font-semibold text-[#111] shadow-md transition hover:brightness-110 disabled:opacity-50"
+        >
+          {publishing ? "Saving…" : "Publish"}
+        </button>
       </div>
 
-      <div className="mx-auto grid max-w-[1400px] gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-10">
+      <div className="mx-auto grid max-w-[1400px] gap-8 px-4 pb-28 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-10">
         {/* Controls */}
         <div className={`flex flex-col gap-5 ${mobileView === "preview" ? "hidden lg:flex" : ""}`}>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
@@ -568,8 +595,14 @@ export function Editor() {
 
         {/* Live preview */}
         <div className={`${mobileView === "edit" ? "hidden lg:block" : "flex justify-center"}`}>
-          <div className="sticky top-24 flex flex-col items-center gap-4">
-            <PhoneFrame profile={p} scale={0.78} />
+          <div className="sticky top-20 flex flex-col items-center gap-4">
+            {/* Responsive scale: 0.62 on mobile screen so the entire phone frame fits in the viewport without cutoffs */}
+            <div className="block lg:hidden">
+              <PhoneFrame profile={p} scale={0.62} />
+            </div>
+            <div className="hidden lg:block">
+              <PhoneFrame profile={p} scale={0.78} />
+            </div>
             <p className="text-[12px] text-fg/40 font-medium">
               makemylink.co/{p.handle}
             </p>

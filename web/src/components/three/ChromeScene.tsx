@@ -28,8 +28,11 @@ function PointerRig({ children, fitWidth, isHero = false }: { children: React.Re
   const ref = useRef<Group>(null);
   const width = useThree((s) => s.viewport.width);
   const scale = Math.min(1, width / fitWidth);
-  // Only the hero 3D scene needs the upward lift to stay behind the headline when shrinking
-  const lift = isHero ? (1 - scale) * 1.3 : 0;
+  // On mobile viewports (narrow screens), do not lift upward into the headline text and CTA
+  const isNarrow = width < 4.2;
+  const lift = isHero ? (isNarrow ? -0.2 : (1 - scale) * 0.9) : 0;
+  const responsiveScale = isHero && isNarrow ? scale * 0.72 : scale;
+
   useFrame((state, delta) => {
     if (!ref.current) return;
     const { x, y } = state.pointer;
@@ -37,7 +40,7 @@ function PointerRig({ children, fitWidth, isHero = false }: { children: React.Re
     ref.current.rotation.x += (-y * 0.25 - ref.current.rotation.x) * Math.min(1, delta * 2.5);
   });
   return (
-    <group ref={ref} scale={scale} position={[0, lift, 0]}>
+    <group ref={ref} scale={responsiveScale} position={[0, lift, 0]}>
       {children}
     </group>
   );
@@ -102,6 +105,28 @@ function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, numbe
   );
 }
 
+function HeroElements({ ballColor }: { ballColor: string }) {
+  const width = useThree((s) => s.viewport.width);
+  const isNarrow = width < 4.2;
+
+  return (
+    <>
+      <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
+        {/* On mobile, shift slightly further right and deeper so it peeks beautifully around text without covering it */}
+        <group position={isNarrow ? [2.5, -1.2, -1.2] : [2.85, -0.35, -0.6]}>
+          <Blob scale={isNarrow ? 1.05 : 1.35} color={ballColor} />
+        </group>
+      </Float>
+      {/* On mobile screens, hide secondary clutter so text and buttons remain clean and readable */}
+      <GlassRing position={isNarrow ? [-2.5, 1.8, -0.8] : [-2.8, 1.05, 0.1]} />
+      {!isNarrow && <ChromeKnot position={[-2.4, -0.65, -0.1]} />}
+      <Pearl position={isNarrow ? [2.2, 2.0, -0.8] : [3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
+      {!isNarrow && <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />}
+      {!isNarrow && <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />}
+    </>
+  );
+}
+
 export default function ChromeScene({
   variant = "bio",
   color = "#eceef2",
@@ -136,20 +161,7 @@ export default function ChromeScene({
             </group>
           </Float>
         )}
-        {hero && (
-          <>
-            <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
-              <group position={[2.85, -0.35, -0.6]}>
-                <Blob scale={1.35} color={ballColor} />
-              </group>
-            </Float>
-            <GlassRing position={[-2.8, 1.05, 0.1]} />
-            <ChromeKnot position={[-2.4, -0.65, -0.1]} />
-            <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
-            <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />
-            <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />
-          </>
-        )}
+        {hero && <HeroElements ballColor={ballColor} />}
         {isBakes && (
           <>
             {/* Kept within the viewport and clear of the top speaker notch and text */}
