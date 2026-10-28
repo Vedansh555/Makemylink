@@ -81,12 +81,14 @@ export function Hero() {
           className="-mr-12 translate-y-6 sm:mr-0 sm:translate-y-10"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="[animation:float_7s_ease-in-out_infinite]">
+          <div className="relative [animation:float_7s_ease-in-out_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#9aa0ad" }} />
             <PhoneFrame profile={left} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10 translate-y-6 sm:translate-y-0">
-          <div className="[animation:float_6s_ease-in-out_-2s_infinite]">
+          <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#ff5fb0" }} />
             <PhoneFrame profile={center} scale={wide ? 0.66 : 0.5} />
           </div>
         </motion.div>
@@ -97,7 +99,8 @@ export function Hero() {
           className="-ml-12 translate-y-6 sm:ml-0 sm:translate-y-10"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="[animation:float_7s_ease-in-out_-3.5s_infinite]">
+          <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#6fe0b0" }} />
             <PhoneFrame profile={right} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>

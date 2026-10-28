@@ -14,6 +14,8 @@ export function Logo({ className = "" }: { className?: string }) {
 export function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
+      {/* Solid cover behind the pill so nothing scrolls visibly above or beside the nav */}
+      <div className="absolute inset-x-0 top-0 h-[44px] bg-bg" />
       <nav className="mx-auto mt-4 flex max-w-6xl items-center justify-between rounded-full border border-fg/10 bg-bg/75 px-4 py-2.5 backdrop-blur-xl sm:px-6">
         <Logo />
         <div className="hidden items-center gap-7 text-[13px] text-fg/70 md:flex">
