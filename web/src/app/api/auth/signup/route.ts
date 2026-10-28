@@ -7,7 +7,7 @@ import { blankProfile } from "@/lib/demo";
 import { RESERVED_HANDLES, clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 
 export async function POST(req: Request) {
-  const blocked = sameOriginOnly(req) ?? rateLimit(`signup:${clientIp(req)}`, 5, 60 * 60 * 1000);
+  const blocked = sameOriginOnly(req) ?? rateLimit(`signup:${clientIp(req)}`, 20, 60 * 60 * 1000);
   if (blocked) return blocked;
   try {
     const body = await req.json();
