@@ -72,12 +72,32 @@ function GlassRing({ position }: { position: [number, number, number] }) {
   );
 }
 
-function Pearl({ position, scale, color }: { position: [number, number, number]; scale: number; color: string }) {
+function Pearl({
+  position,
+  scale,
+  color,
+  metalness = 0.2,
+  roughness = 0.18,
+  clearcoat = 1,
+}: {
+  position: [number, number, number];
+  scale: number;
+  color: string;
+  metalness?: number;
+  roughness?: number;
+  clearcoat?: number;
+}) {
   return (
     <Float speed={2.4} floatIntensity={2} rotationIntensity={0.6}>
       <mesh position={position} scale={scale}>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshPhysicalMaterial color={color} metalness={0.2} roughness={0.18} clearcoat={1} />
+        <meshPhysicalMaterial
+          color={color}
+          metalness={metalness}
+          roughness={roughness}
+          clearcoat={clearcoat}
+          envMapIntensity={1.8}
+        />
       </mesh>
     </Float>
   );
@@ -127,13 +147,12 @@ function HeroElements({ ballColor }: { ballColor: string }) {
     );
   }
 
-  // On mobile: replace the black/white/chrome ball and big glass ring with small warm brown/terracotta metallic pearls placed cleanly away from text
+  // On mobile: 3 small sleek glossy black spheres reflecting the studio lights, positioned safely away from text
   return (
     <>
-      {/* 3 small aesthetic brown/bronze/terracotta balls in different positions */}
-      <Pearl position={[1.9, 2.1, -0.5]} scale={0.24} color="#b87355" />
-      <Pearl position={[-1.9, 0.4, -0.6]} scale={0.21} color="#a05d43" />
-      <Pearl position={[1.8, -1.9, -0.7]} scale={0.23} color="#8c4e38" />
+      <Pearl position={[1.9, 2.1, -0.5]} scale={0.24} color="#151618" metalness={0.9} roughness={0.12} clearcoat={1} />
+      <Pearl position={[-1.9, 0.4, -0.6]} scale={0.21} color="#0c0d0e" metalness={0.9} roughness={0.12} clearcoat={1} />
+      <Pearl position={[1.8, -1.9, -0.7]} scale={0.23} color="#18191c" metalness={0.9} roughness={0.12} clearcoat={1} />
     </>
   );
 }

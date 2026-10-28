@@ -4,7 +4,27 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowDown, ArrowUp, ChevronDown, Eye, ImagePlus, Pencil, Plus, Sparkles, Star, Trash2, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  Eye,
+  FolderOpen,
+  Globe,
+  ImagePlus,
+  Layout,
+  Link as LinkIcon,
+  Palette,
+  Pencil,
+  Plus,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Trash2,
+  User,
+  Users,
+  X,
+} from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
 import { loadDraft, readImage, saveDraft, uid } from "@/lib/draft";
 import { getTheme, themeList } from "@/lib/themes";
@@ -89,6 +109,7 @@ export function Editor() {
   const [p, setP] = useState<Profile | null>(null);
   const [saved, setSaved] = useState<"saved" | "error" | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
+  const [mobileTab, setMobileTab] = useState<"theme" | "profile" | "links" | "shop" | "socials" | "all">("theme");
   const [publishOpen, setPublishOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email: string; handle?: string } | null>(null);
   const [publishing, setPublishing] = useState(false);
@@ -324,273 +345,322 @@ export function Editor() {
             </div>
           </div>
 
-          <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
-            <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} />
-            <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
-              <div>
-                <p className="text-[13px] font-medium">Accent color</p>
-                <p className="mt-0.5 text-[12px] text-fg/50">Make this style&apos;s accent your own color.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {p.accentOverride && (
-                  <button onClick={() => set("accentOverride", undefined)} className="text-[12px] text-fg/50 underline underline-offset-4">
-                    Reset
-                  </button>
-                )}
-                <input
-                  type="color"
-                  value={p.accentOverride ?? "#ff5b37"}
-                  onChange={(e) => set("accentOverride", e.target.value)}
-                  className="h-9 w-9 cursor-pointer rounded-full border border-fg/15 bg-transparent p-0.5"
-                  aria-label="Accent color"
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
-              <div>
-                <p className="text-[13px] font-medium">Name font</p>
-                <p className="mt-0.5 text-[12px] text-fg/50">Swap the headline font this style uses.</p>
-              </div>
-              <select
-                className={`${inputCls} !w-40`}
-                value={p.fontOverride ?? ""}
-                onChange={(e) => set("fontOverride", e.target.value || undefined)}
-              >
-                <option value="">Theme default</option>
-                {fontOptions.map(([key, label]) => (
-                  <option key={key} value={key} className="bg-bg">
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </Panel>
+          {/* Mobile Category Tabs so user never faces an endless stacked scroll on phone */}
+          <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 py-1 lg:hidden">
+            {[
+              { id: "theme", label: "Theme", icon: Palette },
+              { id: "profile", label: "Profile", icon: User },
+              { id: "links", label: `Links (${p.links.length})`, icon: LinkIcon },
+              { id: "shop", label: `Shop (${p.looks.length})`, icon: ShoppingBag },
+              { id: "socials", label: "Socials", icon: Globe },
+              { id: "all", label: "View all", icon: Layout },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const active = mobileTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setMobileTab(tab.id as typeof mobileTab)}
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition ${
+                    active ? "bg-fg text-bg shadow-sm" : "border border-fg/10 bg-fg/[0.04] text-fg/65 hover:text-fg"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
 
-          <Panel title="Profile">
-            <div className="flex items-center gap-4">
-              <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
-                {p.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.avatar} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <ImagePlus className="h-6 w-6 text-fg/50" />
-                )}
-              </ImagePick>
-              <div className="text-[13px] text-fg/50">
-                <p>Upload a profile photo.</p>
-                {p.avatar && (
-                  <button onClick={() => set("avatar", undefined)} className="mt-1 text-fg/70 underline underline-offset-4">
-                    Remove
-                  </button>
-                )}
-              </div>
-            </div>
-            <ImagePick
-              onPick={(v) => set("coverImage", v)}
-              className="group relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60"
-            >
-              {p.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.coverImage} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <span className="flex items-center gap-2 text-[13px] text-fg/50">
-                  <ImagePlus className="h-5 w-5" /> Upload a cover photo (optional)
-                </span>
-              )}
-            </ImagePick>
-            {p.coverImage && (
-              <button onClick={() => set("coverImage", undefined)} className="-mt-2 text-left text-[12px] text-fg/50 underline underline-offset-4">
-                Remove cover photo
-              </button>
-            )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Name">
-                <input className={inputCls} value={p.name} onChange={(e) => set("name", e.target.value)} />
-              </Field>
-              <Field label="Handle">
-                <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 text-[14px] focus-within:border-fg/35">
-                  <span className="text-fg/35">makemylink.co/</span>
-                  <input
-                    className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 outline-none"
-                    value={p.handle}
-                    onChange={(e) => set("handle", e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ""))}
-                  />
+          {/* Theme Section */}
+          <div className={mobileTab === "theme" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
+              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} />
+              <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
+                <div>
+                  <p className="text-[13px] font-medium">Accent color</p>
+                  <p className="mt-0.5 text-[12px] text-fg/50">Make this style&apos;s accent your own color.</p>
                 </div>
-              </Field>
-            </div>
-            <Field label="Bio">
-              <textarea rows={2} className={`${inputCls} resize-none`} value={p.bio} onChange={(e) => set("bio", e.target.value)} maxLength={160} />
-            </Field>
-            <Field label="Location">
-              <input className={inputCls} value={p.location ?? ""} onChange={(e) => set("location", e.target.value)} placeholder="Mumbai" />
-            </Field>
-          </Panel>
-
-          <Panel title="Socials">
-            <div className="grid gap-4 sm:grid-cols-2">
-              {(["instagram", "tiktok", "youtube", "pinterest", "email"] as const).map((k) => (
-                <Field key={k} label={k}>
-                  <input
-                    className={inputCls}
-                    value={p.socials[k] ?? ""}
-                    placeholder={k === "email" ? "you@email.com" : "username"}
-                    onChange={(e) => set("socials", { ...p.socials, [k]: e.target.value || undefined })}
-                  />
-                </Field>
-              ))}
-            </div>
-          </Panel>
-
-          <Panel
-            title="Links"
-            action={
-              <button
-                onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
-                className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
-              >
-                <Plus className="h-3.5 w-3.5" /> Add link
-              </button>
-            }
-          >
-            {p.links.length === 0 && <p className="text-[14px] text-fg/40">No links yet.</p>}
-            {p.links.map((l, i) => (
-              <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3 sm:flex-row sm:items-center">
-                <div className="grid flex-1 gap-2 sm:grid-cols-3">
-                  <input className={inputCls} value={l.title} onChange={(e) => setLink(l.id, { title: e.target.value })} placeholder="Title" />
-                  <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />
-                  <input
-                    className={inputCls}
-                    value={l.folder ?? ""}
-                    onChange={(e) => setLink(l.id, { folder: e.target.value || undefined })}
-                    placeholder="Folder (optional)"
-                  />
-                </div>
-                <div className="flex items-center gap-1 self-end sm:self-auto">
-                  <IconBtn label="Highlight" active={l.featured} onClick={() => setLink(l.id, { featured: !l.featured })}>
-                    <Star className="h-4 w-4" />
-                  </IconBtn>
-                  <IconBtn label="Move up" onClick={() => set("links", move(p.links, i, -1))}>
-                    <ArrowUp className="h-4 w-4" />
-                  </IconBtn>
-                  <IconBtn label="Move down" onClick={() => set("links", move(p.links, i, 1))}>
-                    <ArrowDown className="h-4 w-4" />
-                  </IconBtn>
-                  <IconBtn label="Delete" onClick={() => set("links", p.links.filter((x) => x.id !== l.id))}>
-                    <Trash2 className="h-4 w-4" />
-                  </IconBtn>
-                </div>
-              </div>
-            ))}
-          </Panel>
-
-          <Panel
-            title="Products"
-            action={
-              <button
-                onClick={() =>
-                  set("looks", [
-                    ...p.looks,
-                    { id: uid(), title: "New piece", price: "", store: "LTK", url: "https://", art: arts[p.looks.length % arts.length]!, hue: Math.floor(Math.random() * 360) },
-                  ])
-                }
-                className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
-              >
-                <Plus className="h-3.5 w-3.5" /> Add product
-              </button>
-            }
-          >
-            <Field label="Section title">
-              <input className={inputCls} value={p.shopTitle ?? ""} placeholder="Shop, Merch, My faves…" onChange={(e) => set("shopTitle", e.target.value)} />
-            </Field>
-            {p.looks.length === 0 && <p className="text-[14px] text-fg/40">Add your own products, or affiliate links from Amazon, LTK, Myntra and more.</p>}
-            {p.looks.map((look) => (
-              <div key={look.id} className="flex gap-4 rounded-2xl border border-fg/10 bg-bg/20 p-3">
-                <ImagePick onPick={(v) => setLook(look.id, { image: v })} className="group relative h-28 w-24 shrink-0 overflow-hidden rounded-xl">
-                  {look.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={look.image} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <LookArt kind={look.art} hue={look.hue} />
+                <div className="flex items-center gap-2">
+                  {p.accentOverride && (
+                    <button onClick={() => set("accentOverride", undefined)} className="text-[12px] text-fg/50 underline underline-offset-4">
+                      Reset
+                    </button>
                   )}
-                  <span className="absolute inset-0 grid place-items-center bg-bg/50 opacity-0 transition group-hover:opacity-100">
-                    <ImagePlus className="h-5 w-5" />
-                  </span>
-                </ImagePick>
-                <div className="grid flex-1 gap-2 sm:grid-cols-2">
-                  <input className={inputCls} value={look.title} onChange={(e) => setLook(look.id, { title: e.target.value })} placeholder="Product name" />
-                  <input className={inputCls} value={look.price} onChange={(e) => setLook(look.id, { price: e.target.value })} placeholder="$49 or ₹999" />
-                  <select className={inputCls} value={look.store} onChange={(e) => setLook(look.id, { store: e.target.value as Store })}>
-                    {stores.map((s) => (
-                      <option key={s} className="bg-bg">
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                  <input className={inputCls} value={look.url} onChange={(e) => setLook(look.id, { url: e.target.value })} placeholder="Affiliate link" />
-                  {!look.image ? (
-                    <div className="flex items-center gap-2 sm:col-span-2">
-                      <select className={`${inputCls} !w-32`} value={look.art} onChange={(e) => setLook(look.id, { art: e.target.value as ArtKind })}>
-                        {arts.map((a) => (
-                          <option key={a} className="bg-bg">
-                            {a}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="range"
-                        min={0}
-                        max={359}
-                        value={look.hue}
-                        onChange={(e) => setLook(look.id, { hue: +e.target.value })}
-                        className="h-2 flex-1 cursor-pointer appearance-none rounded-full [background:linear-gradient(90deg,red,yellow,lime,cyan,blue,magenta,red)]"
-                        aria-label="Colour"
-                      />
-                    </div>
+                  <input
+                    type="color"
+                    value={p.accentOverride ?? "#ff5b37"}
+                    onChange={(e) => set("accentOverride", e.target.value)}
+                    className="h-9 w-9 cursor-pointer rounded-full border border-fg/15 bg-transparent p-0.5"
+                    aria-label="Accent color"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
+                <div>
+                  <p className="text-[13px] font-medium">Name font</p>
+                  <p className="mt-0.5 text-[12px] text-fg/50">Swap the headline font this style uses.</p>
+                </div>
+                <select
+                  className={`${inputCls} !w-40`}
+                  value={p.fontOverride ?? ""}
+                  onChange={(e) => set("fontOverride", e.target.value || undefined)}
+                >
+                  <option value="">Theme default</option>
+                  {fontOptions.map(([key, label]) => (
+                    <option key={key} value={key} className="bg-bg">
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </Panel>
+          </div>
+
+          {/* Profile Section */}
+          <div className={mobileTab === "profile" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel title="Profile">
+              <div className="flex items-center gap-4">
+                <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
+                  {p.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.avatar} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <button onClick={() => setLook(look.id, { image: undefined })} className="text-left text-[12px] text-fg/50 underline underline-offset-4 sm:col-span-2">
-                      Remove photo
+                    <ImagePlus className="h-6 w-6 text-fg/50" />
+                  )}
+                </ImagePick>
+                <div className="text-[13px] text-fg/50">
+                  <p>Upload a profile photo.</p>
+                  {p.avatar && (
+                    <button onClick={() => set("avatar", undefined)} className="mt-1 text-fg/70 underline underline-offset-4">
+                      Remove
                     </button>
                   )}
                 </div>
-                <IconBtn label="Delete" onClick={() => set("looks", p.looks.filter((x) => x.id !== look.id))}>
-                  <Trash2 className="h-4 w-4" />
-                </IconBtn>
               </div>
-            ))}
-          </Panel>
+              <ImagePick
+                onPick={(v) => set("coverImage", v)}
+                className="group relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60"
+              >
+                {p.coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.coverImage} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="flex items-center gap-2 text-[13px] text-fg/50">
+                    <ImagePlus className="h-5 w-5" /> Upload a cover photo (optional)
+                  </span>
+                )}
+              </ImagePick>
+              {p.coverImage && (
+                <button onClick={() => set("coverImage", undefined)} className="-mt-2 text-left text-[12px] text-fg/50 underline underline-offset-4">
+                  Remove cover photo
+                </button>
+              )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Name">
+                  <input className={inputCls} value={p.name} onChange={(e) => set("name", e.target.value)} />
+                </Field>
+                <Field label="Handle">
+                  <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 text-[14px] focus-within:border-fg/35">
+                    <span className="text-fg/35">makemylink.co/</span>
+                    <input
+                      className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 outline-none"
+                      value={p.handle}
+                      onChange={(e) => set("handle", e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, ""))}
+                    />
+                  </div>
+                </Field>
+              </div>
+              <Field label="Bio">
+                <textarea rows={2} className={`${inputCls} resize-none`} value={p.bio} onChange={(e) => set("bio", e.target.value)} maxLength={160} />
+              </Field>
+              <Field label="Location">
+                <input className={inputCls} value={p.location ?? ""} onChange={(e) => set("location", e.target.value)} placeholder="Mumbai" />
+              </Field>
+            </Panel>
+          </div>
 
-          <Panel title="Media kit">
-            <Switch on={p.showMediaKit} onChange={(v) => set("showMediaKit", v)} label="Show media kit for brands" />
-            {p.showMediaKit && (
-              <>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <Field label="Followers">
-                    <input className={inputCls} value={kit.followers} onChange={(e) => set("mediaKit", { ...kit, followers: e.target.value })} />
+          {/* Socials Section */}
+          <div className={mobileTab === "socials" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel title="Socials">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {(["instagram", "tiktok", "youtube", "pinterest", "email"] as const).map((k) => (
+                  <Field key={k} label={k}>
+                    <input
+                      className={inputCls}
+                      value={p.socials[k] ?? ""}
+                      placeholder={k === "email" ? "you@email.com" : "username"}
+                      onChange={(e) => set("socials", { ...p.socials, [k]: e.target.value || undefined })}
+                    />
                   </Field>
-                  <Field label="Engagement">
-                    <input className={inputCls} value={kit.engagement} onChange={(e) => set("mediaKit", { ...kit, engagement: e.target.value })} />
-                  </Field>
-                  <Field label="Avg views">
-                    <input className={inputCls} value={kit.avgViews} onChange={(e) => set("mediaKit", { ...kit, avgViews: e.target.value })} />
-                  </Field>
+                ))}
+              </div>
+            </Panel>
+          </div>
+
+          {/* Links Section */}
+          <div className={mobileTab === "links" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel
+              title="Links"
+              action={
+                <button
+                  onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
+                  className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Add link
+                </button>
+              }
+            >
+              {p.links.length === 0 && <p className="text-[14px] text-fg/40">No links yet.</p>}
+              {p.links.map((l, i) => (
+                <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3 sm:flex-row sm:items-center">
+                  <div className="grid flex-1 gap-2 sm:grid-cols-3">
+                    <input className={inputCls} value={l.title} onChange={(e) => setLink(l.id, { title: e.target.value })} placeholder="Title" />
+                    <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />
+                    <input
+                      className={inputCls}
+                      value={l.folder ?? ""}
+                      onChange={(e) => setLink(l.id, { folder: e.target.value || undefined })}
+                      placeholder="Folder (optional)"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 self-end sm:self-auto">
+                    <IconBtn label="Highlight" active={l.featured} onClick={() => setLink(l.id, { featured: !l.featured })}>
+                      <Star className="h-4 w-4" />
+                    </IconBtn>
+                    <IconBtn label="Move up" onClick={() => set("links", move(p.links, i, -1))}>
+                      <ArrowUp className="h-4 w-4" />
+                    </IconBtn>
+                    <IconBtn label="Move down" onClick={() => set("links", move(p.links, i, 1))}>
+                      <ArrowDown className="h-4 w-4" />
+                    </IconBtn>
+                    <IconBtn label="Delete" onClick={() => set("links", p.links.filter((x) => x.id !== l.id))}>
+                      <Trash2 className="h-4 w-4" />
+                    </IconBtn>
+                  </div>
                 </div>
-                <Field label="Audience">
-                  <input className={inputCls} value={kit.audience} placeholder="80% women · 18–34 · IN, US" onChange={(e) => set("mediaKit", { ...kit, audience: e.target.value })} />
-                </Field>
-                <Field label="Brands you've worked with (comma separated)">
-                  <input
-                    className={inputCls}
-                    value={kit.brands.join(", ")}
-                    onChange={(e) => set("mediaKit", { ...kit, brands: e.target.value.split(",").map((b) => b.trim()).filter(Boolean) })}
-                  />
-                </Field>
-              </>
-            )}
-          </Panel>
+              ))}
+            </Panel>
+          </div>
 
-          <Panel title="Audience">
-            <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
-          </Panel>
+          {/* Shop Section */}
+          <div className={mobileTab === "shop" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel
+              title="Products"
+              action={
+                <button
+                  onClick={() =>
+                    set("looks", [
+                      ...p.looks,
+                      { id: uid(), title: "New piece", price: "", store: "LTK", url: "https://", art: arts[p.looks.length % arts.length]!, hue: Math.floor(Math.random() * 360) },
+                    ])
+                  }
+                  className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Add product
+                </button>
+              }
+            >
+              <Field label="Section title">
+                <input className={inputCls} value={p.shopTitle ?? ""} placeholder="Shop, Merch, My faves…" onChange={(e) => set("shopTitle", e.target.value)} />
+              </Field>
+              {p.looks.length === 0 && <p className="text-[14px] text-fg/40">Add your own products, or affiliate links from Amazon, LTK, Myntra and more.</p>}
+              {p.looks.map((look) => (
+                <div key={look.id} className="flex gap-4 rounded-2xl border border-fg/10 bg-bg/20 p-3">
+                  <ImagePick onPick={(v) => setLook(look.id, { image: v })} className="group relative h-28 w-24 shrink-0 overflow-hidden rounded-xl">
+                    {look.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={look.image} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <LookArt kind={look.art} hue={look.hue} />
+                    )}
+                    <span className="absolute inset-0 grid place-items-center bg-bg/50 opacity-0 transition group-hover:opacity-100">
+                      <ImagePlus className="h-5 w-5" />
+                    </span>
+                  </ImagePick>
+                  <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                    <input className={inputCls} value={look.title} onChange={(e) => setLook(look.id, { title: e.target.value })} placeholder="Product name" />
+                    <input className={inputCls} value={look.price} onChange={(e) => setLook(look.id, { price: e.target.value })} placeholder="$49 or ₹999" />
+                    <select className={inputCls} value={look.store} onChange={(e) => setLook(look.id, { store: e.target.value as Store })}>
+                      {stores.map((s) => (
+                        <option key={s} className="bg-bg">
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    <input className={inputCls} value={look.url} onChange={(e) => setLook(look.id, { url: e.target.value })} placeholder="Affiliate link" />
+                    {!look.image ? (
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <select className={`${inputCls} !w-32`} value={look.art} onChange={(e) => setLook(look.id, { art: e.target.value as ArtKind })}>
+                          {arts.map((a) => (
+                            <option key={a} className="bg-bg">
+                              {a}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="range"
+                          min={0}
+                          max={359}
+                          value={look.hue}
+                          onChange={(e) => setLook(look.id, { hue: +e.target.value })}
+                          className="h-2 flex-1 cursor-pointer appearance-none rounded-full [background:linear-gradient(90deg,red,yellow,lime,cyan,blue,magenta,red)]"
+                          aria-label="Colour"
+                        />
+                      </div>
+                    ) : (
+                      <button onClick={() => setLook(look.id, { image: undefined })} className="text-left text-[12px] text-fg/50 underline underline-offset-4 sm:col-span-2">
+                        Remove photo
+                      </button>
+                    )}
+                  </div>
+                  <IconBtn label="Delete" onClick={() => set("looks", p.looks.filter((x) => x.id !== look.id))}>
+                    <Trash2 className="h-4 w-4" />
+                  </IconBtn>
+                </div>
+              ))}
+            </Panel>
+          </div>
+
+          {/* Media Kit Section */}
+          <div className={mobileTab === "shop" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel title="Media kit">
+              <Switch on={p.showMediaKit} onChange={(v) => set("showMediaKit", v)} label="Show media kit for brands" />
+              {p.showMediaKit && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <Field label="Followers">
+                      <input className={inputCls} value={kit.followers} onChange={(e) => set("mediaKit", { ...kit, followers: e.target.value })} />
+                    </Field>
+                    <Field label="Engagement">
+                      <input className={inputCls} value={kit.engagement} onChange={(e) => set("mediaKit", { ...kit, engagement: e.target.value })} />
+                    </Field>
+                    <Field label="Avg views">
+                      <input className={inputCls} value={kit.avgViews} onChange={(e) => set("mediaKit", { ...kit, avgViews: e.target.value })} />
+                    </Field>
+                  </div>
+                  <Field label="Audience">
+                    <input className={inputCls} value={kit.audience} placeholder="80% women · 18–34 · IN, US" onChange={(e) => set("mediaKit", { ...kit, audience: e.target.value })} />
+                  </Field>
+                  <Field label="Brands you've worked with (comma separated)">
+                    <input
+                      className={inputCls}
+                      value={kit.brands.join(", ")}
+                      onChange={(e) => set("mediaKit", { ...kit, brands: e.target.value.split(",").map((b) => b.trim()).filter(Boolean) })}
+                    />
+                  </Field>
+                </>
+              )}
+            </Panel>
+          </div>
+
+          {/* Audience Section */}
+          <div className={mobileTab === "socials" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+            <Panel title="Audience">
+              <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
+            </Panel>
+          </div>
         </div>
 
         {/* Live preview */}
