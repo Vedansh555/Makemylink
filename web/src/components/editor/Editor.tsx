@@ -220,7 +220,7 @@ export function Editor() {
     <div className="min-h-screen bg-bg text-fg">
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-fg/10 bg-bg/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex h-[57px] max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6">
           <Logo />
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="hidden text-[12px] text-fg/40 sm:inline">
@@ -232,7 +232,7 @@ export function Editor() {
             <button
               onClick={handlePublish}
               disabled={publishing}
-              className="rounded-full bg-[#ff5b37] px-4 py-2 text-[13px] font-semibold text-[#111] hover:brightness-110 disabled:opacity-50"
+              className="hidden rounded-full bg-[#ff5b37] px-4 py-2 text-[13px] font-semibold text-[#111] hover:brightness-110 disabled:opacity-50 lg:block"
             >
               {publishing ? "Saving…" : "Publish"}
             </button>
@@ -278,19 +278,19 @@ export function Editor() {
         </button>
       </div>
 
-      <div className="mx-auto grid max-w-[1400px] gap-8 px-4 pb-28 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-10">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-8 overflow-x-clip px-4 pb-28 pt-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-10">
         {/* Controls */}
-        <div className={`flex flex-col gap-5 ${mobileView === "preview" ? "hidden lg:flex" : ""}`}>
+        <div className={`flex min-w-0 flex-col gap-4 sm:gap-5 ${mobileView === "preview" ? "hidden lg:flex" : ""}`}>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <h1 className="font-display text-[34px] sm:text-[48px] italic leading-none">Your page</h1>
               <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[14px] text-fg/50">Changes show up in the phone right away.</p>
             </div>
-            <div ref={examplesRef} className="relative">
+            <div ref={examplesRef} className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => setExamplesOpen((prev) => !prev)}
-                className="flex w-full sm:w-72 items-center justify-between gap-3 rounded-2xl border border-fg/15 bg-fg/[0.04] px-4 py-2.5 text-[13px] font-semibold text-fg shadow-sm transition hover:border-fg/35 hover:bg-fg/[0.07] focus:outline-none"
+                className="flex w-full min-w-0 sm:w-72 items-center justify-between gap-3 rounded-2xl border border-fg/15 bg-fg/[0.04] px-4 py-2.5 text-[13px] font-semibold text-fg shadow-sm transition hover:border-fg/35 hover:bg-fg/[0.07] focus:outline-none"
               >
                 <span className="truncate">Load a creator example</span>
                 <ChevronDown className={`h-4 w-4 text-fg/40 transition-transform duration-200 ${examplesOpen ? "rotate-180" : ""}`} />
@@ -303,7 +303,7 @@ export function Editor() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 4, scale: 0.98 }}
                     transition={{ duration: 0.16 }}
-                    className="absolute right-0 top-full z-50 mt-2 w-80 max-h-[380px] overflow-y-auto rounded-2xl border border-fg/12 bg-bg/95 p-2 shadow-2xl backdrop-blur-xl"
+                    className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[380px] sm:left-auto sm:w-80 overflow-y-auto rounded-2xl border border-fg/12 bg-bg/95 p-2 shadow-2xl backdrop-blur-xl"
                   >
                     <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-fg/40">
                       Popular Creator Profiles
@@ -343,7 +343,7 @@ export function Editor() {
           </div>
 
           {/* Mobile Category Tabs so user never faces an endless stacked scroll on phone */}
-          <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 py-1 lg:hidden">
+          <div className="no-scrollbar sticky top-[57px] z-30 -mx-4 flex gap-1.5 overflow-x-auto bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
             {[
               { id: "theme", label: "Theme", icon: Palette },
               { id: "profile", label: "Profile", icon: User },
@@ -370,11 +370,22 @@ export function Editor() {
             })}
           </div>
 
+          {/* Mobile: live preview pinned above the theme list so a style can be tapped and seen at once */}
+          {mobileTab === "theme" && (
+            <div className="sticky top-[107px] z-20 -mx-4 flex items-center gap-4 border-b border-fg/10 bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
+              <PhoneFrame profile={p} scale={0.3} />
+              <div className="min-w-0">
+                <p className="truncate text-[14px] font-semibold">{getTheme(p.theme).def.label}</p>
+                <p className="mt-0.5 text-[12px] text-fg/50">Tap a style below to try it.</p>
+              </div>
+            </div>
+          )}
+
           {/* Theme Section */}
           <div className={mobileTab === "theme" || mobileTab === "all" ? "block" : "hidden lg:block"}>
             <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
-              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} />
-              <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
+              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" />
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4">
                 <div>
                   <p className="text-[13px] font-medium">Accent color</p>
                   <p className="mt-0.5 text-[12px] text-fg/50">Make this style&apos;s accent your own color.</p>
@@ -394,13 +405,13 @@ export function Editor() {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-4 border-t border-fg/10 pt-4">
+              <div className="flex flex-col gap-3 border-t border-fg/10 pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <div>
                   <p className="text-[13px] font-medium">Name font</p>
                   <p className="mt-0.5 text-[12px] text-fg/50">Swap the headline font this style uses.</p>
                 </div>
                 <select
-                  className={`${inputCls} !w-40`}
+                  className={`${inputCls} sm:!w-40`}
                   value={p.fontOverride ?? ""}
                   onChange={(e) => set("fontOverride", e.target.value || undefined)}
                 >
@@ -564,8 +575,8 @@ export function Editor() {
               </Field>
               {p.looks.length === 0 && <p className="text-[14px] text-fg/40">Add your own products, or affiliate links from Amazon, LTK, Myntra and more.</p>}
               {p.looks.map((look) => (
-                <div key={look.id} className="flex gap-4 rounded-2xl border border-fg/10 bg-bg/20 p-3">
-                  <ImagePick onPick={(v) => setLook(look.id, { image: v })} className="group relative h-28 w-24 shrink-0 overflow-hidden rounded-xl">
+                <div key={look.id} className="flex flex-col gap-3 rounded-2xl border border-fg/10 bg-bg/20 p-3 sm:flex-row sm:gap-4">
+                  <ImagePick onPick={(v) => setLook(look.id, { image: v })} className="group relative h-40 w-full shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-24">
                     {look.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={look.image} alt="" className="h-full w-full object-cover" />
@@ -612,9 +623,11 @@ export function Editor() {
                       </button>
                     )}
                   </div>
-                  <IconBtn label="Delete" onClick={() => set("looks", p.looks.filter((x) => x.id !== look.id))}>
-                    <Trash2 className="h-4 w-4" />
-                  </IconBtn>
+                  <div className="self-end sm:self-start">
+                    <IconBtn label="Delete" onClick={() => set("looks", p.looks.filter((x) => x.id !== look.id))}>
+                      <Trash2 className="h-4 w-4" />
+                    </IconBtn>
+                  </div>
                 </div>
               ))}
             </Panel>

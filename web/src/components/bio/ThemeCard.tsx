@@ -14,14 +14,14 @@ export function ThemeCard({ id, active = false, onClick }: { id: ThemeId; active
       type="button"
       onClick={onClick}
       style={theme.style}
-      className={`group relative overflow-hidden rounded-2xl text-left shadow-sm transition active:scale-[0.98] ${
+      className={`group relative flex w-full min-w-0 shrink-0 flex-col overflow-hidden rounded-2xl text-left shadow-sm transition active:scale-[0.98] ${
         active ? "ring-2 ring-[#ff5b37] ring-offset-2 ring-offset-bg" : "ring-1 ring-fg/10 hover:ring-fg/30"
       }`}
       aria-pressed={active}
       aria-label={`${def.label} theme`}
     >
       <div
-        className="relative flex h-28 sm:h-32 flex-col items-center justify-center gap-1.5 overflow-hidden px-3"
+        className="relative flex h-24 min-h-24 shrink-0 sm:h-32 sm:min-h-32 flex-col items-center justify-center gap-1.5 overflow-hidden px-3"
         style={{ backgroundColor: def.bg, color: def.fg }}
       >
         {gradient && (

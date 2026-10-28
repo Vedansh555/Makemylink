@@ -150,26 +150,31 @@ function StylePlayground() {
     <div className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
       <Reveal>
         <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-8 lg:grid lg:grid-cols-[auto_1fr] lg:items-start lg:gap-10">
-            {/* Phone preview card on mobile and desktop */}
-            <div className="flex flex-col items-center">
-              <PhoneFrame profile={{ ...base, theme }} scale={0.56} />
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                <span className="rounded-full border border-fg/10 bg-fg/5 px-3.5 py-1 text-[13px] font-medium text-fg/75">
+            {/* Phone preview: pinned under the nav on mobile so styles can be tapped and seen together */}
+            <div className="sticky top-[76px] z-20 -mx-2 mb-3 flex items-center gap-4 rounded-2xl bg-bg/90 p-2 backdrop-blur-xl lg:static lg:mx-0 lg:mb-0 lg:flex-col lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+              <div className="lg:hidden">
+                <PhoneFrame profile={{ ...base, theme }} scale={0.34} />
+              </div>
+              <div className="hidden lg:block">
+                <PhoneFrame profile={{ ...base, theme }} scale={0.56} />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-2.5 lg:mt-4 lg:flex-none lg:flex-row lg:flex-wrap lg:items-center lg:justify-center lg:gap-3">
+                <span className="rounded-full border border-fg/10 bg-fg/5 px-3 py-1 text-[12px] font-medium text-fg/75 sm:text-[13px]">
                   {def.label} · {families[def.family].label}
                 </span>
                 <Link
                   href={`/create?theme=${theme}`}
-                  className="inline-flex items-center gap-1 rounded-full bg-fg px-4 py-1.5 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
+                  className="inline-flex items-center gap-1 rounded-full bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
                 >
                   Use this style <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
           <div className="min-w-0">
-            <h3 className="font-display text-[clamp(28px,4vw,52px)] leading-none">Try them all.</h3>
-            <p className="mt-2.5 max-w-[46ch] text-[14px] sm:text-[15px] text-fg/55">Tap any style below and watch the preview update immediately.</p>
-            <div className="mt-6">
-              <ThemePicker value={theme} onChange={setTheme} maxHeight="max-h-[440px] sm:max-h-[520px]" />
+            <h3 className="font-display text-[26px] leading-none sm:text-[clamp(28px,4vw,52px)]">Try them all.</h3>
+            <p className="mt-2.5 hidden max-w-[46ch] text-[15px] text-fg/55 sm:block">Tap any style below and watch the preview update immediately.</p>
+            <div className="mt-4 sm:mt-6">
+              <ThemePicker value={theme} onChange={setTheme} maxHeight="lg:max-h-[520px]" />
             </div>
           </div>
         </div>

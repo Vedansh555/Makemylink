@@ -17,7 +17,7 @@ export function ThemePicker({
   const [filter, setFilter] = useState<Family | "all">("all");
   const shown = filter === "all" ? themeList : themeList.filter((t) => t.family === filter);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1">
         {(["all", ...familyOrder] as const).map((f) => (
           <button
@@ -30,7 +30,7 @@ export function ThemePicker({
           </button>
         ))}
       </div>
-      <div className={`grid ${maxHeight} grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5`}>
+      <div className={`grid ${maxHeight} auto-rows-min grid-cols-3 content-start gap-2.5 overflow-y-auto p-1 sm:gap-3 md:grid-cols-4 xl:grid-cols-5`}>
         {shown.map((t) => (
           <ThemeCard key={t.id} id={t.id} active={value === t.id} onClick={() => onChange(t.id)} />
         ))}
