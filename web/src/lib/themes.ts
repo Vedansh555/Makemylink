@@ -1062,7 +1062,7 @@ export const themeList: ThemeDef[] = [
   T("graphite", "Graphite", "brutalist", ["#1c1c1e", "#e5e5e7", "#e5e5e7", "#6e6e73", "#1c1c1e"], { mono: true }),
 
   // Pop: thick outlines, stickers
-  T("candy", "Candy Y2K", "pop", ["#ffd6ec", "#1a0b2e", "#ff3ea5", "#d9ff5b", "#ffffff"]),
+  T("candy", "Candy Y2K", "pop", ["#ffd6ec", "#1a0b2e", "#ff3ea5", "#6fc4d6", "#ffffff"]),
   T("lime-pop", "Lime Pop", "ticket", ["#efffc4", "#14210a", "#3c7d0e", "#ffe14d", "#ffffff"]),
   T("sky-pop", "Sky Pop", "ticket", ["#d8efff", "#0b1a33", "#2f6bff", "#ffd23f", "#ffffff"]),
   T("tangerine", "Tangerine", "ticket", ["#ffe4cc", "#2a1200", "#ff6a00", "#8af5d4", "#ffffff"]),
