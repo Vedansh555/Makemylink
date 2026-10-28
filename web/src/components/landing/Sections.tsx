@@ -670,6 +670,8 @@ export function Footer() {
         <a href="#themes" className="hover:text-fg">Themes</a>
         <a href="#pricing" className="hover:text-fg">Pricing</a>
         <Link href="/create" className="hover:text-fg">Create</Link>
+        <Link href="/privacy" className="hover:text-fg">Privacy</Link>
+        <Link href="/terms" className="hover:text-fg">Terms</Link>
       </div>
       <p>© {new Date().getFullYear()} Makemylink. One link for everything.</p>
     </footer>

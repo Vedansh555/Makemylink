@@ -8,6 +8,7 @@ import {
   Unbounded,
 } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const instrument = Instrument_Serif({
@@ -26,9 +27,17 @@ const unbounded = Unbounded({ variable: "--font-unbounded", subsets: ["latin"] }
 const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Makemylink: one link for everything you do",
   description:
-    "Put your links, products, videos and contact on one beautiful page. 0% fees on sales. Pay in rupees or dollars.",
+    "Put your links, products, videos and contact on one beautiful page. Low fees on sales, and 0% on Pro. Pay in rupees or dollars.",
+  openGraph: {
+    title: "Makemylink: one link for everything you do",
+    description: "One beautiful page for your links, products, videos and contact.",
+    type: "website",
+    siteName: "Makemylink",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
