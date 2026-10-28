@@ -36,7 +36,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export function Marquee() {
   const words = ["Links", "Products", "Bookings", "Music", "Videos", "Email list", "Media kit", "0% fees", "Your own domain", "UPI & cards"];
   return (
-    <div className="relative z-20 -mt-20 -rotate-2 sm:mt-0 border-y border-fg/10 bg-[#ff5b37] py-4 text-[#111]">
+    <div className="relative z-20 -mt-8 -rotate-2 sm:mt-0 border-y border-fg/10 bg-[#ff5b37] py-4 text-[#111]">
       <div className="marquee flex w-max gap-10 whitespace-nowrap">
         {[...words, ...words].map((w, i) => (
           <span key={i} className="flex items-center gap-10 font-display text-[34px] italic leading-none">
