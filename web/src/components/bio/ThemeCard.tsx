@@ -18,7 +18,10 @@ export function ThemeCard({ id, active = false, onClick }: { id: ThemeId; active
       aria-pressed={active}
       aria-label={`${def.label} theme`}
     >
-      <div className="relative flex h-32 flex-col items-center justify-center gap-1.5 overflow-hidden bg-t-bg px-3 text-t-fg">
+      <div
+        className="relative flex h-28 sm:h-32 flex-col items-center justify-center gap-1.5 overflow-hidden px-3 text-t-fg"
+        style={{ backgroundColor: def.bg, color: def.fg }}
+      >
         {gradient && (
           <>
             <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-t-accent blur-2xl" />

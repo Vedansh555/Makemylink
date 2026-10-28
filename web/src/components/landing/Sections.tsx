@@ -40,7 +40,7 @@ export function Marquee() {
       <div className="marquee flex w-max gap-10 whitespace-nowrap">
         {[...words, ...words].map((w, i) => (
           <span key={i} className="flex items-center gap-10 font-display text-[34px] italic leading-none">
-            {w} <span className="text-[20px] not-italic">✦</span>
+            {w} <span className="text-[20px] not-italic">•</span>
           </span>
         ))}
       </div>

@@ -3,8 +3,8 @@ import Link from "next/link";
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link href="/" className={`flex items-center gap-2 ${className}`}>
-      <span className="grid h-8 w-8 place-items-center rounded-full bg-[conic-gradient(from_200deg,#8a8f99,#fff,#6f747d,#e9ebef,#8a8f99)] text-[15px] font-black text-[#111]">
-        ✦
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-[conic-gradient(from_200deg,#8a8f99,#fff,#6f747d,#e9ebef,#8a8f99)] text-[13px] font-black tracking-tight text-[#111]">
+        M
       </span>
       <span className="font-display text-[26px] italic leading-none">Makemylink</span>
     </Link>

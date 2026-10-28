@@ -109,20 +109,31 @@ function HeroElements({ ballColor }: { ballColor: string }) {
   const width = useThree((s) => s.viewport.width);
   const isNarrow = width < 4.2;
 
+  // On desktop: original chrome blob, glass ring, knot and pastel pearls
+  if (!isNarrow) {
+    return (
+      <>
+        <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
+          <group position={[2.85, -0.35, -0.6]}>
+            <Blob scale={1.35} color={ballColor} />
+          </group>
+        </Float>
+        <GlassRing position={[-2.8, 1.05, 0.1]} />
+        <ChromeKnot position={[-2.4, -0.65, -0.1]} />
+        <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
+        <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />
+        <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />
+      </>
+    );
+  }
+
+  // On mobile: replace the black/white/chrome ball and big glass ring with small warm brown/terracotta metallic pearls placed cleanly away from text
   return (
     <>
-      <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
-        {/* On mobile, shift slightly further right and deeper so it peeks beautifully around text without covering it */}
-        <group position={isNarrow ? [2.5, -1.2, -1.2] : [2.85, -0.35, -0.6]}>
-          <Blob scale={isNarrow ? 1.05 : 1.35} color={ballColor} />
-        </group>
-      </Float>
-      {/* On mobile screens, hide secondary clutter so text and buttons remain clean and readable */}
-      <GlassRing position={isNarrow ? [-2.5, 1.8, -0.8] : [-2.8, 1.05, 0.1]} />
-      {!isNarrow && <ChromeKnot position={[-2.4, -0.65, -0.1]} />}
-      <Pearl position={isNarrow ? [2.2, 2.0, -0.8] : [3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
-      {!isNarrow && <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />}
-      {!isNarrow && <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />}
+      {/* 3 small aesthetic brown/bronze/terracotta balls in different positions */}
+      <Pearl position={[1.9, 2.1, -0.5]} scale={0.24} color="#b87355" />
+      <Pearl position={[-1.9, 0.4, -0.6]} scale={0.21} color="#a05d43" />
+      <Pearl position={[1.8, -1.9, -0.7]} scale={0.23} color="#8c4e38" />
     </>
   );
 }

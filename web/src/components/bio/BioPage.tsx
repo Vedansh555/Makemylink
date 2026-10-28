@@ -58,7 +58,7 @@ function Background({ theme }: { theme: ResolvedTheme }) {
             "right-6 bottom-40 text-t-accent text-5xl rotate-6",
           ].map((c, i) => (
             <span key={i} className={`absolute [animation:float_5s_ease-in-out_infinite] [-webkit-text-stroke:2px_var(--t-fg)] ${c}`} style={{ animationDelay: `${i * -1.3}s` }}>
-              ✦
+              •
             </span>
           ))}
         </div>
@@ -186,7 +186,7 @@ function Avatar({ profile, t, font }: { profile: Profile; t: ThemeTokens; font: 
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={profile.avatar} alt={profile.name} className={`${t.avatar} object-cover`} />;
   }
-  return <div className={`${t.avatar} ${t.monogram} ${font} grid place-items-center text-[34px]`}>{initials || "✦"}</div>;
+  return <div className={`${t.avatar} ${t.monogram} ${font} grid place-items-center text-[28px]`}>{initials || "•"}</div>;
 }
 
 function Subscribe({ t }: { t: ThemeTokens }) {

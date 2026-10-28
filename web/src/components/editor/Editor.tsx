@@ -41,12 +41,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Panel({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border border-fg/10 bg-fg/[0.025] p-5 sm:p-6">
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="font-display text-[26px] italic leading-none">{title}</h2>
+    <section className="rounded-2xl sm:rounded-3xl border border-fg/10 bg-fg/[0.025] p-4 sm:p-6 shadow-sm">
+      <div className="mb-4 sm:mb-5 flex items-center justify-between">
+        <h2 className="font-display text-[22px] sm:text-[26px] italic leading-none">{title}</h2>
         {action}
       </div>
-      <div className="flex flex-col gap-4">{children}</div>
+      <div className="flex flex-col gap-3.5 sm:gap-4">{children}</div>
     </section>
   );
 }
@@ -223,8 +223,8 @@ export function Editor() {
       </header>
 
       {/* Mobile Sticky Bottom Floating Action Bar */}
-      <div className="fixed bottom-4 inset-x-4 z-40 flex items-center justify-between gap-3 rounded-full border border-fg/15 bg-bg/90 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
-        <div className="flex rounded-full bg-fg/10 p-1 text-[13px]">
+      <div className="fixed bottom-4 inset-x-4 z-40 flex items-center justify-between gap-2.5 rounded-full border border-fg/15 bg-bg/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden">
+        <div className="flex rounded-full bg-fg/8 p-0.5 text-[13px]">
           <button
             type="button"
             onClick={() => {
@@ -232,7 +232,7 @@ export function Editor() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
-              mobileView === "edit" ? "bg-fg text-bg shadow-sm" : "text-fg/70"
+              mobileView === "edit" ? "bg-fg text-bg shadow-sm" : "text-fg/70 hover:text-fg"
             }`}
           >
             <Pencil className="h-3.5 w-3.5" /> Edit
@@ -244,7 +244,7 @@ export function Editor() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
-              mobileView === "preview" ? "bg-fg text-bg shadow-sm" : "text-fg/70"
+              mobileView === "preview" ? "bg-fg text-bg shadow-sm" : "text-fg/70 hover:text-fg"
             }`}
           >
             <Eye className="h-3.5 w-3.5" /> Preview
@@ -254,7 +254,7 @@ export function Editor() {
         <button
           onClick={handlePublish}
           disabled={publishing}
-          className="flex items-center gap-1.5 rounded-full bg-[#ff5b37] px-4 py-2 text-[13px] font-semibold text-[#111] shadow-md transition hover:brightness-110 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-full bg-[#ff5b37] px-4 py-2 text-[13px] font-semibold text-[#111] shadow-md transition hover:brightness-110 disabled:opacity-50"
         >
           {publishing ? "Saving…" : "Publish"}
         </button>
@@ -265,8 +265,8 @@ export function Editor() {
         <div className={`flex flex-col gap-5 ${mobileView === "preview" ? "hidden lg:flex" : ""}`}>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <h1 className="font-display text-[48px] italic leading-none">Your page</h1>
-              <p className="mt-2 text-[14px] text-fg/50">Changes show up in the phone right away.</p>
+              <h1 className="font-display text-[34px] sm:text-[48px] italic leading-none">Your page</h1>
+              <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[14px] text-fg/50">Changes show up in the phone right away.</p>
             </div>
             <div ref={examplesRef} className="relative">
               <button

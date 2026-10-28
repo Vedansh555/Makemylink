@@ -30,7 +30,7 @@ export function ThemePicker({
           </button>
         ))}
       </div>
-      <div className={`grid ${maxHeight} grid-cols-3 gap-3 overflow-y-auto p-1 sm:grid-cols-4 xl:grid-cols-5`}>
+      <div className={`grid ${maxHeight} grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5`}>
         {shown.map((t) => (
           <ThemeCard key={t.id} id={t.id} active={value === t.id} onClick={() => onChange(t.id)} />
         ))}
