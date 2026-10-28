@@ -17,18 +17,10 @@ export function Pricing() {
         <p className="text-[12px] uppercase tracking-[0.35em] text-fg/45">Pricing</p>
         <h2 className="mt-4 font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">Simple pricing.</h2>
         <p className="mt-5 max-w-[520px] text-fg/60">
-          Free for 14 days, then one simple price. We never take a cut of what you sell.
+          Free for 14 days, then one simple price. Keep 95% of your sales on Starter, 100% on Pro.
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <Toggle
-            options={[
-              ["GLOBAL", "$ USD · Global"],
-              ["IN", "₹ INR · India"],
-            ]}
-            value={region}
-            onChange={(v) => setRegion(v as Region)}
-          />
           <Toggle
             options={[
               ["monthly", "Monthly"],
@@ -90,8 +82,7 @@ export function Pricing() {
       <p className="mt-8 text-center text-[12px] text-fg/40">
         {region === "IN"
           ? "Prices for India. Pay with UPI, cards or netbanking."
-          : "Prices in USD. Pay by card, Apple Pay or Google Pay."}{" "}
-        Your billing currency is set by your payment method at checkout.
+          : "Prices in USD. Pay by card, Apple Pay or Google Pay."}
       </p>
     </section>
   );

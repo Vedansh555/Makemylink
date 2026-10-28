@@ -45,9 +45,12 @@ export const plans: Plan[] = [
   },
 ];
 
-/** Best-guess region from the browser. Real billing currency is decided by the payment method at checkout. */
+/** Region for pricing: the visitor's country (cookie from middleware), else a guess from the browser. */
 export function detectRegion(): Region {
   try {
+    // Set by middleware.ts from the visitor's country (Vercel). Most reliable, so it wins.
+    const m = /(?:^|; )mml_region=(IN|GLOBAL)/.exec(document.cookie);
+    if (m) return m[1] as Region;
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz === "Asia/Kolkata" || tz === "Asia/Calcutta") return "IN";
     if (navigator.language?.toLowerCase().endsWith("-in")) return "IN";
