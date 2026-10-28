@@ -114,6 +114,29 @@ function ChromeKnot({ position }: { position: [number, number, number] }) {
   );
 }
 
+/** Two interlocked chrome chain links: the "link" in Makemylink. */
+function ChainLinks() {
+  const ref = useRef<Group>(null);
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.x += delta * 0.5;
+  });
+  const material = <meshStandardMaterial color="#e9ebef" metalness={1} roughness={0.12} envMapIntensity={1.4} />;
+  return (
+    <Float speed={1.6} rotationIntensity={0.3} floatIntensity={0.6}>
+      <group ref={ref} rotation={[0, 0, 0.35]} scale={1.15}>
+        <mesh position={[-0.45, 0, 0]} scale={[1.5, 1, 1]}>
+          <torusGeometry args={[0.5, 0.15, 48, 96]} />
+          {material}
+        </mesh>
+        <mesh position={[0.45, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1.5, 1, 1]}>
+          <torusGeometry args={[0.5, 0.15, 48, 96]} />
+          {material}
+        </mesh>
+      </group>
+    </Float>
+  );
+}
+
 function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, number, number]; color?: string }) {
   return (
     <Float speed={2} rotationIntensity={1.2} floatIntensity={1.2}>
@@ -162,7 +185,7 @@ export default function ChromeScene({
   color = "#eceef2",
   accentColor = "#ff758c",
 }: {
-  variant?: "hero" | "bio" | "bakes" | "clay";
+  variant?: "hero" | "chain" | "bio" | "bakes" | "clay";
   color?: string;
   accentColor?: string;
 }) {
@@ -184,7 +207,8 @@ export default function ChromeScene({
       <ambientLight intensity={0.4} />
       <Studio />
       <PointerRig fitWidth={hero ? 5.2 : 3} isHero={hero}>
-        {!hero && !isBakes && !isClay && (
+        {variant === "chain" && <ChainLinks />}
+        {!hero && !isBakes && !isClay && variant !== "chain" && (
           <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.6}>
             <group position={[0, 0, 0]}>
               <Blob scale={0.72} color={ballColor} />

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getDemoProfile } from "@/lib/demo";
 import { PhoneFrame } from "./PhoneFrame";
@@ -13,6 +14,15 @@ const ease = [0.2, 0.7, 0.2, 1] as const;
 const uses = ["Creators", "Musicians", "Artists", "Coaches", "Shops", "Salons", "Photographers"];
 
 export function Hero() {
+  // Desktop gets the big scene behind the headline; phones get a small one below the text.
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
   const left = getDemoProfile("kai")!;
   const center = { ...getDemoProfile("aria")!, theme: "mint-glass" };
   const right = getDemoProfile("bubbles")!;
@@ -20,9 +30,11 @@ export function Hero() {
   return (
     <section className="relative isolate pt-32 sm:pt-36">
       {/* 3D scene, responsive scaling & positioning so it never crowds text on mobile */}
-      <div className="pointer-events-none absolute inset-x-0 top-[110px] sm:top-[70px] z-0 h-[680px] sm:h-[850px] w-full overflow-hidden">
-        <ChromeScene variant="hero" />
-      </div>
+      {wide && (
+        <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 h-[850px] w-full overflow-hidden">
+          <ChromeScene variant="hero" />
+        </div>
+      )}
       {/* Soft glow behind the words so they stay readable over the chrome. No box. */}
       <div className="pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[500px] sm:h-[620px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)] opacity-90 sm:opacity-100" />
 
@@ -52,6 +64,13 @@ export function Hero() {
           </p>
         </div>
       </div>
+
+      {/* Mobile: a chain-link shape in its own clear space, never behind the text */}
+      {!wide && (
+        <div className="pointer-events-none mx-auto mt-4 h-[150px] w-full max-w-[280px]">
+          <ChromeScene variant="chain" />
+        </div>
+      )}
 
       {/* Phones with real pages */}
       <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center gap-6 px-4 [perspective:1600px] sm:mt-20">

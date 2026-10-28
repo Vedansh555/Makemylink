@@ -11,7 +11,7 @@ import {
   Eye,
   Globe,
   ImagePlus,
-  Layout,
+
   Link as LinkIcon,
   Palette,
   Pencil,
@@ -106,7 +106,7 @@ export function Editor() {
   const [p, setP] = useState<Profile | null>(null);
   const [saved, setSaved] = useState<"saved" | "error" | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
-  const [mobileTab, setMobileTab] = useState<"theme" | "profile" | "links" | "shop" | "socials" | "all">("theme");
+  const [mobileTab, setMobileTab] = useState<"theme" | "profile" | "links" | "shop" | "socials">("theme");
   const [publishOpen, setPublishOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email: string; handle?: string } | null>(null);
   const [publishing, setPublishing] = useState(false);
@@ -350,7 +350,6 @@ export function Editor() {
               { id: "links", label: `Links (${p.links.length})`, icon: LinkIcon },
               { id: "shop", label: `Shop (${p.looks.length})`, icon: ShoppingBag },
               { id: "socials", label: "Socials", icon: Globe },
-              { id: "all", label: "View all", icon: Layout },
             ].map((tab) => {
               const Icon = tab.icon;
               const active = mobileTab === tab.id;
@@ -382,7 +381,7 @@ export function Editor() {
           )}
 
           {/* Theme Section */}
-          <div className={mobileTab === "theme" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "theme" ? "block" : "hidden lg:block"}>
             <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
               <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" />
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4">
@@ -427,7 +426,7 @@ export function Editor() {
           </div>
 
           {/* Profile Section */}
-          <div className={mobileTab === "profile" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "profile" ? "block" : "hidden lg:block"}>
             <Panel title="Profile">
               <div className="flex items-center gap-4">
                 <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
@@ -490,7 +489,7 @@ export function Editor() {
           </div>
 
           {/* Socials Section */}
-          <div className={mobileTab === "socials" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
             <Panel title="Socials">
               <div className="grid gap-4 sm:grid-cols-2">
                 {(["instagram", "tiktok", "youtube", "pinterest", "email"] as const).map((k) => (
@@ -508,7 +507,7 @@ export function Editor() {
           </div>
 
           {/* Links Section */}
-          <div className={mobileTab === "links" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "links" ? "block" : "hidden lg:block"}>
             <Panel
               title="Links"
               action={
@@ -553,7 +552,7 @@ export function Editor() {
           </div>
 
           {/* Shop Section */}
-          <div className={mobileTab === "shop" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
             <Panel
               title="Products"
               action={
@@ -634,7 +633,7 @@ export function Editor() {
           </div>
 
           {/* Media Kit Section */}
-          <div className={mobileTab === "shop" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
             <Panel title="Media kit">
               <Switch on={p.showMediaKit} onChange={(v) => set("showMediaKit", v)} label="Show media kit for brands" />
               {p.showMediaKit && (
@@ -666,7 +665,7 @@ export function Editor() {
           </div>
 
           {/* Audience Section */}
-          <div className={mobileTab === "socials" || mobileTab === "all" ? "block" : "hidden lg:block"}>
+          <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
             <Panel title="Audience">
               <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
             </Panel>
