@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Lightformer, MeshDistortMaterial } from "@react-three/drei";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 
 /**
@@ -150,7 +150,40 @@ function HeroElements() {
   );
 }
 
-export default function ChromeScene({
+/**
+ * Browsers allow only a handful of live 3D scenes. A page with many themed phones would starve the hero,
+ * so each scene runs only while it is on (or near) the screen.
+ */
+function OnScreen({ children }: { children: React.ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") return setOn(true);
+    const io = new IntersectionObserver(([e]) => setOn(e!.isIntersecting), { rootMargin: "200px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={box} className="h-full w-full">
+      {on && children}
+    </div>
+  );
+}
+
+export default function ChromeScene(props: {
+  variant?: "hero" | "chain" | "bio" | "bakes" | "clay";
+  color?: string;
+  accentColor?: string;
+}) {
+  return (
+    <OnScreen>
+      <Scene {...props} />
+    </OnScreen>
+  );
+}
+
+function Scene({
   variant = "bio",
   color = "#eceef2",
   accentColor = "#ff758c",
