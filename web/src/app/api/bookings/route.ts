@@ -1,0 +1,96 @@
+import { NextResponse } from "next/server";
+import crypto from "crypto";
+import { all, one, run } from "@/lib/db";
+import { pageByHandle } from "@/lib/account";
+import { slotsForDay } from "@/lib/booking";
+import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
+import { esc, sendMail } from "@/lib/mail";
+import { getSession } from "@/lib/session";
+
+async function findConfig(handle: string, linkId: string) {
+  const page = await pageByHandle(handle);
+  if (!page || page.plan !== "pro") return null;
+  const link = page.profile.links.find((l) => l.id === linkId && l.kind === "booking" && l.booking);
+  return link?.booking ? { page, link, cfg: link.booking } : null;
+}
+
+// GET /api/bookings?handle=&linkId=&date=YYYY-MM-DD — open slots for a day
+export async function GET(req: Request) {
+  const u = new URL(req.url);
+  const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "");
+  if (!found) return NextResponse.json({ slots: [] });
+  const date = u.searchParams.get("date") ?? "";
+  // Look at a window around the day so a slot taken near midnight (in another zone) still blocks.
+  const rows = await all<{ slot_start: number }>(
+    "SELECT slot_start FROM bookings WHERE page_id = $1 AND link_id = $2 AND status <> 'cancelled' AND slot_start > $3 AND slot_start < $4",
+    [found.page.id, found.link.id, Date.now() - 86_400_000, Date.now() + 90 * 86_400_000],
+  );
+  return NextResponse.json({ slots: slotsForDay(found.cfg, date, rows.map((r) => r.slot_start)), durationMin: found.cfg.durationMin, timeZone: found.cfg.timeZone });
+}
+
+// POST /api/bookings {handle, linkId, slot, name, email, note}
+export async function POST(req: Request) {
+  const blocked = sameOriginOnly(req) ?? rateLimit(`book:${clientIp(req)}`, 10, 60 * 60 * 1000);
+  if (blocked) return blocked;
+  const b = (await req.json().catch(() => ({}))) as { handle?: string; linkId?: string; slot?: number; name?: string; email?: string; note?: string };
+  const email = String(b.email ?? "").toLowerCase().trim();
+  const name = String(b.name ?? "").trim().slice(0, 80);
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || typeof b.slot !== "number") {
+    return NextResponse.json({ error: "Name, email and a time are required" }, { status: 400 });
+  }
+  const found = await findConfig(b.handle ?? "", b.linkId ?? "");
+  if (!found) return NextResponse.json({ error: "This session is not available" }, { status: 404 });
+  const { page, link, cfg } = found;
+
+  // The slot must be one the server would have offered (right day, hour, free).
+  const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: cfg.timeZone }).format(new Date(b.slot));
+  const taken = await all<{ slot_start: number }>("SELECT slot_start FROM bookings WHERE page_id = $1 AND link_id = $2 AND status <> 'cancelled'", [page.id, link.id]);
+  if (!slotsForDay(cfg, ymd, taken.map((t) => t.slot_start)).includes(b.slot)) {
+    return NextResponse.json({ error: "That time was just taken. Pick another." }, { status: 409 });
+  }
+
+  const id = crypto.randomUUID();
+  const free = cfg.price === 0;
+  await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)", [
+    id, page.id, link.id, name, email, b.slot, String(b.note ?? "").slice(0, 500), cfg.price, cfg.currency, free ? "confirmed" : "awaiting_payment", Date.now(),
+  ]);
+
+  const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: cfg.timeZone }).format(new Date(b.slot));
+  const owner = await one<{ email: string }>("SELECT email FROM users WHERE id = $1", [page.user_id]);
+  if (owner) await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${free ? "" : "<p>Mark it paid in your dashboard once the money arrives.</p>"}`);
+  if (free) await sendMail(email, `Confirmed: ${link.title}`, `<p>You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
+
+  const pay = free
+    ? null
+    : cfg.currency === "INR" && cfg.upiId
+      ? { kind: "upi" as const, upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` }
+      : cfg.paymentUrl
+        ? { kind: "link" as const, link: cfg.paymentUrl }
+        : null;
+  return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pay });
+}
+
+// PATCH /api/bookings {id, status} — the page owner marks a booking paid/confirmed or cancelled.
+export async function PATCH(req: Request) {
+  const session = await getSession();
+  if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const blocked = sameOriginOnly(req);
+  if (blocked) return blocked;
+  const { id, status } = (await req.json().catch(() => ({}))) as { id?: string; status?: string };
+  if (!id || (status !== "confirmed" && status !== "cancelled")) return NextResponse.json({ error: "Bad request" }, { status: 400 });
+  const row = await one<{ buyer_email: string; slot_start: number; link_id: string; handle: string; status: string }>(
+    `SELECT b.buyer_email, b.slot_start, b.link_id, b.status, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.id = $1 AND p.user_id = $2`,
+    [id, session.userId],
+  );
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  await run("UPDATE bookings SET status = $1 WHERE id = $2", [status, id]);
+  if (status === "confirmed" && row.status !== "confirmed") {
+    const page = await pageByHandle(row.handle);
+    const link = page?.profile.links.find((l) => l.id === row.link_id);
+    if (link?.booking) {
+      const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: link.booking.timeZone }).format(new Date(row.slot_start));
+      await sendMail(row.buyer_email, `Confirmed: ${link.title}`, `<p>Payment received. You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(link.booking.meetingUrl)}">${esc(link.booking.meetingUrl)}</a></p>`);
+    }
+  }
+  return NextResponse.json({ ok: true });
+}

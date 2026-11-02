@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/db";
+import { one } from "@/lib/db";
 import { setSessionCookie } from "@/lib/session";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 
@@ -22,11 +22,10 @@ export async function POST(req: Request) {
     // Per account, so people sharing a Wi-Fi or mobile network are not locked out by someone else's typos.
     const accountBlocked = rateLimit(`login-acct:${cleanEmail}`, 8, 15 * 60 * 1000);
     if (accountBlocked) return accountBlocked;
-    const db = getDb();
-
-    const user = db.prepare("SELECT id, email, password_hash FROM users WHERE email = ?").get(cleanEmail) as
-      | { id: string; email: string; password_hash: string }
-      | undefined;
+    const user = await one<{ id: string; email: string; password_hash: string }>(
+      "SELECT id, email, password_hash FROM users WHERE email = $1",
+      [cleanEmail],
+    );
 
     if (!user) {
       await bcrypt.compare(String(password), DUMMY_HASH);

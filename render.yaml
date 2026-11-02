@@ -1,0 +1,48 @@
+# Render blueprint: one web service plus a daily cron job for the broken-link check.
+# Database: create a free Neon project and paste its connection string into DATABASE_URL.
+services:
+  - type: web
+    name: makemylink
+    runtime: node
+    plan: starter
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+  # Daily at 02:30 UTC. Uses the same CRON_SECRET as the web service (copy it over in the Render dashboard).
+  - type: cron
+    name: makemylink-linkcheck
+    runtime: node
+    plan: starter
+    schedule: "30 2 * * *"
+    rootDir: web
+    buildCommand: "true"
+    startCommand: 'node -e "fetch(process.env.SITE_URL+\"/api/cron/link-check\",{headers:{authorization:\"Bearer \"+process.env.CRON_SECRET}}).then(r=>r.text()).then(console.log)"'
+    envVars:
+      - key: SITE_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false

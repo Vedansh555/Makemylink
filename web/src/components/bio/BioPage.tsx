@@ -6,6 +6,8 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, MapPin, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
+import { linkIsLive, type PlanId } from "@/lib/plans";
+import { BookingModal, bookingPrice } from "./BookingModal";
 import { fontClass, getTheme, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
 import { safeHref } from "@/lib/security";
@@ -190,19 +192,27 @@ function Avatar({ profile, t, font }: { profile: Profile; t: ThemeTokens; font: 
   return <div className={`${t.avatar} ${t.monogram} ${font} grid place-items-center text-[28px]`}>{initials || "•"}</div>;
 }
 
-function Subscribe({ t }: { t: ThemeTokens }) {
+function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: boolean }) {
   const [done, setDone] = useState(false);
+  const [err, setErr] = useState("");
   if (done) return <p className={t.bio}>You&apos;re on the list ✓</p>;
   return (
     <form
-      className="flex items-center gap-2"
-      onSubmit={(e) => {
+      className="flex flex-col gap-2"
+      onSubmit={async (e) => {
         e.preventDefault();
-        setDone(true);
+        const email = new FormData(e.currentTarget).get("email") as string;
+        if (!live) return setDone(true); // editor preview: nothing is stored
+        const res = await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, email }) });
+        if (res.ok) setDone(true);
+        else setErr((await res.json().catch(() => ({}))).error ?? "Something went wrong");
       }}
     >
-      <input type="email" required placeholder="your@email.com" className={t.input} aria-label="Email address" />
-      <button className={`${t.button} shrink-0`}>Join</button>
+      <div className="flex items-center gap-2">
+        <input name="email" type="email" required placeholder="your@email.com" className={t.input} aria-label="Email address" />
+        <button className={`${t.button} shrink-0`}>Join</button>
+      </div>
+      {err && <p className={t.bio}>{err}</p>}
     </form>
   );
 }
@@ -211,8 +221,17 @@ function safeUrl(input?: string): string {
   return safeHref(input);
 }
 
-export function BioPage({ profile, embedded = false }: { profile: Profile; embedded?: boolean }) {
+export function BioPage({ profile, embedded = false, plan = "pro", live = false }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean }) {
   const [qrOpen, setQrOpen] = useState(false);
+  const [booking, setBooking] = useState<BioLink | null>(null);
+  const showBadge = plan !== "pro" || !profile.hideBadge;
+  const visibleLinks = profile.links.filter((l) => linkIsLive(l));
+  const track = (id: string) => {
+    if (!live) return;
+    try {
+      navigator.sendBeacon("/api/track", new Blob([JSON.stringify({ handle: profile.handle, target: id })], { type: "application/json" }));
+    } catch {}
+  };
   const theme = getTheme(profile.theme);
   const t = theme.tokens;
   const family = theme.def.family;
@@ -281,8 +300,8 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
         </motion.header>
 
         {/* Links — plain ones in order, folder links grouped under a collapsible heading. */}
-        {profile.links.length > 0 && (
-          <motion.section variants={rise} custom={i++} className={`flex flex-col ${family === "editorial" ? "" : "gap-3"}`}>
+        {visibleLinks.length > 0 && (
+          <motion.section variants={rise} custom={i++} className={`grid grid-cols-2 ${family === "editorial" ? "" : "gap-3"}`}>
             {(() => {
               let idx = 0;
               const renderLink = (l: BioLink) => {
@@ -295,23 +314,45 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
                   </>
                 );
                 const href = safeUrl(l.url);
+                // Bento sizes (Pro): 1x1 is half width, 2x1 / unset is a full row, 2x2 is a tall tile.
+                const span = l.size === "1x1" ? "col-span-1" : "col-span-2";
+                const tall = l.size === "2x2" ? "[&>a]:min-h-[170px] [&>a]:items-end" : l.size === "1x1" ? "[&>a]:min-h-[84px]" : "";
+                if (l.kind === "booking" && l.booking) {
+                  return (
+                    <div key={l.id} className={`${span} ${tall}`}>
+                      <button type="button" onClick={() => setBooking(l)} className={`${t.featured} w-full cursor-pointer`}>
+                        <span className="flex-1 text-left">
+                          {l.title}
+                          <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">
+                            {l.booking.durationMin} min · {bookingPrice(l)}
+                          </span>
+                        </span>
+                        <ArrowUpRight className="h-4 w-4 shrink-0" />
+                      </button>
+                    </div>
+                  );
+                }
                 return l.featured ? (
-                  <Tilt key={l.id} max={6} className="rounded-2xl">
-                    <a href={href} target="_blank" rel="noreferrer" className={t.featured}>
+                  <div key={l.id} className={`${span} ${tall}`}>
+                    <Tilt max={6} className="rounded-2xl">
+                      <a href={href} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className={t.featured}>
+                        {inner}
+                      </a>
+                    </Tilt>
+                  </div>
+                ) : (
+                  <div key={l.id} className={`${span} ${tall} flex flex-col`}>
+                    <a href={href} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className={t.link}>
                       {inner}
                     </a>
-                  </Tilt>
-                ) : (
-                  <a key={l.id} href={href} target="_blank" rel="noreferrer" className={t.link}>
-                    {inner}
-                  </a>
+                  </div>
                 );
               };
 
               type Item = { kind: "link"; link: BioLink } | { kind: "folder"; name: string; links: BioLink[] };
               const items: Item[] = [];
               const byFolder = new Map<string, BioLink[]>();
-              for (const l of profile.links) {
+              for (const l of visibleLinks) {
                 if (l.folder) {
                   let group = byFolder.get(l.folder);
                   if (!group) {
@@ -329,7 +370,7 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
                 item.kind === "link" ? (
                   renderLink(item.link)
                 ) : (
-                  <details key={item.name} className="group/folder">
+                  <details key={item.name} className="group/folder col-span-2">
                     <summary className={`${t.link} cursor-pointer list-none`}>
                       <span className="flex-1 text-left">{item.name}</span>
                       <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open/folder:rotate-180" />
@@ -416,7 +457,7 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
         {profile.showSubscribe && (
           <motion.section variants={rise} custom={i++} className="flex flex-col gap-3">
             <h2 className={t.section}>Join my list</h2>
-            <Subscribe t={t} />
+            <Subscribe t={t} handle={profile.handle} live={live} />
           </motion.section>
         )}
 
@@ -429,11 +470,15 @@ export function BioPage({ profile, embedded = false }: { profile: Profile; embed
             <QrCode className="h-3.5 w-3.5" />
             <span>Show QR code</span>
           </button>
-          <Link href="/" className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
-            Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span>
-          </Link>
+          {showBadge && (
+            <Link href="/" className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
+              Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span>
+            </Link>
+          )}
         </motion.footer>
       </motion.main>
+
+      {booking && <BookingModal link={booking} handle={profile.handle} live={live} onClose={() => setBooking(null)} />}
 
       {/* Interactive QR Code Modal */}
       {qrOpen && (

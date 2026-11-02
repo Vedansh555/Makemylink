@@ -6,11 +6,12 @@ const isProd = process.env.NODE_ENV === "production";
 // Tighten with nonces later (see PRODUCTION.md).
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' https://checkout.razorpay.com${isProd ? "" : " 'unsafe-eval'"}`,
+  "frame-src https://api.razorpay.com https://checkout.razorpay.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self'",
+  "connect-src 'self' https://lumberjack.razorpay.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -21,6 +22,7 @@ const nextConfig: NextConfig = {
   // Lets a test build run in its own folder while the dev server keeps using .next.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
+  serverExternalPackages: ["pg", "@electric-sql/pglite"],
   async headers() {
     return [
       {

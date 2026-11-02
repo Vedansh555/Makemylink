@@ -21,6 +21,30 @@ export type ArtKind =
 
 export type Store = "LTK" | "ShopMy" | "Amazon" | "Myntra" | "Nykaa" | "Own store";
 
+export type BlockSize = "1x1" | "2x1" | "2x2";
+
+/** A bookable 1:1 session. Pro only. */
+export interface BookingConfig {
+  /** Whole rupees (INR) or whole dollars (USD). */
+  price: number;
+  currency: "INR" | "USD";
+  durationMin: number;
+  description?: string;
+  /** Meeting link sent to the buyer after payment (Google Meet, Zoom...). */
+  meetingUrl: string;
+  /** 0 = Sunday ... 6 = Saturday. */
+  days: number[];
+  /** Hours of the day in the creator's time zone, 24h clock. */
+  startHour: number;
+  endHour: number;
+  /** IANA time zone of the creator, e.g. Asia/Kolkata. */
+  timeZone: string;
+  /** INR sessions are paid straight to the creator's UPI ID (0% fee, no middleman). */
+  upiId?: string;
+  /** USD sessions are paid through the creator's own Stripe/PayPal payment link. */
+  paymentUrl?: string;
+}
+
 export interface BioLink {
   id: string;
   title: string;
@@ -28,6 +52,15 @@ export interface BioLink {
   featured?: boolean;
   /** Links sharing the same folder name are grouped under a collapsible heading. */
   folder?: string;
+  /** "booking" renders a paid 1:1 booking card instead of a plain link. */
+  kind?: "link" | "booking";
+  booking?: BookingConfig;
+  /** Card size in the Bento grid. Pro only; Free is always 1x1. */
+  size?: BlockSize;
+  /** Epoch ms. The link appears from this moment... */
+  startsAt?: number;
+  /** ...and disappears after this one. */
+  expiresAt?: number;
 }
 
 export interface Look {
@@ -79,4 +112,6 @@ export interface Profile {
   mediaKit?: MediaKit;
   showMediaKit: boolean;
   showSubscribe: boolean;
+  /** Pro only: remove the "Made with Makemylink" badge. */
+  hideBadge?: boolean;
 }

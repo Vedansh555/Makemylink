@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * India sees rupee prices; everyone else sees dollars. Used by lib/pricing.ts.
  */
 export function middleware(req: NextRequest) {
-  const country = req.headers.get("x-vercel-ip-country");
+  const country = req.headers.get("cf-ipcountry") ?? req.headers.get("x-vercel-ip-country");
   const res = NextResponse.next();
   if (country) {
     const region = country === "IN" ? "IN" : "GLOBAL";

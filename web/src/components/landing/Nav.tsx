@@ -23,6 +23,7 @@ export function Nav() {
           <a href="#features" className="hover:text-fg">Features</a>
           <a href="#pricing" className="hover:text-fg">Pricing</a>
           <a href="#faq" className="hover:text-fg">FAQ</a>
+          <Link href="/blog" className="hover:text-fg">Blog</Link>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/create" className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
