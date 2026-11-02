@@ -1,5 +1,6 @@
 "use client";
 
+import { SITE_URL, SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
@@ -10,10 +11,13 @@ import { blankProfile, demoProfiles } from "@/lib/demo";
 import { families, getTheme, themeList } from "@/lib/themes";
 import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
+import dynamic from "next/dynamic";
 import { Tilt } from "../ui/Tilt";
 import { Logo } from "./Nav";
 import { PhoneFrame } from "./PhoneFrame";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
+
+const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
 
 function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return (
@@ -34,15 +38,19 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function Marquee() {
-  const words = ["Links", "Products", "Bookings", "Music", "Videos", "Email list", "Media kit", "0% fees on Pro", "Your own domain", "UPI & cards"];
+  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Bento grid", "Media kit", "135 themes"];
   return (
-    <div className="relative z-20 -mt-8 -rotate-2 sm:mt-0 border-y border-fg/10 bg-[#ff5b37] py-4 text-[#111]">
+    <div className="relative z-20 -mt-16">
+      {/* Solid page-colour block under the tilted band, so no phone shows below it */}
+      <div className="absolute inset-x-0 bottom-0 top-1/2 bg-bg" />
+      <div className="relative -rotate-2 border-y border-fg/10 bg-[#ff5b37] py-4 text-[#111]">
       <div className="marquee flex w-max gap-10 whitespace-nowrap">
         {[...words, ...words].map((w, i) => (
           <span key={i} className="flex items-center gap-10 font-display text-[34px] italic leading-none">
             {w} <span className="text-[20px] not-italic">•</span>
           </span>
         ))}
+      </div>
       </div>
     </div>
   );
@@ -51,8 +59,8 @@ export function Marquee() {
 export function HowItWorks() {
   const steps = [
     ["1", "Pick a style", "Choose one of our designs. Change the colours, fonts and photo until it feels like you."],
-    ["2", "Add your things", "Links, products, videos, bookings, your email list. Moving from Linktree? Paste your link and we copy everything over."],
-    ["3", "Put it in your bio", "Copy your Makemylink link into Instagram, TikTok or YouTube. See who visits and what they tap."],
+    ["2", "Add what earns", "A bookable 1:1 call, your products and links, an email sign-up. Moving from Linktree? Paste your link and we copy your links over."],
+    ["3", "Share one link", "Put it in your Instagram, LinkedIn or YouTube bio. Followers book, buy and subscribe. You see what works."],
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 pb-14 pt-28 sm:px-6">
@@ -60,7 +68,10 @@ export function HowItWorks() {
         <Reveal>
           <Eyebrow>How it works</Eyebrow>
           <h2 className="mt-4 font-display text-[clamp(44px,6vw,84px)] leading-[0.95]">Live in two minutes.</h2>
-          <p className="mt-5 max-w-[340px] text-fg/55">Don&apos;t have time? Send us your handle and we&apos;ll set up your first page for free.</p>
+          <p className="mt-5 max-w-[340px] text-fg/55">Free to start, no card needed. Upgrade to Pro when your page starts earning.</p>
+          <div className="pointer-events-none mt-6 hidden h-[170px] w-full max-w-[320px] md:block">
+            <ChromeScene variant="chain" />
+          </div>
         </Reveal>
         <ol className="flex flex-col">
           {steps.map(([n, title, body], i) => (
@@ -233,7 +244,7 @@ export function Features() {
     <section id="features" className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
       <Reveal>
         <Eyebrow>Features</Eyebrow>
-        <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">More than a list of links.</h2>
+        <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">Built to earn, not just to list.</h2>
       </Reveal>
 
       <div className="mt-14 grid gap-5 md:grid-cols-6">
@@ -304,7 +315,7 @@ export function Features() {
                 <h3 className="text-[22px] font-semibold">Keep more of every sale</h3>
                 <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">0% on Pro</span>
               </div>
-              <p className="mt-2 text-fg/55">Other tools keep up to 12% of every sale on their cheaper plans. We take just 5% on Starter, and nothing on Pro.</p>
+              <p className="mt-2 text-fg/55">Many tools keep up to 12% of every sale on their cheaper plans. We keep nothing. Pro is a flat ₹299 or $8 a month.</p>
             </div>
             <div className="flex items-end justify-between mt-6">
               <div className="chrome-text font-syne text-[100px] sm:text-[120px] font-extrabold leading-[0.8]">0%</div>
@@ -397,7 +408,7 @@ export function Features() {
               ))}
             </div>
             <p className="mt-4 text-[12px] text-fg/45">
-              Pro: zero platform fee on {selectedCurrency} transactions worldwide. Starter: 5%.
+              {selectedCurrency}: no platform commission on Pro. The payment company charges its own small fee.
             </p>
           </Card>
         </Reveal>
@@ -439,26 +450,29 @@ export function Features() {
           </Card>
         </Reveal>
 
-        {/* Use your own domain */}
+        {/* Paid 1:1 bookings */}
         <Reveal className="md:col-span-3" delay={0.08}>
           <Card className="h-full">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-[22px] font-semibold">Use your own domain</h3>
-                <p className="mt-2 text-fg/55">Free on Pro. If you ever leave, the domain stays yours.</p>
+                <h3 className="text-[22px] font-semibold">Paid 1:1 bookings</h3>
+                <p className="mt-2 text-fg/55">Followers pick a time and pay you directly. You keep 100%, with no commission.</p>
               </div>
-              <Link
-                href="/create"
-                className="hidden shrink-0 items-center gap-1 text-[12px] font-semibold text-fg/70 hover:text-fg sm:inline-flex"
-              >
-                Connect domain <ArrowRight className="h-3.5 w-3.5" />
+              <Link href="/create" className="hidden shrink-0 items-center gap-1 text-[12px] font-semibold text-fg/70 hover:text-fg sm:inline-flex">
+                Add a booking card <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
-            <div className="mt-8 flex items-center gap-3 rounded-2xl border border-fg/10 bg-bg/40 p-4 font-mono text-[14px]">
-              <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-fg/40">https://</span>
-              <span className="text-fg font-semibold">aria.studio</span>
-              <span className="ml-auto rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600">SSL Active ✓</span>
+            <div className="mt-6 rounded-2xl border border-fg/10 bg-bg/40 p-4">
+              <div className="flex items-center justify-between text-[14px] font-semibold">
+                <span>Career call · 30 min</span>
+                <span>₹999</span>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-[12px]">
+                {["10:00", "10:30", "11:00", "14:00", "14:30", "16:00"].map((t, i) => (
+                  <span key={t} className={`rounded-lg border py-1.5 text-center ${i === 1 ? "border-[#ff5b37] bg-[#ff5b37]/10 font-semibold" : "border-fg/15 text-fg/65"}`}>{t}</span>
+                ))}
+              </div>
+              <p className="mt-3 text-[11px] text-fg/45">Paid by UPI. The meeting link is emailed after you confirm.</p>
             </div>
           </Card>
         </Reveal>
@@ -474,15 +488,15 @@ export function Features() {
             </div>
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-6">
               <div className="rounded-2xl border border-fg/10 bg-white p-3 shadow-md">
-                <QRCodeCanvas text="https://makemylink.co/aria" size={100} />
+                <QRCodeCanvas text={`${SITE_URL}/aria`} size={100} />
               </div>
               <div className="flex flex-col gap-2 text-center sm:text-left">
-                <p className="text-[13px] font-semibold text-fg">makemylink.co/aria</p>
+                <p className="text-[13px] font-semibold text-fg">{SITE_HOST}/aria</p>
                 <p className="text-[11px] text-fg/50">Point phone camera to test instant bio scan</p>
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard?.writeText("https://makemylink.co/aria");
+                    navigator.clipboard?.writeText(`${SITE_URL}/aria`);
                     setCopiedLink(true);
                     setTimeout(() => setCopiedLink(false), 2000);
                   }}
@@ -547,10 +561,9 @@ export function Compare() {
   const yes = <Check className="mx-auto h-5 w-5 text-[#ff5b37]" />;
   const no = <Minus className="mx-auto h-5 w-5 text-fg/25" />;
   const rows: [string, React.ReactNode, React.ReactNode, React.ReactNode, React.ReactNode][] = [
-    ["Paid plans from", "$6 · ₹149", "$8", "$29", "~$10"],
-    ["Fee on your sales", <b key="f" className="text-[#ff5b37]">5% Starter · 0% Pro</b>, "Up to 12%*", "0%", "Up to 9%*"],
+    ["Paid plan from", "$8 · ₹299", "$8", "$29", "~$10"],
+    ["Fee on your sales", <b key="f" className="text-[#ff5b37]">0% on Pro</b>, "Up to 12%*", "0%", "Up to 9%*"],
     ["UPI & rupee pricing", yes, no, no, no],
-    ["Free setup by our team", yes, no, no, no],
     ["Designer themes with 3D", yes, no, no, no],
     ["Product grid", yes, yes, yes, yes],
   ];
@@ -595,12 +608,12 @@ export function Compare() {
 }
 
 const faqs: [string, string][] = [
-  ["Who is Makemylink for?", "Anyone with a bio to fill. Creators, musicians, artists, coaches, photographers, salons, cafés and small shops all use it."],
-  ["Can you set it up for me?", "Yes. Send us your handle and we'll build a first version of your page for free. You can change anything after."],
+  ["Who is Makemylink for?", "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you."],
+  ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays your UPI ID (or your own payment link for dollars). You confirm payment and they get your meeting link by email. We take no cut."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
-  ["Do you take a cut of my sales?", "On Pro, no: 0%. On Starter we take 5% of each sale. On both plans the payment company also charges its normal processing fee (about 2% to 3%)."],
+  ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
   ["Can I move from Linktree?", "Yes. Paste your Linktree link and we copy your links and socials over."],
-  ["What happens after the free trial?", "You choose Starter or Pro. If you don't, your page goes offline. We never charge you without asking."],
+  ["Is the free plan really free?", "Yes, forever, with no card. Free includes 10 themes, 8 links and a Makemylink badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits."],
 ];
 
 export function FAQ() {
@@ -636,7 +649,7 @@ export function FinalCTA() {
       <Reveal>
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-[#ff5b37] px-6 py-20 text-center text-[#141414] sm:px-12 sm:py-28">
           <div className="relative">
-            <h2 className="mx-auto max-w-[16ch] font-display text-[clamp(44px,7vw,100px)] leading-[0.92]">Get your link in two minutes.</h2>
+            <h2 className="mx-auto max-w-[16ch] font-display text-[clamp(44px,7vw,100px)] leading-[0.92]">Turn your bio into a business.</h2>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -644,7 +657,7 @@ export function FinalCTA() {
               }}
               className="mx-auto mt-10 flex max-w-md items-center gap-2 rounded-xl bg-white p-2 shadow-[0_8px_24px_-8px_rgba(0,0,0,.3)]"
             >
-              <span className="pl-4 text-[#141414]/40">makemylink.co/</span>
+              <span className="pl-4 text-[#141414]/40">{SITE_HOST}/</span>
               <input
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
@@ -654,7 +667,7 @@ export function FinalCTA() {
               />
               <button className="rounded-lg bg-[#141414] px-5 py-3 text-[14px] font-semibold text-white">Start free</button>
             </form>
-            <p className="mt-4 text-[13px] text-[#141414]/70">Free for 14 days. No card needed.</p>
+            <p className="mt-4 text-[13px] text-[#141414]/70">Free forever. No card needed.</p>
           </div>
         </div>
       </Reveal>
@@ -669,11 +682,12 @@ export function Footer() {
       <div className="flex gap-6">
         <a href="#themes" className="hover:text-fg">Themes</a>
         <a href="#pricing" className="hover:text-fg">Pricing</a>
+        <Link href="/blog" className="hover:text-fg">Blog</Link>
         <Link href="/create" className="hover:text-fg">Create</Link>
         <Link href="/privacy" className="hover:text-fg">Privacy</Link>
         <Link href="/terms" className="hover:text-fg">Terms</Link>
       </div>
-      <p>© {new Date().getFullYear()} Makemylink. One link for everything.</p>
+      <p>© {new Date().getFullYear()} Makemylink. The link in bio built to earn.</p>
     </footer>
   );
 }

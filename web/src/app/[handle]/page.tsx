@@ -1,40 +1,83 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { BioPage } from "@/components/bio/BioPage";
 import { getDemoProfile } from "@/lib/demo";
-import { getDb } from "@/lib/db";
+import { pageByHandle } from "@/lib/account";
+import { applyPlan, publicProfile, type PlanId } from "@/lib/plans";
+import { run } from "@/lib/db";
+import { SITE_URL } from "@/lib/site";
 import type { Profile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-function getProfile(handle: string): Profile | null {
-  const cleanHandle = handle.toLowerCase();
+async function load(handle: string): Promise<{ profile: Profile; plan: PlanId; pageId?: string } | null> {
   try {
-    const db = getDb();
-    const page = db.prepare("SELECT profile_json FROM pages WHERE handle = ?").get(cleanHandle) as
-      | { profile_json: string }
-      | undefined;
-
-    if (page?.profile_json) {
-      return JSON.parse(page.profile_json) as Profile;
-    }
+    const page = await pageByHandle(handle);
+    if (page) return { profile: publicProfile(applyPlan(page.profile, page.plan)), plan: page.plan, pageId: page.id };
   } catch (err) {
     console.error("Error looking up handle in DB:", err);
   }
-
-  // Fallback to demo profile
-  return getDemoProfile(cleanHandle) ?? null;
+  const demo = getDemoProfile(handle.toLowerCase());
+  return demo ? { profile: demo, plan: "pro" } : null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
   const { handle } = await params;
-  const profile = getProfile(handle);
-  return profile ? { title: `${profile.name} (@${profile.handle}) · Makemylink`, description: profile.bio } : {};
+  const found = await load(handle);
+  if (!found) return {};
+  const { profile } = found;
+  const title = `${profile.name} (@${profile.handle})`;
+  const description = profile.bio || `${profile.name}'s links, shop and bookings on Makemylink.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `${SITE_URL}/${profile.handle}` },
+    openGraph: { title, description, url: `${SITE_URL}/${profile.handle}`, type: "profile", images: profile.avatar?.startsWith("https://") ? [profile.avatar] : undefined },
+    twitter: { card: "summary", title, description },
+  };
 }
+
+const BOT = /bot|crawl|spider|slurp|facebookexternalhit|preview|headless|monitor|uptime/i;
 
 export default async function CreatorPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const profile = getProfile(handle);
-  if (!profile) notFound();
-  return <BioPage profile={profile} />;
+  const found = await load(handle);
+  if (!found) notFound();
+
+  if (found.pageId) {
+    const h = await headers();
+    if (!BOT.test(h.get("user-agent") ?? "")) {
+      const country = h.get("cf-ipcountry") ?? h.get("x-vercel-ip-country") ?? null;
+      run("INSERT INTO events (page_id, kind, target, country, created_at) VALUES ($1, 'view', NULL, $2, $3)", [found.pageId, country, Date.now()]).catch(() => {});
+    }
+  }
+
+  const { profile, plan } = found;
+  const sameAs = Object.entries(profile.socials)
+    .filter(([k, v]) => v && k !== "email")
+    .map(([k, v]) => {
+      const u = String(v).replace(/^@/, "");
+      return /^https?:/.test(u) ? u : `https://${k === "instagram" ? "instagram.com" : k === "tiktok" ? "tiktok.com/@" : k === "youtube" ? "youtube.com/@" : "pinterest.com"}${k === "instagram" ? "/" : ""}${u}`;
+    });
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name: profile.name,
+      alternateName: `@${profile.handle}`,
+      description: profile.bio,
+      url: `${SITE_URL}/${profile.handle}`,
+      sameAs,
+      ...(profile.location ? { homeLocation: { "@type": "Place", name: profile.location } } : {}),
+    },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <BioPage profile={profile} plan={plan} live={!!found.pageId} />
+    </>
+  );
 }

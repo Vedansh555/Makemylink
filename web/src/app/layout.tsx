@@ -28,12 +28,12 @@ const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"] }
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Makemylink: one link for everything you do",
+  title: "Makemylink: the link in bio built to earn",
   description:
-    "Put your links, products, videos and contact on one beautiful page. Low fees on sales, and 0% on Pro. Pay in rupees or dollars.",
+    "Take paid bookings, sell products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.",
   openGraph: {
-    title: "Makemylink: one link for everything you do",
-    description: "One beautiful page for your links, products, videos and contact.",
+    title: "Makemylink: the link in bio built to earn",
+    description: "Paid bookings, products and an email list on one beautiful page. 0% commission on Pro.",
     type: "website",
     siteName: "Makemylink",
   },

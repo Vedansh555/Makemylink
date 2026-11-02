@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
-import { getDb } from "@/lib/db";
+import { run } from "@/lib/db";
+import { pageForUser, planForUser } from "@/lib/account";
+import { applyPlan } from "@/lib/plans";
 import type { Profile } from "@/lib/types";
 import { rateLimit, sameOriginOnly, sanitizeProfile } from "@/lib/security";
 
@@ -11,11 +13,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = getDb();
-  const page = db.prepare("SELECT id, handle, profile_json, created_at, updated_at FROM pages WHERE user_id = ?").get(session.userId) as
-    | { id: string; handle: string; profile_json: string; created_at: number; updated_at: number }
-    | undefined;
-
+  const page = await pageForUser(session.userId);
   if (!page) {
     return NextResponse.json({ error: "Page not found" }, { status: 404 });
   }
@@ -49,11 +47,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Profile object is required" }, { status: 400 });
     }
 
-    const db = getDb();
-    const existing = db.prepare("SELECT id, handle FROM pages WHERE user_id = ?").get(session.userId) as
-      | { id: string; handle: string }
-      | undefined;
-
+    const existing = await pageForUser(session.userId);
     if (!existing) {
       return NextResponse.json({ error: "Page not found for user" }, { status: 404 });
     }
@@ -65,15 +59,13 @@ export async function PUT(req: Request) {
     } catch {
       return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
     }
-    const profileJson = JSON.stringify(clean);
+    // Free plan limits are enforced here, not just in the editor.
+    const plan = await planForUser(session.userId);
+    clean = applyPlan(clean, plan);
 
-    db.prepare(`
-      UPDATE pages
-      SET profile_json = ?, updated_at = ?
-      WHERE user_id = ?
-    `).run(profileJson, now, session.userId);
+    await run("UPDATE pages SET profile_json = $1, updated_at = $2 WHERE user_id = $3", [JSON.stringify(clean), now, session.userId]);
 
-    return NextResponse.json({ ok: true, updatedAt: now });
+    return NextResponse.json({ ok: true, updatedAt: now, plan, profile: clean });
   } catch (err: unknown) {
     console.error("Save page error:", err);
     return NextResponse.json({ error: "Failed to save page" }, { status: 500 });

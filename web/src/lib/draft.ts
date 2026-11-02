@@ -43,3 +43,20 @@ export function readImage(file: File, max = 640): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+/**
+ * Saves a shrunken image to Cloudflare R2 and returns its public address, so pages stay a few KB.
+ * Falls back to the inline data URL when storage is not set up or the visitor is not signed in.
+ */
+export async function storeImage(dataUrl: string): Promise<string> {
+  try {
+    const res = await fetch("/api/upload", { method: "POST" });
+    if (!res.ok) return dataUrl;
+    const { uploadUrl, publicUrl } = await res.json();
+    const blob = await (await fetch(dataUrl)).blob();
+    const put = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": "image/jpeg" }, body: blob });
+    return put.ok ? publicUrl : dataUrl;
+  } catch {
+    return dataUrl;
+  }
+}

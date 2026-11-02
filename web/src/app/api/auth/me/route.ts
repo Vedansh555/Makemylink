@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession, setSessionCookie } from "@/lib/session";
-import { getDb } from "@/lib/db";
+import { one } from "@/lib/db";
+import { planForUser } from "@/lib/account";
 
 export async function GET() {
   const session = await getSession();
@@ -11,18 +12,15 @@ export async function GET() {
   // Sliding session: each visit renews the cookie, so active users are never logged out.
   await setSessionCookie({ userId: session.userId });
 
-  const db = getDb();
-  const user = db.prepare("SELECT id, email, created_at FROM users WHERE id = ?").get(session.userId) as
-    | { id: string; email: string; created_at: number }
-    | undefined;
-
+  const user = await one<{ id: string; email: string; created_at: number; plan_renews_at: number | null }>(
+    "SELECT id, email, created_at, plan_renews_at FROM users WHERE id = $1",
+    [session.userId],
+  );
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 401 });
   }
 
-  const page = db.prepare("SELECT handle FROM pages WHERE user_id = ?").get(session.userId) as
-    | { handle: string }
-    | undefined;
+  const page = await one<{ handle: string }>("SELECT handle FROM pages WHERE user_id = $1", [session.userId]);
 
   return NextResponse.json({
     user: {
@@ -30,6 +28,8 @@ export async function GET() {
       email: user.email,
       createdAt: user.created_at,
       handle: page?.handle,
+      plan: await planForUser(user.id),
+      planRenewsAt: user.plan_renews_at,
     },
   });
 }

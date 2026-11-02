@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/db";
+import { one, transaction } from "@/lib/db";
 import { setSessionCookie } from "@/lib/session";
 import { blankProfile } from "@/lib/demo";
 import { RESERVED_HANDLES, clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
@@ -31,17 +31,10 @@ export async function POST(req: Request) {
     }
     const cleanEmail = email.toLowerCase().trim();
 
-    const db = getDb();
-
-    // Check existing email
-    const existingUser = db.prepare("SELECT id FROM users WHERE email = ?").get(cleanEmail);
-    if (existingUser) {
+    if (await one("SELECT id FROM users WHERE email = $1", [cleanEmail])) {
       return NextResponse.json({ error: "Email is already registered" }, { status: 409 });
     }
-
-    // Check existing handle in pages
-    const existingPage = db.prepare("SELECT id FROM pages WHERE handle = ?").get(cleanHandle);
-    if (existingPage) {
+    if (await one("SELECT id FROM pages WHERE handle = $1", [cleanHandle])) {
       return NextResponse.json({ error: "Handle is already claimed" }, { status: 409 });
     }
 
@@ -56,19 +49,17 @@ export async function POST(req: Request) {
       name: cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1),
     };
 
-    const tx = db.transaction(() => {
-      db.prepare(`
-        INSERT INTO users (id, email, password_hash, created_at)
-        VALUES (?, ?, ?, ?)
-      `).run(userId, cleanEmail, passwordHash, now);
-
-      db.prepare(`
-        INSERT INTO pages (id, user_id, handle, profile_json, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run(pageId, userId, cleanHandle, JSON.stringify(initialProfile), now, now);
+    await transaction(async (tx) => {
+      await tx.query("INSERT INTO users (id, email, password_hash, created_at) VALUES ($1, $2, $3, $4)", [userId, cleanEmail, passwordHash, now]);
+      await tx.query("INSERT INTO pages (id, user_id, handle, profile_json, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)", [
+        pageId,
+        userId,
+        cleanHandle,
+        JSON.stringify(initialProfile),
+        now,
+        now,
+      ]);
     });
-
-    tx();
 
     await setSessionCookie({ userId });
 

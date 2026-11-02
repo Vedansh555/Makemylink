@@ -1,10 +1,11 @@
 import { themeList } from "./themes";
+import { FREE_LIMITS, FREE_THEME_IDS } from "./plans";
 
 export type Region = "IN" | "GLOBAL";
 export type Billing = "monthly" | "yearly";
 
 export interface Plan {
-  id: "starter" | "pro";
+  id: "free" | "pro";
   name: string;
   tagline: string;
   price: Record<Region, Record<Billing, number>>;
@@ -14,32 +15,36 @@ export interface Plan {
 
 export const plans: Plan[] = [
   {
-    id: "starter",
-    name: "Starter",
-    tagline: "Everything you need to get started.",
-    price: { GLOBAL: { monthly: 6, yearly: 48 }, IN: { monthly: 149, yearly: 1199 } },
+    id: "free",
+    name: "Free",
+    tagline: "A real page, free forever.",
+    price: { GLOBAL: { monthly: 0, yearly: 0 }, IN: { monthly: 0, yearly: 0 } },
     features: [
-      `All ${themeList.length} themes, including 3D chrome`,
-      "Unlimited links",
-      "Product grid with affiliate links",
-      "Collect emails from visitors",
-      "Visits and clicks analytics",
-      "Import from Linktree",
-      "5% fee on sales (payment fees extra)",
+      `${FREE_THEME_IDS.length} designer themes`,
+      `Up to ${FREE_LIMITS.links} links and ${FREE_LIMITS.looks} products`,
+      `Collect up to ${FREE_LIMITS.subscribers} emails`,
+      `${FREE_LIMITS.analyticsDays}-day visits and clicks`,
+      "QR code for your page",
+      "Makemylink badge on your page",
     ],
   },
   {
     id: "pro",
     name: "Pro",
-    tagline: "For people who sell or work with brands.",
-    price: { GLOBAL: { monthly: 12, yearly: 96 }, IN: { monthly: 399, yearly: 2999 } },
+    tagline: "For people who earn from their page.",
+    // Keep in step with PRO_PRICE in payments.ts
+    price: { GLOBAL: { monthly: 8, yearly: 79 }, IN: { monthly: 299, yearly: 2999 } },
     features: [
-      "Everything in Starter",
-      "Sell products and bookings, 0% fee",
-      "Media kit for brands",
-      "Free custom domain, yours to keep",
+      `All ${themeList.length} themes, including 3D chrome`,
+      "Paid 1:1 bookings, 0% commission",
+      "Bento grid: half, full and tall cards",
+      "Unlimited links and products",
+      "Unlimited emails, with CSV export",
+      "30-day analytics by link and country",
+      "Schedule links and drops",
+      "Daily broken-link check with email alerts",
+      "Media kit, custom colors and fonts",
       "Remove the Makemylink badge",
-      "Help from a real person",
     ],
     highlight: true,
   },
@@ -48,7 +53,7 @@ export const plans: Plan[] = [
 /** Region for pricing: the visitor's country (cookie from middleware), else a guess from the browser. */
 export function detectRegion(): Region {
   try {
-    // Set by middleware.ts from the visitor's country (Vercel). Most reliable, so it wins.
+    // Set by middleware.ts from the visitor's country (Cloudflare or Vercel header). Most reliable, so it wins.
     const m = /(?:^|; )mml_region=(IN|GLOBAL)/.exec(document.cookie);
     if (m) return m[1] as Region;
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

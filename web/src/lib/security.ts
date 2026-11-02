@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import type { Profile } from "./types";
+import type { BookingConfig, Profile } from "./types";
 
 /** Handles that would collide with real routes or look official. */
 export const RESERVED_HANDLES = new Set([
   "api", "app", "admin", "login", "logout", "signup", "create", "preview", "dashboard", "settings",
   "pricing", "about", "terms", "privacy", "support", "help", "billing", "static", "assets", "_next",
-  "favicon.ico", "robots.txt", "sitemap.xml", "makemylink", "www", "mail", "root",
+  "favicon.ico", "robots.txt", "sitemap.xml", "makemylink", "www", "mail", "root", "blog", "llms.txt", "import",
 ]);
 
 // ---------- rate limiting ----------
@@ -71,6 +71,43 @@ const safeImg = (v: unknown) =>
 
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
 
+const finiteNum = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : undefined);
+const intIn = (v: unknown, min: number, max: number, dflt: number) =>
+  typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : dflt;
+
+/** Keeps a booking config inside sane bounds. Returns undefined when it is unusable. */
+function cleanBooking(raw: unknown): BookingConfig | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const b = raw as Partial<BookingConfig>;
+  const meetingUrl = safeHref(str(b.meetingUrl, 2048));
+  if (meetingUrl === "#") return undefined;
+  const days = Array.isArray(b.days) ? [...new Set(b.days.map((d) => intIn(d, 0, 6, -1)).filter((d) => d >= 0))] : [1, 2, 3, 4, 5];
+  const startHour = intIn(b.startHour, 0, 23, 10);
+  const endHour = Math.max(startHour + 1, intIn(b.endHour, 1, 24, 18));
+  let timeZone = "Asia/Kolkata";
+  try {
+    if (typeof b.timeZone === "string") {
+      new Intl.DateTimeFormat("en", { timeZone: b.timeZone });
+      timeZone = b.timeZone;
+    }
+  } catch {
+    /* keep default */
+  }
+  return {
+    price: intIn(b.price, 0, 1_000_000, 0),
+    currency: b.currency === "USD" ? "USD" : "INR",
+    durationMin: intIn(b.durationMin, 10, 240, 30),
+    description: b.description ? str(b.description, 300) : undefined,
+    meetingUrl,
+    upiId: typeof b.upiId === "string" && /^[\w.\-]{2,64}@[a-zA-Z]{2,32}$/.test(b.upiId.trim()) ? b.upiId.trim() : undefined,
+    paymentUrl: b.paymentUrl && safeHref(str(b.paymentUrl, 2048)) !== "#" ? safeHref(str(b.paymentUrl, 2048)) : undefined,
+    days: days.length ? days : [1, 2, 3, 4, 5],
+    startHour,
+    endHour,
+    timeZone,
+  };
+}
+
 /** Cap sizes and neutralise dangerous URLs before anything is stored. Throws on a malformed profile. */
 export function sanitizeProfile(raw: unknown, handle: string): Profile {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Profile must be an object");
@@ -87,7 +124,13 @@ export function sanitizeProfile(raw: unknown, handle: string): Profile {
     title: str(l.title, 120),
     url: safeHref(str(l.url, 2048)),
     folder: l.folder ? str(l.folder, 60) : undefined,
+    kind: l.kind === "booking" ? "booking" : "link",
+    size: l.size === "1x1" || l.size === "2x1" || l.size === "2x2" ? l.size : undefined,
+    startsAt: finiteNum(l.startsAt),
+    expiresAt: finiteNum(l.expiresAt),
+    booking: l.kind === "booking" ? cleanBooking(l.booking) : undefined,
   }));
+  out.hideBadge = !!p.hideBadge;
   out.looks = (Array.isArray(p.looks) ? p.looks : []).slice(0, 100).map((l) => ({
     ...l,
     id: str(l.id, 64),

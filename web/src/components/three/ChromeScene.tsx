@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Lightformer, MeshDistortMaterial } from "@react-three/drei";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 
 /**
@@ -61,17 +61,6 @@ function Blob({ scale = 1.6, color = "#d6d9df" }: { scale?: number; color?: stri
   );
 }
 
-function GlassRing({ position }: { position: [number, number, number] }) {
-  return (
-    <Float speed={1.8} rotationIntensity={1.2} floatIntensity={1.2}>
-      <mesh position={position} rotation={[0.9, 0.4, 0]} scale={1.15}>
-        <torusGeometry args={[0.62, 0.2, 48, 128]} />
-        <meshPhysicalMaterial color="#ffffff" transmission={1} roughness={0.03} thickness={1.2} ior={1.5} iridescence={0.6} />
-      </mesh>
-    </Float>
-  );
-}
-
 function Pearl({
   position,
   scale,
@@ -103,35 +92,27 @@ function Pearl({
   );
 }
 
-function ChromeKnot({ position }: { position: [number, number, number] }) {
-  return (
-    <Float speed={1.4} rotationIntensity={2} floatIntensity={1}>
-      <mesh position={position} scale={0.4}>
-        <torusKnotGeometry args={[1, 0.32, 220, 32]} />
-        <meshStandardMaterial color="#e9ebef" metalness={1} roughness={0.12} />
-      </mesh>
-    </Float>
-  );
-}
-
-/** Two interlocked chrome chain links: the "link" in Makemylink. */
-function ChainLinks() {
+/**
+ * A chain of interlocked chrome links: the "link" in Makemylink.
+ * Neighbouring links alternate between flat and edge-on so each one passes through the next.
+ */
+function ChainLinks({ count = 3, scale = 1, position = [0, 0, 0], tilt = 0.35 }: { count?: number; scale?: number; position?: [number, number, number]; tilt?: number }) {
   const ref = useRef<Group>(null);
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.x += delta * 0.5;
+    if (ref.current) ref.current.rotation.x += delta * 0.45;
   });
-  const material = <meshStandardMaterial color="#e9ebef" metalness={1} roughness={0.12} envMapIntensity={1.4} />;
+  const spacing = 0.88;
   return (
     <Float speed={1.6} rotationIntensity={0.3} floatIntensity={0.6}>
-      <group ref={ref} rotation={[0, 0, 0.35]} scale={1.15}>
-        <mesh position={[-0.45, 0, 0]} scale={[1.5, 1, 1]}>
-          <torusGeometry args={[0.5, 0.15, 48, 96]} />
-          {material}
-        </mesh>
-        <mesh position={[0.45, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1.5, 1, 1]}>
-          <torusGeometry args={[0.5, 0.15, 48, 96]} />
-          {material}
-        </mesh>
+      <group position={position} rotation={[0, 0, tilt]} scale={scale}>
+        <group ref={ref}>
+          {Array.from({ length: count }, (_, i) => (
+            <mesh key={i} position={[(i - (count - 1) / 2) * spacing, 0, 0]} rotation={[i % 2 ? Math.PI / 2 : 0, 0, 0]} scale={[1.35, 1, 1]}>
+              <torusGeometry args={[0.5, 0.15, 48, 96]} />
+              <meshStandardMaterial color="#e9ebef" metalness={1} roughness={0.12} envMapIntensity={1.4} />
+            </mesh>
+          ))}
+        </group>
       </group>
     </Float>
   );
@@ -148,39 +129,61 @@ function PastelDonut({ position, color = "#ffb5c5" }: { position: [number, numbe
   );
 }
 
-function HeroElements({ ballColor }: { ballColor: string }) {
-  const width = useThree((s) => s.viewport.width);
-  const isNarrow = width < 4.2;
-
-  // On desktop: original chrome blob, glass ring, knot and pastel pearls
-  if (!isNarrow) {
-    return (
-      <>
-        <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
-          <group position={[2.85, -0.35, -0.6]}>
-            <Blob scale={1.35} color={ballColor} />
-          </group>
-        </Float>
-        <GlassRing position={[-2.8, 1.05, 0.1]} />
-        <ChromeKnot position={[-2.4, -0.65, -0.1]} />
-        <Pearl position={[3.4, 1.4, -0.4]} scale={0.24} color="#ffb7a5" />
-        <Pearl position={[-1.5, -1.05, 0.5]} scale={0.17} color="#ff5b37" />
-        <Pearl position={[1.5, -1.8, -1]} scale={0.14} color="#c9b8ff" />
-      </>
-    );
-  }
-
-  // On mobile: 3 small sleek glossy black spheres reflecting the studio lights, positioned safely away from text
+function HeroElements() {
+  const vw = useThree((s) => s.viewport.width);
+  const px = useThree((s) => s.size.width);
+  // The headline is about 26% of the page width on each side of centre (capped at 400px).
+  // A chain is drawn only when it fits entirely in the white space beside it, so it can never sit behind text, phones or the nav.
+  const unitsPerPx = vw / px;
+  const textHalf = Math.min(0.27 * px, 400) * unitsPerPx;
+  const chainHalf = 0.5; // half the width of a 3-link chain at this size, in world units
+  const worldX = vw / 2 - 0.35 - chainHalf;
+  if (vw < 5.2 || worldX - chainHalf < textHalf + 0.15) return null;
+  // PointerRig scales this group by min(1, vw / 5.2); undo it so positions are in world units.
+  const k = Math.min(1, vw / 5.2);
+  const x = worldX / k;
   return (
     <>
-      <Pearl position={[1.9, 2.1, -0.5]} scale={0.24} color="#151618" metalness={0.9} roughness={0.12} clearcoat={1} />
-      <Pearl position={[-1.9, 0.4, -0.6]} scale={0.21} color="#0c0d0e" metalness={0.9} roughness={0.12} clearcoat={1} />
-      <Pearl position={[1.8, -1.9, -0.7]} scale={0.23} color="#18191c" metalness={0.9} roughness={0.12} clearcoat={1} />
+      <ChainLinks count={3} scale={0.34} position={[-x, 0.5, 0]} tilt={0.5} />
+      <ChainLinks count={3} scale={0.34} position={[x, 0.6, 0]} tilt={-0.5} />
     </>
   );
 }
 
-export default function ChromeScene({
+/**
+ * Browsers allow only a handful of live 3D scenes. A page with many themed phones would starve the hero,
+ * so each scene runs only while it is on (or near) the screen.
+ */
+function OnScreen({ children }: { children: React.ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") return setOn(true);
+    const io = new IntersectionObserver(([e]) => setOn(e!.isIntersecting), { rootMargin: "200px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={box} className="h-full w-full">
+      {on && children}
+    </div>
+  );
+}
+
+export default function ChromeScene(props: {
+  variant?: "hero" | "chain" | "bio" | "bakes" | "clay";
+  color?: string;
+  accentColor?: string;
+}) {
+  return (
+    <OnScreen>
+      <Scene {...props} />
+    </OnScreen>
+  );
+}
+
+function Scene({
   variant = "bio",
   color = "#eceef2",
   accentColor = "#ff758c",
@@ -207,7 +210,7 @@ export default function ChromeScene({
       <ambientLight intensity={0.4} />
       <Studio />
       <PointerRig fitWidth={hero ? 5.2 : 3} isHero={hero}>
-        {variant === "chain" && <ChainLinks />}
+        {variant === "chain" && <ChainLinks count={4} scale={0.8} />}
         {!hero && !isBakes && !isClay && variant !== "chain" && (
           <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.6}>
             <group position={[0, 0, 0]}>
@@ -215,7 +218,7 @@ export default function ChromeScene({
             </group>
           </Float>
         )}
-        {hero && <HeroElements ballColor={ballColor} />}
+        {hero && <HeroElements />}
         {isBakes && (
           <>
             {/* Kept within the viewport and clear of the top speaker notch and text */}

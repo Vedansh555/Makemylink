@@ -1,5 +1,6 @@
 "use client";
 
+import { SITE_URL, SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -23,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
-import { loadDraft, readImage, saveDraft, uid } from "@/lib/draft";
+import { loadDraft, readImage, saveDraft, storeImage, uid } from "@/lib/draft";
 import { getTheme, themeList } from "@/lib/themes";
 
 const fontOptions: [string, string][] = [
@@ -34,7 +35,8 @@ const fontOptions: [string, string][] = [
   ["grotesk", "Space Grotesk (mono-ish)"],
   ["sans", "Inter (plain sans)"],
 ];
-import type { ArtKind, BioLink, Look, Profile, Store } from "@/lib/types";
+import type { ArtKind, BioLink, BlockSize, BookingConfig, Look, Profile, Store } from "@/lib/types";
+import { FREE_LIMITS, applyPlan, type PlanId } from "@/lib/plans";
 import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
 import { Logo } from "../landing/Nav";
@@ -93,11 +95,92 @@ function ImagePick({ onPick, children, className = "" }: { onPick: (dataUrl: str
         hidden
         onChange={async (e) => {
           const f = e.target.files?.[0];
-          if (f) onPick(await readImage(f));
+          if (f) onPick(await storeImage(await readImage(f)));
           e.target.value = "";
         }}
       />
     </>
+  );
+}
+
+const toLocalInput = (ms?: number) => {
+  if (!ms) return "";
+  const d = new Date(ms - new Date(ms).getTimezoneOffset() * 60_000);
+  return d.toISOString().slice(0, 16);
+};
+const fromLocalInput = (v: string) => (v ? new Date(v).getTime() : undefined);
+
+const newBooking = (): BioLink => ({
+  id: uid(),
+  title: "Book a 1:1 call",
+  url: "",
+  kind: "booking",
+  booking: {
+    price: 999,
+    currency: "INR",
+    durationMin: 30,
+    meetingUrl: "https://meet.google.com/",
+    days: [1, 2, 3, 4, 5],
+    startHour: 10,
+    endHour: 18,
+    timeZone: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "Asia/Kolkata",
+  },
+});
+
+const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
+
+function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: BookingConfig) => void }) {
+  const up = (patch: Partial<BookingConfig>) => onChange({ ...b, ...patch });
+  return (
+    <div className="grid gap-2 rounded-xl border border-fg/10 bg-fg/[0.03] p-3 sm:grid-cols-2">
+      <Field label="Price (0 = free)">
+        <div className="flex gap-2">
+          <select className={`${inputCls} !w-24`} value={b.currency} onChange={(e) => up({ currency: e.target.value as "INR" | "USD" })}>
+            <option className="bg-bg" value="INR">₹ INR</option>
+            <option className="bg-bg" value="USD">$ USD</option>
+          </select>
+          <input type="number" min={0} className={inputCls} value={b.price} onChange={(e) => up({ price: Math.max(0, Math.round(+e.target.value)) })} />
+        </div>
+      </Field>
+      <Field label="Length (minutes)">
+        <input type="number" min={10} max={240} step={5} className={inputCls} value={b.durationMin} onChange={(e) => up({ durationMin: +e.target.value })} />
+      </Field>
+      <Field label="Meeting link (sent after booking)">
+        <input className={inputCls} value={b.meetingUrl} onChange={(e) => up({ meetingUrl: e.target.value })} placeholder="https://meet.google.com/…" />
+      </Field>
+      <Field label="Your UPI ID (Indian buyers pay you directly)">
+        <input className={inputCls} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
+      </Field>
+      <Field label="Card / PayPal payment link (international buyers)">
+        <input className={inputCls} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://buy.stripe.com/…" />
+      </Field>
+      <Field label="Days">
+        <div className="flex gap-1">
+          {DAY_LABELS.map((d, i) => (
+            <button
+              type="button"
+              key={i}
+              onClick={() => up({ days: b.days.includes(i) ? b.days.filter((x) => x !== i) : [...b.days, i] })}
+              className={`h-9 w-9 rounded-lg text-[12px] font-semibold ${b.days.includes(i) ? "bg-fg text-bg" : "border border-fg/15 text-fg/60"}`}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Hours (24h) and time zone">
+        <div className="flex gap-2">
+          <input type="number" min={0} max={23} className={`${inputCls} !w-16`} value={b.startHour} onChange={(e) => up({ startHour: +e.target.value })} />
+          <input type="number" min={1} max={24} className={`${inputCls} !w-16`} value={b.endHour} onChange={(e) => up({ endHour: +e.target.value })} />
+          <input className={inputCls} value={b.timeZone} onChange={(e) => up({ timeZone: e.target.value })} />
+        </div>
+      </Field>
+      <div className="sm:col-span-2">
+        <Field label="Short description (optional)">
+          <input className={inputCls} value={b.description ?? ""} maxLength={300} onChange={(e) => up({ description: e.target.value })} />
+        </Field>
+      </div>
+    </div>
   );
 }
 
@@ -108,7 +191,10 @@ export function Editor() {
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [mobileTab, setMobileTab] = useState<"theme" | "profile" | "links" | "shop" | "socials">("theme");
   const [publishOpen, setPublishOpen] = useState(false);
-  const [user, setUser] = useState<{ id: string; email: string; handle?: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string; handle?: string; plan?: PlanId } | null>(null);
+  const [notice, setNotice] = useState("");
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [examplesOpen, setExamplesOpen] = useState(false);
@@ -203,6 +289,24 @@ export function Editor() {
   };
 
   if (!p) return <div className="min-h-screen bg-bg" />;
+
+  // What the visitor will actually see: Free limits applied, so the preview never promises what Free can't publish.
+  const plan: PlanId = user?.plan ?? "free";
+  const isPro = plan === "pro";
+  const shown = applyPlan(p, plan);
+  const proOnly = (what: string) => setNotice(`${what} is on Pro. Upgrade from your dashboard to use it.`);
+
+  async function importLinktree() {
+    setImporting(true);
+    setNotice("");
+    const res = await fetch("/api/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: importUrl }) });
+    const d = await res.json().catch(() => ({}));
+    setImporting(false);
+    if (!res.ok) return setNotice(d.error ?? "Import failed");
+    setP((cur) => (cur ? { ...cur, name: cur.name && cur.name !== cur.handle ? cur.name : d.name, bio: cur.bio || d.bio, links: [...cur.links, ...d.links.map((l: BioLink) => ({ ...l, id: uid() }))] } : cur));
+    setNotice(`Imported ${d.links.length} links.`);
+    setImportUrl("");
+  }
 
   const set = <K extends keyof Profile>(key: K, value: Profile[K]) => setP({ ...p, [key]: value });
   const setLink = (id: string, patch: Partial<BioLink>) => set("links", p.links.map((l) => (l.id === id ? { ...l, ...patch } : l)));
@@ -342,6 +446,18 @@ export function Editor() {
             </div>
           </div>
 
+          {p.links.length <= 3 && (
+            <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#ff5b37]/40 bg-[#ff5b37]/[0.06] p-4 sm:flex-row sm:items-center">
+              <div className="flex-1">
+                <p className="text-[14px] font-semibold">Already have a Linktree?</p>
+                <p className="text-[12px] text-fg/55">Paste your link and we copy your name, bio and links in seconds.</p>
+              </div>
+              <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="linktr.ee/yourname" />
+              <button disabled={!importUrl || importing} onClick={importLinktree} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
+                {importing ? "Importing…" : "Import"}
+              </button>
+            </div>
+          )}
           {/* Mobile Category Tabs so user never faces an endless stacked scroll on phone */}
           <div className="no-scrollbar sticky top-[57px] z-30 -mx-4 flex gap-1.5 overflow-x-auto bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
             {[
@@ -372,7 +488,7 @@ export function Editor() {
           {/* Mobile: live preview pinned above the theme list so a style can be tapped and seen at once */}
           {mobileTab === "theme" && (
             <div className="sticky top-[107px] z-20 -mx-4 flex items-center gap-4 border-b border-fg/10 bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
-              <PhoneFrame profile={p} scale={0.2} />
+              <PhoneFrame profile={shown} plan={plan} scale={0.2} />
               <div className="min-w-0">
                 <p className="truncate text-[14px] font-semibold">{getTheme(p.theme).def.label}</p>
                 <p className="mt-0.5 text-[12px] text-fg/50">Tap a style below to try it.</p>
@@ -383,7 +499,8 @@ export function Editor() {
           {/* Theme Section */}
           <div className={mobileTab === "theme" ? "block" : "hidden lg:block"}>
             <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
-              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" />
+              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" plan={plan} onLocked={() => proOnly("This theme")} />
+              {notice && <p className="text-[13px] text-[#ff5b37]">{notice}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4">
                 <div>
                   <p className="text-[13px] font-medium">Accent color</p>
@@ -470,7 +587,7 @@ export function Editor() {
                 </Field>
                 <Field label="Handle">
                   <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 text-[14px] focus-within:border-fg/35">
-                    <span className="text-fg/35">makemylink.co/</span>
+                    <span className="text-fg/35">{SITE_HOST}/</span>
                     <input
                       className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 outline-none"
                       value={p.handle}
@@ -511,20 +628,39 @@ export function Editor() {
             <Panel
               title="Links"
               action={
-                <button
-                  onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
-                  className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
-                >
-                  <Plus className="h-3.5 w-3.5" /> Add link
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => (isPro ? set("links", [...p.links, newBooking()]) : proOnly("Paid bookings"))}
+                    className="flex items-center gap-1 rounded-full border border-fg/20 px-3 py-1.5 text-[12px] font-semibold"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Booking{!isPro && " · Pro"}
+                  </button>
+                  <button
+                    onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
+                    className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Add link
+                  </button>
+                </div>
               }
             >
+              <div className="flex gap-2">
+                <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import from Linktree: linktr.ee/yourname" />
+                <button disabled={!importUrl || importing} onClick={importLinktree} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
+                  {importing ? "Importing…" : "Import"}
+                </button>
+              </div>
+              {notice && <p className="text-[13px] text-[#ff5b37]">{notice}</p>}
+              {!isPro && p.links.length > FREE_LIMITS.links && (
+                <p className="text-[13px] text-fg/55">Free pages show the first {FREE_LIMITS.links} links. The rest are kept and appear when you go Pro.</p>
+              )}
               {p.links.length === 0 && <p className="text-[14px] text-fg/40">No links yet.</p>}
               {p.links.map((l, i) => (
-                <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3 sm:flex-row sm:items-center">
-                  <div className="grid flex-1 gap-2 sm:grid-cols-3">
+                <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <div className={`grid flex-1 gap-2 ${l.kind === "booking" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                     <input className={inputCls} value={l.title} onChange={(e) => setLink(l.id, { title: e.target.value })} placeholder="Title" />
-                    <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />
+                    {l.kind !== "booking" && <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />}
                     <input
                       className={inputCls}
                       value={l.folder ?? ""}
@@ -546,6 +682,32 @@ export function Editor() {
                       <Trash2 className="h-4 w-4" />
                     </IconBtn>
                   </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-fg/60">
+                    <label className="flex items-center gap-1.5">
+                      Size{!isPro && " (Pro)"}
+                      <select
+                        className={`${inputCls} !w-auto !py-1.5`}
+                        value={l.size ?? "2x1"}
+                        onChange={(e) => (isPro ? setLink(l.id, { size: e.target.value as BlockSize }) : proOnly("Grid card sizes"))}
+                      >
+                        <option className="bg-bg" value="1x1">Half width</option>
+                        <option className="bg-bg" value="2x1">Full width</option>
+                        <option className="bg-bg" value="2x2">Tall</option>
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1.5">
+                      Show from
+                      <input type="datetime-local" className={`${inputCls} !w-auto !py-1.5`} value={toLocalInput(l.startsAt)} onChange={(e) => setLink(l.id, { startsAt: fromLocalInput(e.target.value) })} />
+                    </label>
+                    <label className="flex items-center gap-1.5">
+                      Hide after
+                      <input type="datetime-local" className={`${inputCls} !w-auto !py-1.5`} value={toLocalInput(l.expiresAt)} onChange={(e) => setLink(l.id, { expiresAt: fromLocalInput(e.target.value) })} />
+                    </label>
+                  </div>
+
+                  {l.kind === "booking" && l.booking && <BookingFields b={l.booking} onChange={(b) => setLink(l.id, { booking: b })} />}
                 </div>
               ))}
             </Panel>
@@ -635,7 +797,7 @@ export function Editor() {
           {/* Media Kit Section */}
           <div className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
             <Panel title="Media kit">
-              <Switch on={p.showMediaKit} onChange={(v) => set("showMediaKit", v)} label="Show media kit for brands" />
+              <Switch on={p.showMediaKit && isPro} onChange={(v) => (isPro ? set("showMediaKit", v) : proOnly("The media kit"))} label={`Show media kit for brands${isPro ? "" : " (Pro)"}`} />
               {p.showMediaKit && (
                 <>
                   <div className="grid gap-4 sm:grid-cols-3">
@@ -668,6 +830,10 @@ export function Editor() {
           <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
             <Panel title="Audience">
               <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
+              <Switch on={!!p.hideBadge && isPro} onChange={(v) => (isPro ? set("hideBadge", v) : proOnly("Removing the badge"))} label={`Hide the Makemylink badge${isPro ? "" : " (Pro)"}`} />
+              <p className="text-[12px] text-fg/40">
+                Plan: <b>{isPro ? "Pro" : "Free"}</b> · <Link href="/dashboard" className="underline">Open dashboard</Link> for emails, bookings and stats
+              </p>
             </Panel>
           </div>
         </div>
@@ -677,13 +843,13 @@ export function Editor() {
           <div className="sticky top-20 flex flex-col items-center gap-4">
             {/* Responsive scale: 0.62 on mobile screen so the entire phone frame fits in the viewport without cutoffs */}
             <div className="block lg:hidden">
-              <PhoneFrame profile={p} scale={0.62} />
+              <PhoneFrame profile={shown} plan={plan} scale={0.62} />
             </div>
             <div className="hidden lg:block">
-              <PhoneFrame profile={p} scale={0.78} />
+              <PhoneFrame profile={shown} plan={plan} scale={0.78} />
             </div>
             <p className="text-[12px] text-fg/40 font-medium">
-              makemylink.co/{p.handle}
+              {SITE_HOST}/{p.handle}
             </p>
           </div>
         </div>
@@ -713,8 +879,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Published!</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
+                  <QRCodeCanvas text={`${SITE_URL}/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <p className="mt-2 text-[12px] text-fg/45">Scan to open your page — handy for prints, menus and business cards.</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Saved directly to database for account {user.email}.
@@ -733,7 +899,7 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[38px] italic leading-none">Ready to publish?</h3>
                   <p className="mt-3 text-fg/60">Create a free account to claim your handle and publish your live page.</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Your current edits are temporarily saved in this browser. Sign up or log in to make your page permanent.
                   </p>
@@ -751,8 +917,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Looking good.</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
+                  <QRCodeCanvas text={`${SITE_URL}/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <div className="mt-7 flex flex-col gap-2">
                     <Link href={`/${p.handle}`} target="_blank" className="rounded-full bg-[#ff5b37] py-3.5 font-semibold text-[#111] hover:brightness-110">
                       View live page

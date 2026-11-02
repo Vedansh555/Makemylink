@@ -17,7 +17,7 @@ export function Pricing() {
         <p className="text-[12px] uppercase tracking-[0.35em] text-fg/45">Pricing</p>
         <h2 className="mt-4 font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">Simple pricing.</h2>
         <p className="mt-5 max-w-[520px] text-fg/60">
-          Free for 14 days, then one simple price. Keep 95% of your sales on Starter, 100% on Pro.
+          Start free. Upgrade to Pro when your page starts earning. No commission on bookings or sales, ever.
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -57,7 +57,7 @@ export function Pricing() {
                 <span className="pb-1 text-fg/50">/ month</span>
               </div>
               <p className="mt-2 h-5 text-[13px] text-fg/40">
-                {billing === "yearly" ? `Billed ${formatPrice(amount, region)} yearly` : "Billed monthly, cancel anytime"}
+                {p.id === "free" ? "No card needed" : billing === "yearly" ? `Pay ${formatPrice(amount, region)} once for a year` : "Pay for one month at a time, no auto-renewal"}
               </p>
               <ul className="mt-8 flex flex-1 flex-col gap-3 text-[14px] text-fg/80">
                 {p.features.map((f) => (
@@ -68,12 +68,12 @@ export function Pricing() {
                 ))}
               </ul>
               <Link
-                href="/create"
+                href={p.id === "free" ? "/create" : "/dashboard?tab=billing"}
                 className={`mt-9 rounded-xl py-4 text-center text-[15px] font-semibold transition ${
                   p.highlight ? "bg-[#ff5b37] text-[#111] hover:brightness-110" : "border border-fg/20 hover:border-fg/50"
                 }`}
               >
-                Start 14-day free trial
+                {p.id === "free" ? "Create your free page" : "Get Pro"}
               </Link>
             </div>
           );
