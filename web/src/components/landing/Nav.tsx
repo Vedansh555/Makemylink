@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export function Logo({ className = "" }: { className?: string }) {
@@ -12,6 +15,11 @@ export function Logo({ className = "" }: { className?: string }) {
 }
 
 export function Nav() {
+  // Signed-in creators get a link to their dashboard (stats, emails, bookings, plan).
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => setSignedIn(r.ok)).catch(() => {});
+  }, []);
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       {/* Solid cover behind the pill so nothing scrolls visibly above or beside the nav */}
@@ -26,6 +34,15 @@ export function Nav() {
           <Link href="/blog" className="hover:text-fg">Blog</Link>
         </div>
         <div className="flex items-center gap-2">
+          {signedIn ? (
+            <Link href="/dashboard" className="rounded-lg border border-fg/15 px-4 py-2 text-[13px] font-semibold transition hover:border-fg/40">
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/login" className="px-3 py-2 text-[13px] text-fg/70 hover:text-fg">
+              Log in
+            </Link>
+          )}
           <Link href="/create" className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
             Create<span className="hidden sm:inline"> your page</span>
           </Link>

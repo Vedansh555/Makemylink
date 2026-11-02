@@ -11,7 +11,7 @@ const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false }
 
 const ease = [0.2, 0.7, 0.2, 1] as const;
 
-const uses = ["Creators", "Musicians", "Artists", "Coaches", "Shops", "Salons", "Photographers"];
+const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "small shops"];
 
 export function Hero() {
   // Desktop gets the big scene behind the headline; phones get a small one below the text.
@@ -28,7 +28,7 @@ export function Hero() {
   const right = { ...getDemoProfile("aria")!, theme: "violet-mist" };
 
   return (
-    <section className="relative isolate pt-32 sm:pt-36">
+    <section className="relative isolate pt-32 [clip-path:inset(-300px_-300px_0_-300px)] sm:pt-36">
       {/* 3D scene, responsive scaling & positioning so it never crowds text on mobile */}
       {wide && (
         <div className="pointer-events-none absolute inset-x-0 top-[70px] z-0 h-[850px] w-full overflow-hidden">
@@ -41,18 +41,18 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6">
         <div>
           <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
-            One link for
+            Your link in bio,
             <br />
-            everything <span className="chrome-text [text-shadow:none]">you do.</span>
+            built to <span className="chrome-text [text-shadow:none]">earn.</span>
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
-            Put your links, products, videos and contact on one page. Add it to your Instagram or TikTok bio in two minutes.
+            Take paid bookings, sell products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.
           </p>
 
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-5 [animation-delay:.24s] [text-shadow:none]">
             <Link href="/create" className="rounded-xl bg-fg px-6 py-3.5 text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
-              Create your page
+              Create your free page
             </Link>
             <a href="#themes" className="text-[15px] text-fg/80 underline decoration-fg/30 underline-offset-[6px] transition hover:text-fg hover:decoration-fg">
               See examples
@@ -60,7 +60,7 @@ export function Hero() {
           </div>
 
           <p className="rise mt-10 text-[13px] text-fg/55 [animation-delay:.36s]">
-            Used by {uses.join(", ").toLowerCase()} and more.
+            Made for {uses.join(", ")}.
           </p>
         </div>
       </div>
@@ -83,13 +83,13 @@ export function Hero() {
         >
           <div className="relative [animation:float_7s_ease-in-out_infinite]">
             <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#9aa0ad" }} />
-            <PhoneFrame profile={left} scale={wide ? 0.56 : 0.34} />
+            <PhoneFrame interactive={false} profile={left} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10 translate-y-6 sm:translate-y-0">
           <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
             <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#ff5fb0" }} />
-            <PhoneFrame profile={center} scale={wide ? 0.66 : 0.5} />
+            <PhoneFrame interactive={false} profile={center} scale={wide ? 0.66 : 0.5} />
           </div>
         </motion.div>
         <motion.div
@@ -101,7 +101,7 @@ export function Hero() {
         >
           <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
             <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#b38aff" }} />
-            <PhoneFrame profile={right} scale={wide ? 0.56 : 0.34} />
+            <PhoneFrame interactive={false} profile={right} scale={wide ? 0.56 : 0.34} />
           </div>
         </motion.div>
       </div>

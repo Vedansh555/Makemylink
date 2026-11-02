@@ -60,14 +60,13 @@ export async function POST(req: Request) {
   if (owner) await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${free ? "" : "<p>Mark it paid in your dashboard once the money arrives.</p>"}`);
   if (free) await sendMail(email, `Confirmed: ${link.title}`, `<p>You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
 
-  const pay = free
-    ? null
-    : cfg.currency === "INR" && cfg.upiId
-      ? { kind: "upi" as const, upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` }
-      : cfg.paymentUrl
-        ? { kind: "link" as const, link: cfg.paymentUrl }
-        : null;
-  return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pay });
+  // Offer every way the creator set up: UPI for Indian buyers, a payment link (cards) for everyone else.
+  const pays: ({ kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
+  if (!free) {
+    if (cfg.upiId && cfg.currency === "INR") pays.push({ kind: "upi", upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` });
+    if (cfg.paymentUrl) pays.push({ kind: "link", link: cfg.paymentUrl });
+  }
+  return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pays });
 }
 
 // PATCH /api/bookings {id, status} — the page owner marks a booking paid/confirmed or cancelled.

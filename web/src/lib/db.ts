@@ -85,6 +85,9 @@ CREATE TABLE IF NOT EXISTS link_health (
   checked_at DOUBLE PRECISION NOT NULL,
   PRIMARY KEY (page_id, link_id)
 );
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS custom_domain TEXT;
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS custom_domain_verified BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS pages_custom_domain ON pages (custom_domain);
 CREATE TABLE IF NOT EXISTS password_resets (
   token_hash TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,

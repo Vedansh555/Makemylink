@@ -7,7 +7,8 @@ import type { BioLink } from "@/lib/types";
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
 
-type Result = { status: string; meetingUrl?: string; pay: { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string } | null };
+type Pay = { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
+type Result = { status: string; meetingUrl?: string; pays: Pay[] };
 
 export function BookingModal({ link, handle, live, onClose }: { link: BioLink; handle: string; live: boolean; onClose: () => void }) {
   const cfg = link.booking!;
@@ -86,20 +87,21 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
               <>
                 <p className="text-[16px] font-semibold">Slot held. One step left.</p>
                 <p className="text-white/70">Pay {money(cfg.price, cfg.currency)} directly to {link.title.length ? "the creator" : ""}. Your meeting link is emailed as soon as they confirm payment.</p>
-                {done.pay?.kind === "upi" && (
-                  <>
-                    <a href={done.pay.link} className="block rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
-                      Pay with UPI app
+                {done.pays.map((p) =>
+                  p.kind === "upi" ? (
+                    <div key="upi">
+                      <a href={p.link} className="block rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
+                        Pay with UPI (India)
+                      </a>
+                      <p className="mt-2 text-center text-white/50">or UPI ID: <span className="select-all font-mono text-white">{p.upiId}</span></p>
+                    </div>
+                  ) : (
+                    <a key="link" href={p.link} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/30 px-4 py-3 text-center font-semibold text-white">
+                      Pay by card or PayPal
                     </a>
-                    <p className="text-center text-white/50">or pay to UPI ID: <span className="select-all font-mono text-white">{done.pay.upiId}</span></p>
-                  </>
+                  ),
                 )}
-                {done.pay?.kind === "link" && (
-                  <a href={done.pay.link} target="_blank" rel="noreferrer" className="block rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
-                    Pay now
-                  </a>
-                )}
-                {!done.pay && <p className="text-white/50">The creator will email you how to pay.</p>}
+                {!done.pays.length && <p className="text-white/50">The creator will email you how to pay.</p>}
               </>
             )}
           </div>

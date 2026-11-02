@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { detectRegion, formatPrice, plans, type Billing, type Region } from "@/lib/pricing";
 import { Logo } from "../landing/Nav";
 
-type Tab = "overview" | "leads" | "bookings" | "links" | "billing";
+type Tab = "overview" | "leads" | "bookings" | "links" | "domain" | "billing";
 interface Data {
   plan: "free" | "pro";
   handle: string;
@@ -47,7 +47,7 @@ export function Dashboard() {
     load();
   }, [load]);
 
-  const tabs: [Tab, string][] = [["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["billing", "Plan"]];
+  const tabs: [Tab, string][] = [["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["domain", "Domain"], ["billing", "Plan"]];
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -76,6 +76,7 @@ export function Dashboard() {
             {tab === "leads" && <Leads d={data} />}
             {tab === "bookings" && <Bookings d={data} reload={load} />}
             {tab === "links" && <Health d={data} />}
+            {tab === "domain" && <DomainTab d={data} />}
             {tab === "billing" && <Billing d={data} email={email} reload={load} />}
           </div>
         )}
@@ -302,6 +303,62 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
       </div>
       <p className="mt-3 text-[12px] text-fg/40">{region === "IN" ? "UPI, cards and netbanking via Razorpay." : "Cards, Apple Pay and Google Pay via Stripe."} One-time payment. It does not auto-renew.</p>
       {msg && <p className="mt-4 text-[14px] text-fg">{msg}</p>}
+    </div>
+  );
+}
+
+function DomainTab({ d }: { d: Data }) {
+  const [info, setInfo] = useState<{ domain: string | null; verified: boolean; target: string } | null>(null);
+  const [input, setInput] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => {
+    const r = await fetch("/api/domain");
+    if (r.ok) setInfo(await r.json());
+  }, []);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (d.plan !== "pro") return <Locked>Use your own domain, like links.yourname.com, on Pro. Upgrade on the Plan tab.</Locked>;
+
+  async function call(body: object) {
+    setBusy(true);
+    setMsg("");
+    const r = await fetch("/api/domain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const o = await r.json().catch(() => ({}));
+    setBusy(false);
+    if (!r.ok) setMsg(o.error ?? "Something went wrong");
+    else if ("verified" in o && "verify" in body) setMsg(o.verified ? "Connected. Your page now loads on your domain." : "We can't see it pointing here yet. DNS can take up to an hour. Try again later.");
+    await load();
+  }
+
+  return (
+    <div className={card}>
+      <p className="text-[11px] uppercase tracking-[0.2em] text-fg/45">Your domain</p>
+      {info?.domain ? (
+        <>
+          <p className="mt-2 font-mono text-[18px]">{info.domain} <span className={`ml-2 text-[12px] font-semibold ${info.verified ? "text-emerald-500" : "text-amber-500"}`}>{info.verified ? "Connected" : "Waiting for DNS"}</span></p>
+          {!info.verified && (
+            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[14px] text-fg/70">
+              <li>Open the DNS settings where you bought the domain.</li>
+              <li>Add a <b>CNAME</b> record: name <span className="font-mono">{info.domain.split(".").length > 2 ? info.domain.split(".")[0] : "www"}</span>, value <span className="select-all font-mono">{info.target}</span>.</li>
+              <li>Come back and press <b>Check connection</b>.</li>
+              <li>Then email us your domain so we switch on its secure (https) certificate. We do this within a day.</li>
+            </ol>
+          )}
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button disabled={busy} onClick={() => call({ verify: true })} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">Check connection</button>
+            <button disabled={busy} onClick={async () => { await fetch("/api/domain", { method: "DELETE" }); load(); }} className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Remove</button>
+          </div>
+        </>
+      ) : (
+        <form onSubmit={(e) => { e.preventDefault(); call({ domain: input }); }} className="mt-3 flex flex-wrap gap-2">
+          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="links.yourname.com" className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg/60 px-4 py-2.5 text-[14px] outline-none focus:border-fg/40" />
+          <button disabled={busy || !input} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">Connect</button>
+        </form>
+      )}
+      {msg && <p className="mt-4 text-[14px]">{msg}</p>}
     </div>
   );
 }

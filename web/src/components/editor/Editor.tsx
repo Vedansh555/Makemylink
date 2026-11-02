@@ -1,5 +1,6 @@
 "use client";
 
+import { SITE_URL, SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -23,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
-import { loadDraft, readImage, saveDraft, uid } from "@/lib/draft";
+import { loadDraft, readImage, saveDraft, storeImage, uid } from "@/lib/draft";
 import { getTheme, themeList } from "@/lib/themes";
 
 const fontOptions: [string, string][] = [
@@ -94,7 +95,7 @@ function ImagePick({ onPick, children, className = "" }: { onPick: (dataUrl: str
         hidden
         onChange={async (e) => {
           const f = e.target.files?.[0];
-          if (f) onPick(await readImage(f));
+          if (f) onPick(await storeImage(await readImage(f)));
           e.target.value = "";
         }}
       />
@@ -147,12 +148,11 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
       <Field label="Meeting link (sent after booking)">
         <input className={inputCls} value={b.meetingUrl} onChange={(e) => up({ meetingUrl: e.target.value })} placeholder="https://meet.google.com/…" />
       </Field>
-      <Field label={b.currency === "INR" ? "Your UPI ID (buyers pay you directly)" : "Your payment link (Stripe / PayPal)"}>
-        {b.currency === "INR" ? (
-          <input className={inputCls} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
-        ) : (
-          <input className={inputCls} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://buy.stripe.com/…" />
-        )}
+      <Field label="Your UPI ID (Indian buyers pay you directly)">
+        <input className={inputCls} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
+      </Field>
+      <Field label="Card / PayPal payment link (international buyers)">
+        <input className={inputCls} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://buy.stripe.com/…" />
       </Field>
       <Field label="Days">
         <div className="flex gap-1">
@@ -446,6 +446,18 @@ export function Editor() {
             </div>
           </div>
 
+          {p.links.length <= 3 && (
+            <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#ff5b37]/40 bg-[#ff5b37]/[0.06] p-4 sm:flex-row sm:items-center">
+              <div className="flex-1">
+                <p className="text-[14px] font-semibold">Already have a Linktree?</p>
+                <p className="text-[12px] text-fg/55">Paste your link and we copy your name, bio and links in seconds.</p>
+              </div>
+              <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="linktr.ee/yourname" />
+              <button disabled={!importUrl || importing} onClick={importLinktree} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
+                {importing ? "Importing…" : "Import"}
+              </button>
+            </div>
+          )}
           {/* Mobile Category Tabs so user never faces an endless stacked scroll on phone */}
           <div className="no-scrollbar sticky top-[57px] z-30 -mx-4 flex gap-1.5 overflow-x-auto bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
             {[
@@ -575,7 +587,7 @@ export function Editor() {
                 </Field>
                 <Field label="Handle">
                   <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 text-[14px] focus-within:border-fg/35">
-                    <span className="text-fg/35">makemylink.co/</span>
+                    <span className="text-fg/35">{SITE_HOST}/</span>
                     <input
                       className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 outline-none"
                       value={p.handle}
@@ -837,7 +849,7 @@ export function Editor() {
               <PhoneFrame profile={shown} plan={plan} scale={0.78} />
             </div>
             <p className="text-[12px] text-fg/40 font-medium">
-              makemylink.co/{p.handle}
+              {SITE_HOST}/{p.handle}
             </p>
           </div>
         </div>
@@ -867,8 +879,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Published!</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
+                  <QRCodeCanvas text={`${SITE_URL}/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <p className="mt-2 text-[12px] text-fg/45">Scan to open your page — handy for prints, menus and business cards.</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Saved directly to database for account {user.email}.
@@ -887,7 +899,7 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[38px] italic leading-none">Ready to publish?</h3>
                   <p className="mt-3 text-fg/60">Create a free account to claim your handle and publish your live page.</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
                   <p className="mt-5 text-[13px] text-fg/45">
                     Your current edits are temporarily saved in this browser. Sign up or log in to make your page permanent.
                   </p>
@@ -905,8 +917,8 @@ export function Editor() {
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#ff5b37] text-3xl text-[#111]">✓</div>
                   <h3 className="mt-6 font-display text-[40px] italic leading-none">Looking good.</h3>
                   <p className="mt-3 text-fg/60">Your page is live at</p>
-                  <p className="mt-1 text-[18px] font-medium">makemylink.co/{p.handle}</p>
-                  <QRCodeCanvas text={`https://makemylink.co/${p.handle}`} size={140} className="mx-auto mt-5" />
+                  <p className="mt-1 text-[18px] font-medium">{SITE_HOST}/{p.handle}</p>
+                  <QRCodeCanvas text={`${SITE_URL}/${p.handle}`} size={140} className="mx-auto mt-5" />
                   <div className="mt-7 flex flex-col gap-2">
                     <Link href={`/${p.handle}`} target="_blank" className="rounded-full bg-[#ff5b37] py-3.5 font-semibold text-[#111] hover:brightness-110">
                       View live page

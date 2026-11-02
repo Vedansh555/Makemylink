@@ -1,5 +1,6 @@
 "use client";
 
+import { SITE_URL, SITE_HOST } from "@/lib/site";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
@@ -242,6 +243,9 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
 
   return (
     <div
+      // Phone mockups are for looking at: scroll and hover work, but links, buttons and forms do nothing.
+      onClickCapture={embedded ? (e) => { if ((e.target as HTMLElement).closest("a, button, input, textarea")) e.preventDefault(); } : undefined}
+      onSubmitCapture={embedded ? (e) => e.preventDefault() : undefined}
       style={profile.accentOverride ? { ...theme.style, "--t-accent": profile.accentOverride } as React.CSSProperties : theme.style}
       className={`relative isolate overflow-hidden ${family === "mono" ? "grain" : ""} ${t.root} ${embedded ? "min-h-full" : "min-h-screen"}`}
     >
@@ -471,8 +475,8 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
             <span>Show QR code</span>
           </button>
           {showBadge && (
-            <Link href="/" className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
-              Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span>
+            <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
+              ✦ Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span> · Get yours →
             </Link>
           )}
         </motion.footer>
@@ -500,10 +504,10 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
               <X className="h-4 w-4" />
             </button>
             <div className="mx-auto rounded-2xl bg-white p-3.5 shadow-inner inline-block">
-              <QRCodeCanvas text={`https://makemylink.co/${profile.handle}`} size={160} />
+              <QRCodeCanvas text={`${SITE_URL}/${profile.handle}`} size={160} />
             </div>
             <p className="mt-4 text-[16px] font-bold">@{profile.handle}</p>
-            <p className="mt-1 text-[12px] text-white/50">makemylink.co/{profile.handle}</p>
+            <p className="mt-1 text-[12px] text-white/50">{SITE_HOST}/{profile.handle}</p>
             <p className="mt-3 text-[11px] text-white/40">Point your phone camera to scan</p>
           </div>
         </div>
