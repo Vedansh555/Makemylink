@@ -313,7 +313,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
 }
 
 function DomainTab({ d }: { d: Data }) {
-  const [info, setInfo] = useState<{ domain: string | null; verified: boolean; target: string } | null>(null);
+  const [info, setInfo] = useState<{ domain: string | null; verified: boolean; target: string; auto?: boolean } | null>(null);
   const [input, setInput] = useState("");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -334,7 +334,7 @@ function DomainTab({ d }: { d: Data }) {
     const o = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) setMsg(o.error ?? "Something went wrong");
-    else if ("verified" in o && "verify" in body) setMsg(o.verified ? "Connected. Your page now loads on your domain." : "We can't see it pointing here yet. DNS can take up to an hour. Try again later.");
+    else if ("verified" in o && "verify" in body) setMsg(o.verified ? (o.certificate === "automatic" ? "Connected. The secure padlock is being set up and can take a few minutes." : "DNS is correct. Email us your domain to switch on the secure padlock.") : "We can't see it pointing here yet. DNS can take up to an hour. Try again later.");
     await load();
   }
 
@@ -349,7 +349,7 @@ function DomainTab({ d }: { d: Data }) {
               <li>Open the DNS settings where you bought the domain.</li>
               <li>Add a <b>CNAME</b> record: name <span className="font-mono">{info.domain.split(".").length > 2 ? info.domain.split(".")[0] : "www"}</span>, value <span className="select-all font-mono">{info.target}</span>.</li>
               <li>Come back and press <b>Check connection</b>.</li>
-              <li>Then email us your domain so we switch on its secure (https) certificate. We do this within a day.</li>
+              <li>{info.auto ? "That is all. Once your DNS is right, we switch on the secure (https) padlock automatically. It can take a few minutes." : "Then email us your domain so we switch on its secure (https) certificate. We do this within a day."}</li>
             </ol>
           )}
           <div className="mt-5 flex flex-wrap gap-2">
