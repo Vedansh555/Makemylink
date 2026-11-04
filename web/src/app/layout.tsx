@@ -9,6 +9,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
+import { CookieNotice } from "@/components/CookieNotice";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const instrument = Instrument_Serif({
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         className={`${inter.variable} ${instrument.variable} ${syne.variable} ${bodoni.variable} ${unbounded.variable} ${grotesk.variable} antialiased`}
       >
         {children}
+        <CookieNotice />
       </body>
     </html>
   );

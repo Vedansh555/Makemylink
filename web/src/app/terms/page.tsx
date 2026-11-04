@@ -1,31 +1,48 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPage } from "@/components/landing/LegalPage";
+import { LEGAL_UPDATED, OPERATOR } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Terms of Service · Makemylink" };
 
 export default function Terms() {
   return (
-    <LegalPage title="Terms of Service" updated="October 2026">
-      <p>This is a plain-language draft. Have a lawyer review it before you rely on it.</p>
+    <LegalPage title="Terms of Service" updated={LEGAL_UPDATED}>
+      <h2>Who we are</h2>
+      <p>
+        Makemylink is operated by {OPERATOR.names} from {OPERATOR.place}. In these terms, &quot;we&quot; and &quot;us&quot; mean the people who run Makemylink, and &quot;you&quot; means anyone who uses it.
+      </p>
       <h2>Using Makemylink</h2>
-      <p>You must be at least 13 and able to form a binding agreement. You are responsible for your account and for everything published on your page.</p>
+      <p>You must be at least 18, or have a parent or guardian&apos;s permission, and be able to form a binding agreement. You are responsible for your account, your password and everything published on your page.</p>
       <h2>What you can&apos;t do</h2>
       <ul>
-        <li>Publish illegal, hateful, harassing, or misleading content, or content you have no right to share.</li>
-        <li>Link to malware, phishing, or scams.</li>
+        <li>Publish illegal, hateful, harassing, sexually explicit or misleading content, or content you have no right to share.</li>
+        <li>Link to malware, phishing, scams, pirated material, betting, or schemes that promise guaranteed returns.</li>
+        <li>Sell or promote anything that is illegal in India or in the buyer&apos;s country.</li>
         <li>Try to break, overload, or get around the security of the service.</li>
       </ul>
-      <p>We may remove content or suspend accounts that break these rules.</p>
-      <h2>Plans, fees and payments</h2>
-      <p>Paid plans renew until you cancel. Starter charges a 5% fee on sales made through your page; Pro charges 0%. Payment processors also charge their own fees. We never charge you without asking.</p>
+      <p>We may remove content or suspend accounts that break these rules, with or without notice.</p>
+      <h2>Plans and payments</h2>
+      <p>
+        Makemylink has a Free plan and a paid Pro plan. Pro is sold as a prepaid period (one month or one year) and does <b>not</b> renew automatically. When the period ends, your page stays online with Free plan limits until you pay again. Prices are shown in rupees (₹) in India, paid through Razorpay, and in US dollars elsewhere, paid through Stripe. Payment providers may charge their own fees. We take no commission on your bookings or sales.
+      </p>
+      <p>Refunds are covered in our <Link href="/refund" className="underline">Refund and Cancellation Policy</Link>.</p>
+      <h2>Bookings and sales between you and your visitors</h2>
+      <p>
+        If you offer paid sessions or products through your page, the agreement is between you and your customer. Payments for bookings go directly to you (for example to your UPI ID or your own payment link). We do not hold that money, and we are not responsible for the quality, delivery or refund of what you sell. You are responsible for any taxes that apply to you.
+      </p>
       <h2>Your content</h2>
-      <p>You keep ownership of what you publish. You give us permission to host and display it so the service works.</p>
+      <p>You keep ownership of what you publish. You give us a licence to host, copy and display it so the service works. You promise you have the right to publish it.</p>
       <h2>Availability</h2>
-      <p>We work hard to keep the service running but cannot promise it will always be available or error-free.</p>
+      <p>We work to keep the service running but cannot promise it will always be available or error-free. Features may change.</p>
+      <h2>Limits of our responsibility</h2>
+      <p>The service is provided &quot;as is&quot;. To the extent the law allows, we are not liable for lost income, lost data or indirect damages arising from your use of Makemylink. Our total liability for any claim is limited to the amount you paid us in the 12 months before the claim.</p>
       <h2>Ending your account</h2>
-      <p>You can stop using Makemylink and delete your account at any time. We can suspend or end accounts that break these terms.</p>
+      <p>You can stop using Makemylink and delete your account at any time by emailing us. We can suspend or end accounts that break these terms.</p>
+      <h2>Governing law</h2>
+      <p>These terms are governed by the laws of India. Disputes will be handled by the courts at Haridwar, Uttarakhand, India.</p>
       <h2>Contact</h2>
-      <p>Questions about these terms: add your support email here.</p>
+      <p>Questions about these terms: <a href={`mailto:${OPERATOR.supportEmail}`} className="underline">{OPERATOR.supportEmail}</a></p>
     </LegalPage>
   );
 }

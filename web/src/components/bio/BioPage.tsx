@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, MapPin, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
+import { OPERATOR } from "@/lib/legal";
 import { BookingModal, bookingPrice } from "./BookingModal";
 import { fontClass, getTheme, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
@@ -478,6 +479,11 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
             <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
               ✦ Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span> · Get yours →
             </Link>
+          )}
+          {live && (
+            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100`}>
+              Report this page
+            </a>
           )}
         </motion.footer>
       </motion.main>

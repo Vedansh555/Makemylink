@@ -13,6 +13,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, handle }),
+        body: JSON.stringify({ email, password, handle, agreed }),
       });
 
       const data = await res.json();
@@ -98,17 +99,26 @@ export default function SignupPage() {
             <input
               type="password"
               required
-              minLength={6}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               className="w-full rounded-xl border border-fg/10 bg-fg/[0.04] px-3.5 py-2.5 text-[14px] text-fg outline-none transition placeholder:text-fg/30 focus:border-fg/35 focus:bg-fg/[0.07]"
             />
           </label>
 
+          <label className="flex items-start gap-2.5 text-[13px] leading-snug text-fg/60">
+            <input type="checkbox" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#ff5b37]" />
+            <span>
+              I agree to the <Link href="/terms" target="_blank" className="text-fg underline">Terms of Service</Link>, the{" "}
+              <Link href="/privacy" target="_blank" className="text-fg underline">Privacy Policy</Link> and the{" "}
+              <Link href="/refund" target="_blank" className="text-fg underline">Refund Policy</Link>.
+            </span>
+          </label>
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !agreed}
             className="mt-3 w-full rounded-full bg-[#ff5b37] py-3 text-[14px] font-semibold text-[#111] transition hover:brightness-110 disabled:opacity-50"
           >
             {loading ? "Creating account…" : "Create free account"}

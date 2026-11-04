@@ -1,6 +1,7 @@
 "use client";
 
 import { SITE_URL, SITE_HOST } from "@/lib/site";
+import { OPERATOR } from "@/lib/legal";
 import Link from "next/link";
 import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
@@ -676,18 +677,27 @@ export function FinalCTA() {
 }
 
 export function Footer() {
+  const link = "hover:text-fg";
   return (
-    <footer className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 border-t border-fg/10 px-4 py-10 text-[13px] text-fg/45 sm:flex-row sm:px-6">
-      <Logo />
-      <div className="flex gap-6">
-        <a href="#themes" className="hover:text-fg">Themes</a>
-        <a href="#pricing" className="hover:text-fg">Pricing</a>
-        <Link href="/blog" className="hover:text-fg">Blog</Link>
-        <Link href="/create" className="hover:text-fg">Create</Link>
-        <Link href="/privacy" className="hover:text-fg">Privacy</Link>
-        <Link href="/terms" className="hover:text-fg">Terms</Link>
+    <footer className="mx-auto max-w-6xl border-t border-fg/10 px-4 py-10 text-[13px] text-fg/45 sm:px-6">
+      <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
+        <Logo />
+        <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-center sm:grid-cols-3 sm:text-left">
+          <a href="#themes" className={link}>Themes</a>
+          <a href="#pricing" className={link}>Pricing</a>
+          <Link href="/blog" className={link}>Blog</Link>
+          <Link href="/create" className={link}>Create</Link>
+          <Link href="/contact" className={link}>Contact</Link>
+          <Link href="/terms" className={link}>Terms</Link>
+          <Link href="/privacy" className={link}>Privacy</Link>
+          <Link href="/refund" className={link}>Refunds</Link>
+          <Link href="/cookies" className={link}>Cookies</Link>
+        </div>
       </div>
-      <p>© {new Date().getFullYear()} Makemylink. The link in bio built to earn.</p>
+      <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-fg/10 pt-6 text-[12px] sm:flex-row">
+        <p>© {new Date().getFullYear()} Makemylink. The link in bio built to earn.</p>
+        <p>Made by {OPERATOR.names} · {OPERATOR.place}</p>
+      </div>
     </footer>
   );
 }
