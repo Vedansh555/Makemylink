@@ -12,8 +12,8 @@ export async function GET() {
   // Sliding session: each visit renews the cookie, so active users are never logged out.
   await setSessionCookie({ userId: session.userId });
 
-  const user = await one<{ id: string; email: string; created_at: number; plan_renews_at: number | null }>(
-    "SELECT id, email, created_at, plan_renews_at FROM users WHERE id = $1",
+  const user = await one<{ id: string; email: string; created_at: number; plan_renews_at: number | null; email_verified: boolean }>(
+    "SELECT id, email, created_at, plan_renews_at, email_verified FROM users WHERE id = $1",
     [session.userId],
   );
   if (!user) {
@@ -30,6 +30,7 @@ export async function GET() {
       handle: page?.handle,
       plan: await planForUser(user.id),
       planRenewsAt: user.plan_renews_at,
+      emailVerified: user.email_verified,
     },
   });
 }

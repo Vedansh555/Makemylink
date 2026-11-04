@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { detectRegion, formatPrice, plans, type Billing, type Region } from "@/lib/pricing";
 import { Logo } from "../landing/Nav";
 
-type Tab = "overview" | "leads" | "bookings" | "links" | "domain" | "billing";
+type Tab = "overview" | "leads" | "bookings" | "links" | "domain" | "billing" | "account";
 interface Data {
   plan: "free" | "pro";
   handle: string;
@@ -33,12 +33,15 @@ export function Dashboard() {
   const [tab, setTab] = useState<Tab>((params.get("tab") as Tab) || "overview");
   const [data, setData] = useState<Data | null>(null);
   const [email, setEmail] = useState("");
+  const [verified, setVerified] = useState(true);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     const me = await fetch("/api/auth/me");
     if (!me.ok) return router.replace("/login");
-    setEmail((await me.json()).user.email);
+    const u = (await me.json()).user;
+    setEmail(u.email);
+    setVerified(u.emailVerified !== false);
     const r = await fetch("/api/dashboard");
     if (r.ok) setData(await r.json());
     else setError("Could not load your dashboard.");
@@ -47,7 +50,7 @@ export function Dashboard() {
     load();
   }, [load]);
 
-  const tabs: [Tab, string][] = [["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["domain", "Domain"], ["billing", "Plan"]];
+  const tabs: [Tab, string][] = [["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["domain", "Domain"], ["billing", "Plan"], ["account", "Account"]];
 
   return (
     <main className="min-h-screen bg-bg text-fg">
@@ -68,6 +71,7 @@ export function Dashboard() {
             </button>
           ))}
         </nav>
+        {!verified && <VerifyBanner />}
         {error && <p className="mt-6 text-[14px] text-red-400">{error}</p>}
         {!data && !error && <p className="mt-8 text-fg/50">Loading…</p>}
         {data && (
@@ -77,6 +81,7 @@ export function Dashboard() {
             {tab === "bookings" && <Bookings d={data} reload={load} />}
             {tab === "links" && <Health d={data} />}
             {tab === "domain" && <DomainTab d={data} />}
+            {tab === "account" && <AccountTab email={email} />}
             {tab === "billing" && <Billing d={data} email={email} reload={load} />}
           </div>
         )}
@@ -359,6 +364,69 @@ function DomainTab({ d }: { d: Data }) {
         </form>
       )}
       {msg && <p className="mt-4 text-[14px]">{msg}</p>}
+    </div>
+  );
+}
+
+function VerifyBanner() {
+  const [sent, setSent] = useState(false);
+  return (
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#ff5b37]/40 bg-[#ff5b37]/[0.06] p-4 text-[14px]">
+      <span>Please confirm your email. We sent you a link when you signed up.</span>
+      <button
+        disabled={sent}
+        onClick={async () => {
+          await fetch("/api/auth/resend-verification", { method: "POST" });
+          setSent(true);
+        }}
+        className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg disabled:opacity-50"
+      >
+        {sent ? "Sent. Check your inbox" : "Resend link"}
+      </button>
+    </div>
+  );
+}
+
+function AccountTab({ email }: { email: string }) {
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+    router.refresh();
+  }
+  async function del() {
+    if (!window.confirm("Delete your account, page, emails and bookings forever? This cannot be undone.")) return;
+    setBusy(true);
+    setMsg("");
+    const r = await fetch("/api/account", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
+    const o = await r.json().catch(() => ({}));
+    setBusy(false);
+    if (!r.ok) return setMsg(o.error ?? "Something went wrong");
+    router.push("/");
+    router.refresh();
+  }
+  return (
+    <div className="space-y-4">
+      <div className={card}>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-fg/45">Signed in as</p>
+        <p className="mt-2 text-[16px]">{email}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button onClick={logout} className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Log out</button>
+          <Link href="/forgot" className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Change password</Link>
+        </div>
+      </div>
+      <div className={`${card} border-red-500/30`}>
+        <p className="text-[15px] font-semibold">Delete account</p>
+        <p className="mt-1 text-[13px] text-fg/55">Removes your page, emails, bookings and stats. Payment records are kept without your name. This cannot be undone.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg/60 px-4 py-2.5 text-[14px] outline-none focus:border-red-400" />
+          <button disabled={busy || !password} onClick={del} className="rounded-xl bg-red-500 px-5 py-2.5 text-[13px] font-semibold text-white disabled:opacity-40">{busy ? "Deleting…" : "Delete forever"}</button>
+        </div>
+        {msg && <p className="mt-3 text-[13px] text-red-400">{msg}</p>}
+      </div>
     </div>
   );
 }
