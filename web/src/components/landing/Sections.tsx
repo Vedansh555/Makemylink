@@ -314,7 +314,7 @@ export function Features() {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="text-[22px] font-semibold">Keep more of every sale</h3>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600">0% on Pro</span>
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-[#ff5b37] px-3 py-1 text-[11px] font-bold text-[#111]">0% on Pro</span>
               </div>
               <p className="mt-2 text-fg/55">Many tools keep up to 12% of every sale on their cheaper plans. We keep nothing. Pro is a flat ₹299 or $8 a month.</p>
             </div>
@@ -423,9 +423,9 @@ export function Features() {
                 <p className="mt-2 text-fg/55">How many people visit, what they tap, and where they come from.</p>
               </div>
               {activeBar !== null && (
-                <div className="rounded-xl border border-fg/10 bg-fg/[0.04] px-3 py-1 text-right">
-                  <p className="text-[14px] font-bold text-fg">{statsData[activeBar].visitors} views</p>
-                  <p className="text-[10px] text-fg/50">{statsData[activeBar].label}</p>
+                <div className="shrink-0 whitespace-nowrap rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-semibold text-bg">
+                  {statsData[activeBar].visitors.toLocaleString("en-IN")} views
+                  <span className="ml-1.5 font-normal opacity-60">{statsData[activeBar].label}</span>
                 </div>
               )}
             </div>
