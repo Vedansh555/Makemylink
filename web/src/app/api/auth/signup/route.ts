@@ -3,6 +3,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { one, transaction } from "@/lib/db";
 import { setSessionCookie } from "@/lib/session";
+import { sendVerifyEmail } from "@/lib/authmail";
 import { blankProfile } from "@/lib/demo";
 import { RESERVED_HANDLES, clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
     });
 
     await setSessionCookie({ userId });
+    sendVerifyEmail(userId, cleanEmail).catch((e) => console.error("verify mail", e));
 
     return NextResponse.json({
       user: { id: userId, email: cleanEmail },

@@ -93,6 +93,8 @@ CREATE TABLE IF NOT EXISTS password_resets (
   user_id TEXT NOT NULL,
   expires_at DOUBLE PRECISION NOT NULL
 );
+ALTER TABLE password_resets ADD COLUMN IF NOT EXISTS purpose TEXT NOT NULL DEFAULT 'reset';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE;
 `;
 
 interface Ctx {
