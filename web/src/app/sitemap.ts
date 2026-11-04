@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const handles = new Set(demoProfiles.map((d) => d.handle));
   try {
-    const rows = await all<{ handle: string }>("SELECT handle FROM pages");
+    const rows = await all<{ handle: string }>("SELECT handle FROM pages WHERE suspended = FALSE");
     rows.forEach((r) => handles.add(r.handle));
   } catch {
     // Database unavailable: list the static and demo pages only.

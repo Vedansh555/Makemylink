@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { planForUser } from "@/lib/account";
 import { rateLimit, sameOriginOnly } from "@/lib/security";
 import { SITE_HOST } from "@/lib/site";
+import { addRenderDomain, removeRenderDomain, renderConfigured } from "@/lib/render";
 
 const HOST_RE = /^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
 
@@ -28,7 +29,7 @@ export async function GET() {
   const session = await getSession();
   if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const row = await one<{ custom_domain: string | null; custom_domain_verified: boolean }>("SELECT custom_domain, custom_domain_verified FROM pages WHERE user_id = $1", [session.userId]);
-  return NextResponse.json({ domain: row?.custom_domain ?? null, verified: !!row?.custom_domain_verified, target: SITE_HOST });
+  return NextResponse.json({ domain: row?.custom_domain ?? null, verified: !!row?.custom_domain_verified, target: SITE_HOST, auto: renderConfigured() });
 }
 
 // POST {domain} saves a domain (Pro). POST {verify:true} checks that its DNS points at us.
@@ -45,7 +46,9 @@ export async function POST(req: Request) {
     if (!row?.custom_domain) return NextResponse.json({ error: "Save a domain first" }, { status: 400 });
     const ok = await pointsHere(row.custom_domain);
     await run("UPDATE pages SET custom_domain_verified = $1 WHERE user_id = $2", [ok, session.userId]);
-    return NextResponse.json({ verified: ok });
+    // DNS is right: ask Render to add the domain, and it issues the HTTPS certificate by itself.
+    const certificate = ok && (await addRenderDomain(row.custom_domain)) ? "automatic" : "manual";
+    return NextResponse.json({ verified: ok, certificate });
   }
 
   const domain = String(body.domain ?? "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
@@ -62,6 +65,8 @@ export async function POST(req: Request) {
 export async function DELETE() {
   const session = await getSession();
   if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const row = await one<{ custom_domain: string | null }>("SELECT custom_domain FROM pages WHERE user_id = $1", [session.userId]);
+  if (row?.custom_domain) await removeRenderDomain(row.custom_domain);
   await run("UPDATE pages SET custom_domain = NULL, custom_domain_verified = FALSE WHERE user_id = $1", [session.userId]);
   return NextResponse.json({ ok: true });
 }

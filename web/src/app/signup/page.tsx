@@ -69,15 +69,15 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Handle</span>
-            <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[14px] text-fg/40 select-none">{SITE_HOST}/</span>
+            <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 transition focus-within:border-fg/35 focus-within:bg-fg/[0.07]">
+              <span className="max-w-[60%] shrink-0 truncate select-none text-[14px] text-fg/40">{SITE_HOST}/</span>
               <input
                 type="text"
                 required
                 value={handle}
                 onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
                 placeholder="yourname"
-                className="w-full rounded-xl border border-fg/10 bg-fg/[0.04] py-2.5 pr-3.5 pl-[84px] text-[14px] text-fg outline-none transition placeholder:text-fg/30 focus:border-fg/35 focus:bg-fg/[0.07]"
+                className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 text-[14px] text-fg outline-none placeholder:text-fg/30"
               />
             </div>
           </label>

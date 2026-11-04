@@ -5,7 +5,7 @@ import type { BookingConfig, Profile } from "./types";
 export const RESERVED_HANDLES = new Set([
   "api", "app", "admin", "login", "logout", "signup", "create", "preview", "dashboard", "settings",
   "pricing", "about", "terms", "privacy", "support", "help", "billing", "static", "assets", "_next",
-  "favicon.ico", "robots.txt", "sitemap.xml", "makemylink", "www", "mail", "root", "blog", "llms.txt", "import", "refund", "cookies", "contact", "forgot", "reset", "account",
+  "favicon.ico", "robots.txt", "sitemap.xml", "makemylink", "www", "mail", "root", "blog", "llms.txt", "import", "refund", "cookies", "contact", "forgot", "reset", "account", "admin",
 ]);
 
 // ---------- rate limiting ----------

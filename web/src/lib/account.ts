@@ -1,4 +1,4 @@
-import { one } from "./db";
+import { one, transaction } from "./db";
 import type { PlanId } from "./plans";
 import type { Profile } from "./types";
 
@@ -19,10 +19,10 @@ export interface PageRow {
   updatedAt: number;
 }
 
-/** A page by handle together with the owner's plan, or null when the handle is unclaimed. */
+/** A page by handle together with the owner's plan, or null when the handle is unclaimed or the page was taken down by an admin. */
 export async function pageByHandle(handle: string): Promise<PageRow | null> {
   const row = await one<{ id: string; user_id: string; handle: string; profile_json: string; updated_at: number }>(
-    "SELECT id, user_id, handle, profile_json, updated_at FROM pages WHERE handle = $1",
+    "SELECT id, user_id, handle, profile_json, updated_at FROM pages WHERE handle = $1 AND suspended = FALSE",
     [handle.toLowerCase()],
   );
   if (!row) return null;
@@ -42,3 +42,17 @@ export async function pageForUser(userId: string) {
 }
 
 export const SITE_NAME = "Makemylink";
+
+/** Removes a user and everything of theirs. Payment records stay, without the user id, because the law may require them. */
+export async function deleteAccount(uid: string) {
+  await transaction(async (tx) => {
+    const pages = await tx.query("SELECT id FROM pages WHERE user_id = $1", [uid]);
+    for (const p of pages as { id: string }[]) {
+      for (const t of ["subscribers", "bookings", "events", "link_health"]) await tx.query(`DELETE FROM ${t} WHERE page_id = $1`, [p.id]);
+    }
+    await tx.query("DELETE FROM pages WHERE user_id = $1", [uid]);
+    await tx.query("DELETE FROM password_resets WHERE user_id = $1", [uid]);
+    await tx.query("UPDATE payments SET user_id = NULL WHERE user_id = $1", [uid]);
+    await tx.query("DELETE FROM users WHERE id = $1", [uid]);
+  });
+}
