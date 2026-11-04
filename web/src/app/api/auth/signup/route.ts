@@ -11,7 +11,11 @@ export async function POST(req: Request) {
   if (blocked) return blocked;
   try {
     const body = await req.json();
-    const { email, password, handle } = body ?? {};
+    const { email, password, handle, agreed } = body ?? {};
+
+    if (agreed !== true) {
+      return NextResponse.json({ error: "Please accept the Terms and Privacy Policy to continue" }, { status: 400 });
+    }
 
     if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
       return NextResponse.json({ error: "A valid email is required" }, { status: 400 });

@@ -301,7 +301,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
           {region === "IN" ? "Pay in USD instead" : "Pay in ₹ (India) instead"}
         </button>
       </div>
-      <p className="mt-3 text-[12px] text-fg/40">{region === "IN" ? "UPI, cards and netbanking via Razorpay." : "Cards, Apple Pay and Google Pay via Stripe."} One-time payment. It does not auto-renew.</p>
+      <p className="mt-3 text-[12px] text-fg/40">{region === "IN" ? "UPI, cards and netbanking via Razorpay." : "Cards, Apple Pay and Google Pay via Stripe."} One-time payment. It does not auto-renew. By paying you agree to the <Link href="/terms" className="underline">Terms</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (7-day refund).</p>
       {msg && <p className="mt-4 text-[14px] text-fg">{msg}</p>}
     </div>
   );
