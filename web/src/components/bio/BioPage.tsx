@@ -4,11 +4,12 @@ import { SITE_URL, SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowUpRight, ChevronDown, MapPin, QrCode, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, MapPin, Play, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { OPERATOR } from "@/lib/legal";
 import { BookingModal, bookingPrice } from "./BookingModal";
+import { WhatsAppModal, WhatsAppIcon } from "./WhatsAppModal";
 import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
 import { safeHref } from "@/lib/security";
@@ -214,6 +215,7 @@ function safeUrl(input?: string): string {
 export function BioPage({ profile, embedded = false, plan = "pro", live = false }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean }) {
   const [qrOpen, setQrOpen] = useState(false);
   const [booking, setBooking] = useState<BioLink | null>(null);
+  const [chat, setChat] = useState<BioLink | null>(null);
   const showBadge = plan !== "pro" || !profile.hideBadge;
   const visibleLinks = profile.links.filter((l) => linkIsLive(l));
   const track = (id: string) => {
@@ -327,6 +329,49 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
                 // Bento sizes (Pro): 1x1 is half width, 2x1 / unset is a full row, 2x2 is a tall tile.
                 const span = l.size === "1x1" ? "col-span-1" : "col-span-2";
                 const tall = l.size === "2x2" ? "[&>a]:min-h-[170px] [&>a]:items-end" : l.size === "1x1" ? "[&>a]:min-h-[84px]" : "";
+                if (l.kind === "whatsapp" && l.whatsapp) {
+                  return (
+                    <div key={l.id} className={`${span} ${tall}`}>
+                      <button type="button" onClick={() => setChat(l)} className={`${t.featured} w-full cursor-pointer`}>
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-sm sm:h-11 sm:w-11">
+                          <WhatsAppIcon className="h-5 w-5" />
+                        </span>
+                        <span className="flex-1 text-left">
+                          {l.title}
+                          <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">Chat on WhatsApp</span>
+                        </span>
+                        <ArrowUpRight className="h-4 w-4 shrink-0" />
+                      </button>
+                    </div>
+                  );
+                }
+                if (l.kind === "youtube") {
+                  const yt = l.video ? `https://www.youtube.com/watch?v=${l.video.id}` : safeUrl(l.url);
+                  return (
+                    <div key={l.id} className="col-span-2">
+                      <Tilt max={5} className="rounded-2xl">
+                        <a href={yt} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className={`${t.link} !flex-col !items-stretch !gap-3 !py-3`}>
+                          {l.video ? (
+                            <span className="relative block overflow-hidden rounded-xl">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={`https://i.ytimg.com/vi/${l.video.id}/hqdefault.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />
+                              <span className="absolute inset-0 grid place-items-center bg-black/15">
+                                <span className="grid h-12 w-12 place-items-center rounded-full bg-white/95 text-black shadow-lg"><Play className="h-5 w-5 translate-x-0.5 fill-current" /></span>
+                              </span>
+                            </span>
+                          ) : null}
+                          <span className="flex items-center gap-2">
+                            <span className="flex-1 text-left">
+                              <span className="block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">{l.video ? "Latest video" : "YouTube"}</span>
+                              {l.video?.title ?? l.title}
+                            </span>
+                            {arrow}
+                          </span>
+                        </a>
+                      </Tilt>
+                    </div>
+                  );
+                }
                 if (l.kind === "booking" && l.booking) {
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
@@ -497,6 +542,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
         </motion.footer>
       </motion.main>
 
+      {chat && <WhatsAppModal link={chat} handle={profile.handle} live={live} onClose={() => setChat(null)} />}
       {booking && <BookingModal link={booking} handle={profile.handle} live={live} onClose={() => setBooking(null)} />}
 
       {/* Interactive QR Code Modal */}

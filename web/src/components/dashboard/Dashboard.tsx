@@ -15,7 +15,7 @@ interface Data {
   daily: { day: string; kind: string; n: number }[];
   perLink: { target: string; title: string; n: number }[];
   countries: { country: string; n: number }[];
-  subscribers: { total: number; recent: { email: string; created_at: number }[]; limit: number | null };
+  subscribers: { total: number; recent: { email: string; name?: string | null; source?: string | null; created_at: number }[]; limit: number | null };
   bookings: { id: string; title: string; buyer_name: string; buyer_email: string; slot_start: number; note: string; amount: number; currency: string; status: string }[];
   health: { link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }[];
   checklist: { key: string; label: string; done: boolean; href?: string }[];
@@ -196,7 +196,7 @@ function Leads({ d }: { d: Data }) {
       </div>
       <ul className="mt-4 divide-y divide-fg/10 text-[14px]">
         {d.subscribers.recent.map((s) => (
-          <li key={s.email} className="flex justify-between gap-3 py-2"><span className="truncate">{s.email}</span><span className="shrink-0 text-fg/45">{new Date(s.created_at).toLocaleDateString()}</span></li>
+          <li key={s.email} className="flex justify-between gap-3 py-2"><span className="truncate">{s.name ? <>{s.name} <span className="text-fg/45">· {s.email}</span></> : s.email}</span><span className="shrink-0 text-fg/45">{s.source === "whatsapp" && <span className="mr-2 rounded-full bg-[#25d366]/15 px-2 py-0.5 text-[10px] font-semibold text-[#128c4a]">WhatsApp</span>}{new Date(s.created_at).toLocaleDateString()}</span></li>
         ))}
         {!d.subscribers.recent.length && <li className="py-2 text-fg/50">Nobody has joined yet. Turn on “Collect emails” in the editor.</li>}
       </ul>

@@ -8,6 +8,7 @@ import { applyPlan, publicProfile, type PlanId } from "@/lib/plans";
 import { run } from "@/lib/db";
 import { SITE_URL } from "@/lib/site";
 import type { Profile } from "@/lib/types";
+import { latestVideo } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,12 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
     }
   }
 
-  const { profile, plan } = found;
+  const { plan } = found;
+  // "Latest video" cards: look up the newest upload so the page updates itself.
+  const profile: Profile = {
+    ...found.profile,
+    links: await Promise.all(found.profile.links.map(async (l) => (l.kind === "youtube" && l.url ? { ...l, video: (await latestVideo(l.url)) ?? undefined } : l))),
+  };
   const sameAs = Object.entries(profile.socials)
     .filter(([k, v]) => v && k !== "email")
     .map(([k, v]) => {

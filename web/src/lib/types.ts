@@ -53,8 +53,12 @@ export interface BioLink {
   /** Links sharing the same folder name are grouped under a collapsible heading. */
   folder?: string;
   /** "booking" renders a paid 1:1 booking card instead of a plain link. */
-  kind?: "link" | "booking";
+  kind?: "link" | "booking" | "whatsapp" | "youtube";
   booking?: BookingConfig;
+  /** "whatsapp": a visitor leaves name and email, then WhatsApp opens with your message ready. */
+  whatsapp?: { phone: string; message: string };
+  /** "youtube": the card always shows the newest video of the channel in `url`. Filled in by the server when the page loads. */
+  video?: { id: string; title: string };
   /** Optional small picture shown beside the title (https address or inline image). Without it the link is a plain button. */
   image?: string;
   /** Card size in the Bento grid. Pro only; Free is always 1x1. */

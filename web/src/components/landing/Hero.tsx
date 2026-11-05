@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getDemoProfile } from "@/lib/demo";
@@ -16,6 +17,8 @@ const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "sm
 export function Hero() {
   // Desktop gets the big scene behind the headline; phones get a small one below the text.
   const [wide, setWide] = useState(false);
+  const router = useRouter();
+  const [pasted, setPasted] = useState("");
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 640px)");
     const update = () => setWide(mq.matches);
@@ -58,6 +61,32 @@ export function Hero() {
               See examples
             </a>
           </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/start");
+            }}
+            className="rise mx-auto mt-8 flex w-full max-w-[460px] flex-col gap-2 text-left [animation-delay:.3s] [text-shadow:none]"
+          >
+            <label htmlFor="hero-import" className="px-1 text-[13px] text-fg/70">
+              Already on Linktree, Carrd or another link page? Paste it and we copy everything over in seconds.
+            </label>
+            <div className="flex gap-2 rounded-full border border-fg/15 bg-bg/70 p-1.5 backdrop-blur focus-within:border-[#ff5b37]">
+              <input
+                id="hero-import"
+                type="text"
+                inputMode="url"
+                value={pasted}
+                onChange={(e) => setPasted(e.target.value)}
+                placeholder="Paste your page link"
+                className="min-w-0 flex-1 bg-transparent px-4 text-[14px] text-fg outline-none placeholder:text-fg/40"
+              />
+              <button type="submit" className="shrink-0 rounded-full bg-fg px-5 py-2.5 text-[14px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                Import
+              </button>
+            </div>
+          </form>
 
           <p className="rise mt-10 text-[13px] text-fg/55 [animation-delay:.36s]">
             Made for {uses.join(", ")}.

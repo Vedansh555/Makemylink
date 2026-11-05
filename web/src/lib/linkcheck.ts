@@ -41,7 +41,7 @@ export async function runLinkCheck(): Promise<number> {
     const profile = JSON.parse(pg.profile_json) as Profile;
     const before = new Map((await all<{ link_id: string; ok: boolean }>("SELECT link_id, ok FROM link_health WHERE page_id = $1", [pg.id])).map((r) => [r.link_id, r.ok]));
     const newlyBroken: string[] = [];
-    for (const l of profile.links.filter((x) => x.kind !== "booking" && linkIsLive(x)).slice(0, 60)) {
+    for (const l of profile.links.filter((x) => x.kind !== "booking" && x.kind !== "whatsapp" && linkIsLive(x)).slice(0, 60)) {
       const u = publicHttpUrl(l.url);
       if (!u) continue;
       const status = await probe(u);

@@ -29,7 +29,7 @@ export async function GET() {
     ? await all<{ country: string; n: number }>("SELECT country, COUNT(*)::int AS n FROM events WHERE page_id = $1 AND kind = 'view' AND country IS NOT NULL AND created_at >= $2 GROUP BY country ORDER BY n DESC LIMIT 8", [pid, since])
     : [];
   const subs = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM subscribers WHERE page_id = $1", [pid]);
-  const recentSubs = await all<{ email: string; created_at: number }>("SELECT email, created_at FROM subscribers WHERE page_id = $1 ORDER BY created_at DESC LIMIT 25", [pid]);
+  const recentSubs = await all<{ email: string; name: string | null; source: string | null; created_at: number }>("SELECT email, name, source, created_at FROM subscribers WHERE page_id = $1 ORDER BY created_at DESC LIMIT 25", [pid]);
   const bookings = await all("SELECT id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status FROM bookings WHERE page_id = $1 ORDER BY slot_start DESC LIMIT 50", [pid]);
   const health = await all<{ link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }>("SELECT link_id, url, status, ok, checked_at FROM link_health WHERE page_id = $1", [pid]);
 

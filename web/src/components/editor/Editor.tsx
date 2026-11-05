@@ -126,6 +126,9 @@ const newBooking = (): BioLink => ({
   },
 });
 
+const newWhatsApp = (): BioLink => ({ id: uid(), title: "Chat with me on WhatsApp", url: "", kind: "whatsapp", whatsapp: { phone: "", message: "Hi! I found you on Showz and I'd like to talk about " } });
+const newYoutube = (): BioLink => ({ id: uid(), title: "My latest video", url: "", kind: "youtube" });
+
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: BookingConfig) => void }) {
@@ -706,12 +709,24 @@ export function Editor() {
               title="Links and bookings"
               hint="The buttons people tap. Tap the Picture square on a card to show a small image beside its title. Add a booking card to get paid for calls."
               action={
-                <div className="flex gap-2">
+                <div className="flex flex-wrap justify-end gap-2">
                   <button
                     onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) proNote("Paid bookings"); }}
                     className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
                     <Plus className="h-3.5 w-3.5" /> Booking
+                  </button>
+                  <button
+                    onClick={() => set("links", [...p.links, newWhatsApp()])}
+                    className="flex items-center gap-1 whitespace-nowrap rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> WhatsApp
+                  </button>
+                  <button
+                    onClick={() => set("links", [...p.links, newYoutube()])}
+                    className="flex items-center gap-1 whitespace-nowrap rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Latest video
                   </button>
                   <button
                     onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
@@ -757,7 +772,7 @@ export function Editor() {
                     </div>
                   <div className={`grid flex-1 gap-2 ${l.kind === "booking" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                     <input className={inputCls} value={l.title} onChange={(e) => setLink(l.id, { title: e.target.value })} placeholder="Title" />
-                    {l.kind !== "booking" && <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />}
+                    {l.kind !== "booking" && l.kind !== "whatsapp" && <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder={l.kind === "youtube" ? "Your YouTube channel link or @name" : "https://"} />}
                     <input
                       className={inputCls}
                       value={l.folder ?? ""}
@@ -821,6 +836,18 @@ export function Editor() {
                     </div>
                   )}
 
+                  {l.kind === "whatsapp" && l.whatsapp && (
+                    <div className="grid gap-2 rounded-xl border border-fg/10 bg-fg/[0.03] p-3 sm:grid-cols-2">
+                      <Field label="Your WhatsApp number (with country code)">
+                        <input className={inputCls} inputMode="tel" value={l.whatsapp.phone} onChange={(e) => setLink(l.id, { whatsapp: { ...l.whatsapp!, phone: e.target.value } })} placeholder="919876543210" />
+                      </Field>
+                      <Field label="Message they send you">
+                        <input className={inputCls} value={l.whatsapp.message} onChange={(e) => setLink(l.id, { whatsapp: { ...l.whatsapp!, message: e.target.value } })} maxLength={300} />
+                      </Field>
+                      <p className="text-[11px] text-fg/40 sm:col-span-2">Visitors give their name and email first, so every chat is also saved as a lead in your dashboard. Your number is visible on your public page.</p>
+                    </div>
+                  )}
+                  {l.kind === "youtube" && <p className="rounded-xl border border-fg/10 bg-fg/[0.03] p-3 text-[12px] text-fg/55">This card shows your newest YouTube video on its own, with a live thumbnail. Paste your channel link once. It refreshes within about 30 minutes of a new upload. The video appears on your live page.</p>}
                   {l.kind === "booking" && l.booking && <BookingFields b={l.booking} onChange={(b) => setLink(l.id, { booking: b })} />}
                 </div>
               ))}
