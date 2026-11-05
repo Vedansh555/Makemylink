@@ -344,7 +344,7 @@ export function Editor() {
     const nLinks = d.links.length;
     const nShop = (d.looks ?? []).length;
     setNotice(
-      `Copied ${d.avatar ? "your picture, " : ""}${nLinks} link${nLinks === 1 ? "" : "s"}${nShop ? `, ${nShop} shop item${nShop === 1 ? "" : "s"} with photos` : ""} and your social handles. Linktree's look can't be copied, so pick a style on the left.`,
+      `Copied ${d.avatar ? "your picture, " : ""}${nLinks} link${nLinks === 1 ? "" : "s"}${nShop ? `, ${nShop} shop item${nShop === 1 ? "" : "s"} with photos` : ""} and your social handles. ${d.source ? `${d.source}'s` : "That page's"} look can't be copied, so pick a style on the left.${!isPro && (nLinks > FREE_LIMITS.links || nShop > FREE_LIMITS.looks) ? ` Free pages show the first ${FREE_LIMITS.links} links and ${FREE_LIMITS.looks} products. The rest stay saved and appear on Pro.` : ""}`,
     );
     setImportUrl("");
   }
@@ -490,10 +490,10 @@ export function Editor() {
           {p.links.length <= 3 && (
             <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#ff5b37]/40 bg-[#ff5b37]/[0.06] p-4 sm:flex-row sm:items-center">
               <div className="flex-1">
-                <p className="text-[14px] font-semibold">Already have a Linktree?</p>
-                <p className="text-[12px] text-fg/55">Paste your link and we copy your name, bio and links in seconds.</p>
+                <p className="text-[14px] font-semibold">Already have a link page?</p>
+                <p className="text-[12px] text-fg/55">Paste its link (Linktree, Carrd, Solo.to, Hoo.be, Bio.site and more). We copy your picture, links, socials and shop items.</p>
               </div>
-              <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="linktr.ee/yourname" />
+              <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Paste your page link" />
               <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
                 {importing ? "Importing…" : "Import"}
               </button>
@@ -686,7 +686,7 @@ export function Editor() {
               }
             >
               <div className="flex gap-2">
-                <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import from Linktree: linktr.ee/yourname" />
+                <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import your existing page: paste its link" />
                 <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
                   {importing ? "Importing…" : "Import"}
                 </button>
@@ -896,7 +896,7 @@ export function Editor() {
           <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
             <Panel title="Audience">
               <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
-              <Switch on={!!p.hideBadge && isPro} onChange={(v) => (isPro ? set("hideBadge", v) : proOnly("Removing the badge"))} label={`Hide the Makemylink badge${isPro ? "" : " (Pro)"}`} />
+              <Switch on={!!p.hideBadge && isPro} onChange={(v) => (isPro ? set("hideBadge", v) : proOnly("Removing the badge"))} label={`Hide the Showz badge${isPro ? "" : " (Pro)"}`} />
               <p className="text-[12px] text-fg/40">
                 Plan: <b>{isPro ? "Pro" : "Free"}</b> · <Link href="/dashboard" className="underline">Open dashboard</Link> for emails, bookings and stats
               </p>

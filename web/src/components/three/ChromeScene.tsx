@@ -93,7 +93,7 @@ function Pearl({
 }
 
 /**
- * A chain of interlocked chrome links: the "link" in Makemylink.
+ * A chain of interlocked chrome links: the "link" in Showz.
  * Neighbouring links alternate between flat and edge-on so each one passes through the next.
  */
 function ChainLinks({ count = 3, scale = 1, position = [0, 0, 0], tilt = 0.35 }: { count?: number; scale?: number; position?: [number, number, number]; tilt?: number }) {

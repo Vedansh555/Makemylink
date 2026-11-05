@@ -477,7 +477,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
           </button>
           {showBadge && (
             <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
-              ✦ Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Makemylink</span> · Get yours →
+              ✦ Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Showz</span> · Get yours →
             </Link>
           )}
           {live && (

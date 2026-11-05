@@ -20,7 +20,7 @@ function publicHttpUrl(raw: string): URL | null {
 async function probe(url: URL): Promise<number | null> {
   for (const method of ["HEAD", "GET"]) {
     try {
-      const res = await fetch(url, { method, redirect: "follow", signal: AbortSignal.timeout(8000), headers: { "User-Agent": "MakemylinkLinkChecker/1.0" } });
+      const res = await fetch(url, { method, redirect: "follow", signal: AbortSignal.timeout(8000), headers: { "User-Agent": "ShowzLinkChecker/1.0" } });
       if (res.status !== 405 && res.status !== 403 && !(method === "HEAD" && res.status >= 400)) return res.status;
       if (method === "GET") return res.status;
     } catch {
@@ -54,7 +54,7 @@ export async function runLinkCheck(): Promise<number> {
       if (!ok && before.get(l.id) !== false) newlyBroken.push(`${l.title} — ${l.url} (${status ?? "no response"})`);
     }
     if (newlyBroken.length) {
-      await sendMail(pg.email, "A link on your Makemylink page looks broken", `<p>These links failed our check:</p><ul>${newlyBroken.map((t) => `<li>${esc(t)}</li>`).join("")}</ul><p>Fix them in your editor so you don't lose clicks.</p>`);
+      await sendMail(pg.email, "A link on your Showz page looks broken", `<p>These links failed our check:</p><ul>${newlyBroken.map((t) => `<li>${esc(t)}</li>`).join("")}</ul><p>Fix them in your editor so you don't lose clicks.</p>`);
     }
   }
   return checked;

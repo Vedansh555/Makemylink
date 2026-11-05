@@ -2,7 +2,7 @@
 # Database: create a free Neon project and paste its connection string into DATABASE_URL.
 services:
   - type: web
-    name: makemylink
+    name: showz
     runtime: node
     plan: starter
     rootDir: web
@@ -34,7 +34,7 @@ services:
         sync: false
   # Daily at 02:30 UTC. Uses the same CRON_SECRET as the web service (copy it over in the Render dashboard).
   - type: cron
-    name: makemylink-linkcheck
+    name: showz-linkcheck
     runtime: node
     plan: starter
     schedule: "30 2 * * *"

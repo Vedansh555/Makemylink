@@ -41,7 +41,7 @@ export async function pageForUser(userId: string) {
   return row ?? null;
 }
 
-export const SITE_NAME = "Makemylink";
+export const SITE_NAME = "Showz";
 
 /** Removes a user and everything of theirs. Payment records stay, without the user id, because the law may require them. */
 export async function deleteAccount(uid: string) {

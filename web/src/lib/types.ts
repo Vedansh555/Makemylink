@@ -112,6 +112,6 @@ export interface Profile {
   mediaKit?: MediaKit;
   showMediaKit: boolean;
   showSubscribe: boolean;
-  /** Pro only: remove the "Made with Makemylink" badge. */
+  /** Pro only: remove the "Made with Showz" badge. */
   hideBadge?: boolean;
 }

@@ -3,12 +3,12 @@ import Link from "next/link";
 import { LegalPage } from "@/components/landing/LegalPage";
 import { LEGAL_UPDATED } from "@/lib/legal";
 
-export const metadata: Metadata = { title: "Cookie Policy · Makemylink" };
+export const metadata: Metadata = { title: "Cookie Policy · Showz" };
 
 export default function Cookies() {
   return (
     <LegalPage title="Cookie Policy" updated={LEGAL_UPDATED}>
-      <p>Cookies are small files a website saves in your browser. Makemylink uses only the ones it needs to work.</p>
+      <p>Cookies are small files a website saves in your browser. Showz uses only the ones it needs to work.</p>
       <h2>Cookies we set</h2>
       <ul>
         <li><b>Login cookie:</b> keeps you signed in to your account. It is removed when you log out or after a period of inactivity.</li>

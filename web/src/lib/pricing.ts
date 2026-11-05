@@ -25,7 +25,7 @@ export const plans: Plan[] = [
       `Collect up to ${FREE_LIMITS.subscribers} emails`,
       `${FREE_LIMITS.analyticsDays}-day visits and clicks`,
       "QR code for your page",
-      "Makemylink badge on your page",
+      "Showz badge on your page",
     ],
   },
   {
@@ -44,7 +44,7 @@ export const plans: Plan[] = [
       "Schedule links and drops",
       "Daily broken-link check with email alerts",
       "Media kit, custom colors and fonts",
-      "Remove the Makemylink badge",
+      "Remove the Showz badge",
     ],
     highlight: true,
   },
