@@ -29,7 +29,7 @@ function showcase(p: Profile, booking: { title: string; price: number; currency:
     booking: { price: booking.price, currency: booking.currency, durationMin: booking.min, description: booking.text, meetingUrl: "", days: [1, 2, 3, 4, 5, 6], startHour: 10, endHour: 19, timeZone: "Asia/Kolkata" },
   };
   const halves: BioLink[] = others.slice(0, 2).map((l, i) => ({ ...l, size: "1x1" as const, featured: false, image: l.image ?? p.looks[i]?.image }));
-  return { ...p, links: [{ ...first!, size: "2x1" as const }, tile, ...halves], looks: p.looks.slice(0, 2) };
+  return { ...p, links: [{ ...first!, size: "2x1" as const, featured: false }, tile, ...halves], looks: p.looks.slice(0, 2) };
 }
 
 const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "small shops"];

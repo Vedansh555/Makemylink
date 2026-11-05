@@ -32,12 +32,12 @@ export default async function StylePage({ searchParams }: { searchParams: Promis
           <h1 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,8vw,96px)] leading-[0.92] tracking-[-0.01em]">Pick a look.</h1>
           <p className="mt-5 max-w-[540px] text-[17px] leading-relaxed text-fg/65">Every look works with every feature, and you can change it any time. Tap the one that feels like you.</p>
 
-          <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-6">
-            {looks.map((l) => (
+          <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3">
+            {looks.map((l, i) => (
               <div key={l.id} className="group relative flex flex-col items-center gap-3 text-center">
                 <Link href={`/create?goal=${goal}&theme=${l.id}${q}`} aria-label={`Use the ${l.label} look`} className="absolute inset-0 z-20 rounded-[34px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5b37]" />
                 <div className="rounded-[34px] transition duration-300 group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5">
-                  <PhoneFrame interactive={false} profile={{ ...previewFor(goal, l.id), theme: l.id }} scale={0.4} />
+                  <PhoneFrame interactive={false} profile={{ ...previewFor(goal, String(i)), theme: l.id }} scale={0.5} />
                 </div>
                 <span className="text-[14px] font-semibold">{l.label}</span>
                 <span className="-mt-2 inline-flex items-center gap-1 text-[12px] text-fg/50 group-hover:text-fg">

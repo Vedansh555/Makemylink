@@ -546,6 +546,26 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                     </div>
                   );
                 }
+                // A highlighted link with a photo becomes a cover card: the photo fills the card, the title sits on it.
+                if (l.featured && l.image && l.size !== "1x1") {
+                  return (
+                    <div key={l.id} className="col-span-2">
+                      <Tilt max={5} className="rounded-3xl">
+                        <a href={href} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className="group relative block aspect-[16/10] overflow-hidden rounded-3xl shadow-[0_30px_60px_-24px_rgba(0,0,0,0.65)] ring-1 ring-white/15">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={l.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                          <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <span className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4 text-white">
+                            <span className="flex-1 text-left text-[18px] font-semibold leading-snug [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">{l.title}</span>
+                            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/95 text-black shadow-lg transition group-hover:scale-110">
+                              <ArrowUpRight className="h-4 w-4" />
+                            </span>
+                          </span>
+                        </a>
+                      </Tilt>
+                    </div>
+                  );
+                }
                 return l.featured ? (
                   <div key={l.id} className={`${span} ${tall}`}>
                     <Tilt max={6} className="rounded-2xl">
