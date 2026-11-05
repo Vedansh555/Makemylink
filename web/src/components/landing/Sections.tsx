@@ -39,7 +39,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function Marquee() {
-  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Bento grid", "Media kit", "135 themes"];
+  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Card sizes", "Media kit", "135 themes"];
   return (
     <div className="relative z-20 -mt-16">
       {/* Solid page-colour block under the tilted band, so no phone shows below it */}
@@ -59,7 +59,7 @@ export function Marquee() {
 
 export function HowItWorks() {
   const steps = [
-    ["1", "Pick a style", "Choose one of our designs. Change the colours, fonts and photo until it feels like you."],
+    ["1", "Pick your goal", "Get booked, show your products, grow your email list, or bring your existing page. You start from a page that already looks finished."],
     ["2", "Add what earns", "A bookable 1:1 call, your product links, an email sign-up. Already have a page on Linktree? Paste its link and we copy your picture, links and shop items."],
     ["3", "Share one link", "Put it in your Instagram, LinkedIn or YouTube bio. Followers book, buy and subscribe. You see what works."],
   ];
@@ -262,7 +262,7 @@ export function Features() {
                 <Link href="/aria" className="rounded-full border border-fg/15 bg-fg/[0.03] px-3.5 py-1.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg">
                   See an example
                 </Link>
-                <Link href="/create?focus=shop" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                <Link href="/create?goal=products" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
                   Add products <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -467,7 +467,7 @@ export function Features() {
               <Link href="/rohan" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2 text-[12px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
                 Try a live booking page <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
-              <Link href="/create?focus=booking" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
+              <Link href="/create?goal=booking" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
                 Add one to my page <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -568,15 +568,15 @@ export function Features() {
             <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
                 <div className="flex items-center gap-3">
-                  <h3 className="text-[22px] font-semibold">Bento grid layout</h3>
+                  <h3 className="text-[22px] font-semibold">Card sizes</h3>
                   <span className="rounded-full bg-[#ff5b37] px-2.5 py-0.5 text-[11px] font-bold text-[#111]">Pro</span>
                 </div>
-                <p className="mt-2 max-w-[44ch] text-fg/55">Mix half-width, full-width and tall cards, so your page looks designed instead of like a list of buttons. Pick each card&apos;s size with one tap in the editor.</p>
+                <p className="mt-2 max-w-[44ch] text-fg/55">Make some cards half width, some full width and some tall, so your page looks designed instead of like a plain list of buttons. Pick each card&apos;s size with one tap in the editor.</p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Link href="/rohan" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2 text-[12px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
                     See it live <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
-                  <Link href="/create?focus=links" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
+                  <Link href="/create?goal=booking" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
                     Try it in the editor <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
@@ -681,7 +681,7 @@ export function FinalCTA() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                router.push(`/create${handle ? `?handle=${encodeURIComponent(handle.replace(/^@/, ""))}` : ""}`);
+                router.push(`/start${handle ? `?handle=${encodeURIComponent(handle.replace(/^@/, ""))}` : ""}`);
               }}
               className="mx-auto mt-10 flex max-w-md items-center gap-2 rounded-xl bg-white p-2 shadow-[0_8px_24px_-8px_rgba(0,0,0,.3)]"
             >
@@ -713,7 +713,7 @@ export function Footer() {
           <a href="#themes" className={link}>Themes</a>
           <a href="#pricing" className={link}>Pricing</a>
           <Link href="/blog" className={link}>Blog</Link>
-          <Link href="/create" className={link}>Create</Link>
+          <Link href="/start" className={link}>Create</Link>
           <Link href="/contact" className={link}>Contact</Link>
           <Link href="/terms" className={link}>Terms</Link>
           <Link href="/privacy" className={link}>Privacy</Link>

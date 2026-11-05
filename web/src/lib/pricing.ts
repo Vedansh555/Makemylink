@@ -37,7 +37,7 @@ export const plans: Plan[] = [
     features: [
       `All ${themeList.length} themes, including 3D chrome`,
       "Paid 1:1 bookings, 0% commission",
-      "Bento grid: half, full and tall cards",
+      "Card sizes: half, full or tall",
       "Unlimited links and products",
       "Unlimited emails, with CSV export",
       "30-day analytics by link and country",

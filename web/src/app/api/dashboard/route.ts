@@ -33,7 +33,22 @@ export async function GET() {
   const bookings = await all("SELECT id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status FROM bookings WHERE page_id = $1 ORDER BY slot_start DESC LIMIT 50", [pid]);
   const health = await all<{ link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }>("SELECT link_id, url, status, ok, checked_at FROM link_health WHERE page_id = $1", [pid]);
 
+  const verified = await one<{ email_verified: boolean }>("SELECT email_verified FROM users WHERE id = $1", [session.userId]);
+  const totalViews = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM events WHERE page_id = $1 AND kind = 'view'", [pid]);
+  const hasBooking = profile.links.some((l) => l.kind === "booking");
+  const defaultName = !profile.name || profile.name.toLowerCase() === page.handle.toLowerCase();
+  // Plain steps that lead a new person from "published" to "earning".
+  const checklist = [
+    { key: "profile", label: "Add your name and photo", done: !!profile.avatar && !defaultName, href: "/create" },
+    { key: "earn", label: "Add a booking card or products", done: hasBooking || profile.looks.length > 0, href: "/create?focus=booking" },
+    { key: "email", label: "Turn on the email sign-up box", done: profile.showSubscribe, href: "/create" },
+    { key: "share", label: "Share your link and get your first visit", done: (totalViews?.n ?? 0) > 0, href: `/${page.handle}` },
+    { key: "verify", label: "Confirm your email address", done: !!verified?.email_verified },
+    { key: "first", label: "Get your first email or booking", done: (subs?.n ?? 0) > 0 || bookings.length > 0 },
+  ];
+
   return NextResponse.json({
+    checklist,
     plan,
     handle: page.handle,
     days,

@@ -10,17 +10,13 @@ import {
   ArrowUp,
   ChevronDown,
   Eye,
-  Globe,
   ImagePlus,
-
   Link as LinkIcon,
   Palette,
   Pencil,
   Plus,
-  ShoppingBag,
   Star,
   Trash2,
-  User,
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
@@ -36,7 +32,9 @@ const fontOptions: [string, string][] = [
   ["sans", "Inter (plain sans)"],
 ];
 import type { ArtKind, BioLink, BlockSize, BookingConfig, Look, Profile, Store } from "@/lib/types";
-import { FREE_LIMITS, applyPlan, type PlanId } from "@/lib/plans";
+import { FREE_LIMITS, isFreeTheme, type PlanId } from "@/lib/plans";
+import { isBlankProfile, isGoal, starterFor } from "@/lib/templates";
+import { detectRegion, formatPrice } from "@/lib/pricing";
 import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
 import { Logo } from "../landing/Nav";
@@ -58,13 +56,14 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Panel({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
+function Panel({ title, children, action, hint }: { title: string; children: React.ReactNode; action?: React.ReactNode; hint?: string }) {
   return (
     <section className="rounded-2xl sm:rounded-3xl border border-fg/10 bg-fg/[0.025] p-4 sm:p-6 shadow-sm">
-      <div className="mb-4 sm:mb-5 flex items-center justify-between">
+      <div className={`${hint ? "mb-2" : "mb-4 sm:mb-5"} flex items-center justify-between`}>
         <h2 className="font-display text-[22px] sm:text-[26px] italic leading-none">{title}</h2>
         {action}
       </div>
+      {hint && <p className="mb-4 text-[13px] leading-snug text-fg/50 sm:mb-5">{hint}</p>}
       <div className="flex flex-col gap-3.5 sm:gap-4">{children}</div>
     </section>
   );
@@ -189,7 +188,8 @@ export function Editor() {
   const [p, setP] = useState<Profile | null>(null);
   const [saved, setSaved] = useState<"saved" | "error" | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
-  const [mobileTab, setMobileTab] = useState<"theme" | "profile" | "links" | "shop" | "socials">("theme");
+  const [tab, setTab] = useState<"content" | "look">("content");
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email: string; handle?: string; plan?: PlanId } | null>(null);
   const [notice, setNotice] = useState("");
@@ -226,7 +226,11 @@ export function Editor() {
             .then((r) => (r.ok ? r.json() : null))
             .then((pageData) => {
               if (pageData?.profile) {
-                setP(pageData.profile);
+                const goal = new URLSearchParams(window.location.search).get("goal");
+                const saved = pageData.profile as Profile;
+                // A brand-new account holds an empty page; keep the starter the person chose instead of overwriting it with that.
+                if (isGoal(goal) && !isBlankProfile(saved)) setNotice("You already have a page, so we opened it. A goal's starting page is only used for new pages.");
+                setP(isGoal(goal) && isBlankProfile(saved) ? { ...starterFor(goal), handle: saved.handle, name: saved.name } : saved);
               }
             });
         }
@@ -240,8 +244,12 @@ export function Editor() {
     const themeParam = params.get("theme");
     const draft = loadDraft();
 
+    const goal = params.get("goal");
     let initial: Profile;
-    if (draft && !handle) {
+    if (isGoal(goal) && (!draft || isBlankProfile(draft))) {
+      const t = starterFor(goal);
+      initial = handle ? { ...t, handle, name: handle.charAt(0).toUpperCase() + handle.slice(1) } : { ...t, handle: draft?.handle ?? t.handle };
+    } else if (draft && !handle) {
       initial = { ...draft };
     } else {
       initial = handle
@@ -263,7 +271,7 @@ export function Editor() {
     return () => clearTimeout(t);
   }, [p]);
 
-  const handlePublish = async () => {
+  const doPublish = async () => {
     if (!p) return;
     if (!user) {
       setPublishOpen(true);
@@ -295,11 +303,12 @@ export function Editor() {
   useEffect(() => {
     if (!p || queryHandled.current) return;
     queryHandled.current = true;
-    const focus = params.get("focus");
+    const goal = params.get("goal");
+    const focus = params.get("focus") ?? (goal === "booking" ? "booking" : goal === "products" ? "shop" : null);
     const imp = params.get("import");
     if (imp) importLinktree(imp);
     if (focus) {
-      setMobileTab(focus === "shop" || focus === "mediakit" ? "shop" : "links");
+      setTab("content");
       if (focus === "booking") {
         setPulse(true);
         setTimeout(() => setPulse(false), 8000);
@@ -314,8 +323,27 @@ export function Editor() {
   // What the visitor will actually see: Free limits applied, so the preview never promises what Free can't publish.
   const plan: PlanId = user?.plan ?? "free";
   const isPro = plan === "pro";
-  const shown = applyPlan(p, plan);
-  const proOnly = (what: string) => setNotice(`${what} is on Pro. Upgrade from your dashboard to use it.`);
+  const shown = p;
+  // Free users can try Pro features in the preview. The publish step shows exactly what needs Pro.
+  const proNote = (what: string) => setNotice(`${what} is a Pro feature. Try it now. When you publish, we will show what needs Pro.`);
+
+  // What a Free page would lose at publish time, so the upgrade screen can list it.
+  const lockedItems: string[] = [];
+  const bookingCount = p.links.filter((l) => l.kind === "booking").length;
+  if (bookingCount) lockedItems.push(`${bookingCount} paid booking card${bookingCount === 1 ? "" : "s"}`);
+  if (p.links.some((l) => l.size)) lockedItems.push("Card sizes (half, full, tall)");
+  if (!isFreeTheme(p.theme)) lockedItems.push("Your chosen theme");
+  if (p.accentOverride || p.fontOverride) lockedItems.push("Custom colour or font");
+  if (p.showMediaKit) lockedItems.push("Media kit");
+  if (p.hideBadge) lockedItems.push("Hidden Showz badge");
+  const plainLinks = p.links.filter((l) => l.kind !== "booking").length;
+  if (plainLinks > FREE_LIMITS.links) lockedItems.push(`${plainLinks - FREE_LIMITS.links} links beyond the first ${FREE_LIMITS.links}`);
+  if (p.looks.length > FREE_LIMITS.looks) lockedItems.push(`${p.looks.length - FREE_LIMITS.looks} products beyond the first ${FREE_LIMITS.looks}`);
+
+  const handlePublish = () => {
+    if (user && !isPro && lockedItems.length) return setUpgradeOpen(true);
+    return doPublish();
+  };
 
   async function importLinktree(from: string = importUrl) {
     setImporting(true);
@@ -499,35 +527,33 @@ export function Editor() {
               </button>
             </div>
           )}
-          {/* Mobile Category Tabs so user never faces an endless stacked scroll on phone */}
-          <div className="no-scrollbar sticky top-[57px] z-30 -mx-4 flex gap-1.5 overflow-x-auto bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
-            {[
-              { id: "theme", label: "Theme", icon: Palette },
-              { id: "profile", label: "Profile", icon: User },
-              { id: "links", label: `Links (${p.links.length})`, icon: LinkIcon },
-              { id: "shop", label: `Shop (${p.looks.length})`, icon: ShoppingBag },
-              { id: "socials", label: "Socials", icon: Globe },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const active = mobileTab === tab.id;
-              return (
+          {/* Two clear places: what is on the page, and how it looks */}
+          <div className="sticky top-[57px] z-30 -mx-4 bg-bg/90 px-4 py-2 backdrop-blur-xl sm:mx-0 sm:px-0">
+            <div className="inline-flex w-full rounded-full border border-fg/10 bg-fg/5 p-1 sm:w-auto" role="tablist">
+              {([["content", "Content", "Links, bookings, products", LinkIcon], ["look", "Look", "Themes and colours", Palette]] as const).map(([id, label, sub, Icon]) => (
                 <button
-                  key={tab.id}
+                  key={id}
                   type="button"
-                  onClick={() => setMobileTab(tab.id as typeof mobileTab)}
-                  className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition ${
-                    active ? "bg-fg text-bg shadow-sm" : "border border-fg/10 bg-fg/[0.04] text-fg/65 hover:text-fg"
-                  }`}
+                  role="tab"
+                  aria-selected={tab === id}
+                  onClick={() => {
+                    setTab(id);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-2 text-left transition sm:flex-none sm:px-6 ${tab === id ? "bg-fg text-bg shadow-sm" : "text-fg/65 hover:text-fg"}`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  {tab.label}
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="leading-tight">
+                    <span className="block text-[13px] font-semibold">{label}</span>
+                    <span className="hidden text-[11px] opacity-60 sm:block">{sub}</span>
+                  </span>
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
           {/* Mobile: live preview pinned above the theme list so a style can be tapped and seen at once */}
-          {mobileTab === "theme" && (
+          {tab === "look" && (
             <div className="sticky top-[107px] z-20 -mx-4 flex items-center gap-4 border-b border-fg/10 bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
               <PhoneFrame profile={shown} plan={plan} scale={0.2} />
               <div className="min-w-0">
@@ -538,9 +564,9 @@ export function Editor() {
           )}
 
           {/* Theme Section */}
-          <div className={mobileTab === "theme" ? "block" : "hidden lg:block"}>
-            <Panel title="Theme" action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
-              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" plan={plan} onLocked={() => proOnly("This theme")} />
+          <div className={tab === "look" ? "block" : "hidden"}>
+            <Panel title="Theme" hint="Pick how your page looks. Your content stays exactly the same." action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
+              <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" plan={plan} onLocked={(id) => { set("theme", id); proNote("This theme"); }} />
               {notice && <p className="text-[13px] text-[#ff5b37]">{notice}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4">
                 <div>
@@ -584,8 +610,8 @@ export function Editor() {
           </div>
 
           {/* Profile Section */}
-          <div className={mobileTab === "profile" ? "block" : "hidden lg:block"}>
-            <Panel title="Profile">
+          <div className={`${tab === "content" ? "block" : "hidden"} order-1`}>
+            <Panel title="Profile" hint="Your name, photo and bio. This is the top of your page.">
               <div className="flex items-center gap-4">
                 <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
                   {p.avatar ? (
@@ -647,8 +673,8 @@ export function Editor() {
           </div>
 
           {/* Socials Section */}
-          <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
-            <Panel title="Socials">
+          <div className={`${tab === "content" ? "block" : "hidden"} order-5`}>
+            <Panel title="Socials" hint="Small icons under your bio that open your accounts.">
               <div className="grid gap-4 sm:grid-cols-2">
                 {(["instagram", "tiktok", "youtube", "pinterest", "email"] as const).map((k) => (
                   <Field key={k} label={k}>
@@ -665,13 +691,14 @@ export function Editor() {
           </div>
 
           {/* Links Section */}
-          <div id="section-links" className={mobileTab === "links" ? "block" : "hidden lg:block"}>
+          <div id="section-links" className={`${tab === "content" ? "block" : "hidden"} order-2`}>
             <Panel
-              title="Links"
+              title="Links and bookings"
+              hint="The buttons people tap. Add a booking card to get paid for calls. Open Layout and schedule on a card to make it half, full or tall."
               action={
                 <div className="flex gap-2">
                   <button
-                    onClick={() => (isPro ? set("links", [...p.links, newBooking()]) : proOnly("Paid bookings"))}
+                    onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) proNote("Paid bookings"); }}
                     className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
                     <Plus className="h-3.5 w-3.5" /> Booking{!isPro && " · Pro"}
@@ -745,7 +772,7 @@ export function Editor() {
                             <button
                               type="button"
                               key={v}
-                              onClick={() => (isPro ? setLink(l.id, { size: v }) : proOnly("Grid card sizes"))}
+                              onClick={() => { setLink(l.id, { size: v }); if (!isPro && v !== "2x1") proNote("Card sizes"); }}
                               className={`rounded-md px-3.5 py-1.5 text-[12px] transition ${(l.size ?? "2x1") === v ? "bg-fg text-bg" : "text-fg/60 hover:text-fg"}`}
                             >
                               {label}
@@ -772,9 +799,10 @@ export function Editor() {
           </div>
 
           {/* Shop Section */}
-          <div id="section-shop" className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
+          <div id="section-shop" className={`${tab === "content" ? "block" : "hidden"} order-3`}>
             <Panel
               title="Products"
+              hint="A photo grid of things you sell or recommend. Each one opens its store link."
               action={
                 <button
                   onClick={() =>
@@ -861,9 +889,9 @@ export function Editor() {
           </div>
 
           {/* Media Kit Section */}
-          <div id="section-mediakit" className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
-            <Panel title="Media kit">
-              <Switch on={p.showMediaKit && isPro} onChange={(v) => (isPro ? set("showMediaKit", v) : proOnly("The media kit"))} label={`Show media kit for brands${isPro ? "" : " (Pro)"}`} />
+          <div id="section-mediakit" className={`${tab === "content" ? "block" : "hidden"} order-6`}>
+            <Panel title="Media kit" hint="Your numbers for brands, with a Work with me button.">
+              <Switch on={p.showMediaKit} onChange={(v) => { set("showMediaKit", v); if (v && !isPro) proNote("The media kit"); }} label={`Show media kit for brands${isPro ? "" : " (Pro)"}`} />
               {p.showMediaKit && (
                 <>
                   <div className="grid gap-4 sm:grid-cols-3">
@@ -893,10 +921,10 @@ export function Editor() {
           </div>
 
           {/* Audience Section */}
-          <div className={mobileTab === "socials" ? "block" : "hidden lg:block"}>
-            <Panel title="Audience">
+          <div className={`${tab === "content" ? "block" : "hidden"} order-4`}>
+            <Panel title="Email list" hint="Shows a sign-up box so visitors can join your list. You see the emails in your dashboard.">
               <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
-              <Switch on={!!p.hideBadge && isPro} onChange={(v) => (isPro ? set("hideBadge", v) : proOnly("Removing the badge"))} label={`Hide the Showz badge${isPro ? "" : " (Pro)"}`} />
+              <Switch on={!!p.hideBadge} onChange={(v) => { set("hideBadge", v); if (v && !isPro) proNote("Hiding the badge"); }} label={`Hide the Showz badge${isPro ? "" : " (Pro)"}`} />
               <p className="text-[12px] text-fg/40">
                 Plan: <b>{isPro ? "Pro" : "Free"}</b> · <Link href="/dashboard" className="underline">Open dashboard</Link> for emails, bookings and stats
               </p>
@@ -920,6 +948,41 @@ export function Editor() {
           </div>
         </div>
       </div>
+
+      {upgradeOpen && (
+        <div role="dialog" aria-modal="true" onClick={() => setUpgradeOpen(false)} className="fixed inset-0 z-[70] grid place-items-center bg-black/60 p-4 backdrop-blur-sm">
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-3xl border border-fg/10 bg-bg p-7 shadow-2xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#c8431f]">Pro features</p>
+            <h3 className="mt-2 font-display text-[34px] italic leading-none">Your page uses Pro</h3>
+            <p className="mt-3 text-[14px] text-fg/60">These are only live on Pro. On the free plan they are hidden, but they stay saved in your editor.</p>
+            <ul className="mt-4 space-y-2 text-[14px]">
+              {lockedItems.map((t) => (
+                <li key={t} className="flex gap-2.5">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5b37]" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-6 flex flex-col gap-2.5">
+              <Link href="/dashboard?tab=billing" className="rounded-xl bg-[#ff5b37] py-3.5 text-center text-[14px] font-semibold text-[#111] transition hover:brightness-110">
+                Upgrade to Pro · {formatPrice(detectRegion() === "IN" ? 299 : 8, detectRegion())}/month, 0% commission
+              </Link>
+              <button
+                onClick={() => {
+                  setUpgradeOpen(false);
+                  doPublish();
+                }}
+                className="rounded-xl border border-fg/20 py-3 text-[14px] font-medium transition hover:border-fg/50"
+              >
+                Publish the free version
+              </button>
+              <button onClick={() => setUpgradeOpen(false)} className="py-1 text-[13px] text-fg/55 underline underline-offset-4">
+                Keep editing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {publishOpen && (
