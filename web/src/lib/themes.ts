@@ -1276,6 +1276,28 @@ export interface ResolvedTheme {
   style: CSSProperties;
 }
 
+const channel = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+function luminance(hex: string): number {
+  const h = hex.replace("#", "");
+  const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const [r, g, b] = [0, 2, 4].map((i) => channel(parseInt(v.slice(i, i + 2), 16) / 255));
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+}
+const ratio = (a: string, b: string) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi! + 0.05) / (lo! + 0.05);
+};
+
+/** Text colour for a button of colour `bg`: keep the theme's choice if it reads well, otherwise dark or light, whichever is clearer. */
+export function readableOn(bg: string, preferred: string): string {
+  try {
+    if (ratio(preferred, bg) >= 3.5) return preferred;
+    return ratio("#111111", bg) >= ratio("#ffffff", bg) ? "#111111" : "#ffffff";
+  } catch {
+    return preferred;
+  }
+}
+
 export function getTheme(id: ThemeId): ResolvedTheme {
   const def = byId.get(id) ?? themeList[0]!;
   const family = families[def.family];
@@ -1284,7 +1306,7 @@ export function getTheme(id: ThemeId): ResolvedTheme {
     "--t-fg": def.fg,
     "--t-accent": def.accent,
     "--t-accent2": def.accent2,
-    "--t-on-accent": def.onAccent,
+    "--t-on-accent": readableOn(def.accent, def.onAccent),
   };
   if (def.chrome) {
     style["--c1"] = def.chrome[0];

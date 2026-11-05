@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -9,6 +10,8 @@ const KEY = "mml_cookie_notice";
 /** We set only essential cookies (login and pricing region), so this is a small notice with one button, not a consent wall. */
 export function CookieNotice() {
   const [show, setShow] = useState(false);
+  // The editor has a floating Edit / Preview / Publish bar at the bottom of phones; sit above it there.
+  const inEditor = usePathname().startsWith("/create");
   useEffect(() => {
     try {
       if (!localStorage.getItem(KEY)) {
@@ -40,7 +43,7 @@ export function CookieNotice() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 12 }}
           transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
-          className="fixed bottom-4 right-4 z-[60] flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-fg/10 bg-bg/95 py-2 pl-4 pr-2 text-[12px] text-fg shadow-[0_8px_28px_-10px_rgba(0,0,0,.35)] backdrop-blur-xl"
+          className={`fixed right-4 z-[60] ${inEditor ? "bottom-24 lg:bottom-4" : "bottom-4"} flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-fg/10 bg-bg/95 py-2 pl-4 pr-2 text-[12px] text-fg shadow-[0_8px_28px_-10px_rgba(0,0,0,.35)] backdrop-blur-xl`}
         >
           <span className="text-fg/65">
             Essential cookies only.{" "}

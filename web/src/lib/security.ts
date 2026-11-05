@@ -125,6 +125,7 @@ export function sanitizeProfile(raw: unknown, handle: string): Profile {
     url: safeHref(str(l.url, 2048)),
     folder: l.folder ? str(l.folder, 60) : undefined,
     kind: l.kind === "booking" ? "booking" : "link",
+    image: safeImg(l.image),
     size: l.size === "1x1" || l.size === "2x1" || l.size === "2x2" ? l.size : undefined,
     startsAt: finiteNum(l.startsAt),
     expiresAt: finiteNum(l.expiresAt),

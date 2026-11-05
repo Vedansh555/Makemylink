@@ -54,7 +54,7 @@ export function Hero() {
             <Link href="/start" className="rounded-xl bg-fg px-6 py-3.5 text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
               Create your free page
             </Link>
-            <a href="#themes" className="text-[15px] text-fg/80 underline decoration-fg/30 underline-offset-[6px] transition hover:text-fg hover:decoration-fg">
+            <a href="#themes" className="inline-block py-2.5 text-[15px] text-fg/80 underline decoration-fg/30 underline-offset-[6px] transition hover:text-fg hover:decoration-fg">
               See examples
             </a>
           </div>

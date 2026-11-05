@@ -65,7 +65,7 @@ export function Dashboard() {
       <div className="mx-auto max-w-5xl px-4 pb-24 sm:px-6">
         <h1 className="font-display text-[40px] italic leading-none sm:text-[56px]">Dashboard</h1>
         <p className="mt-2 text-[13px] text-fg/45">{email}</p>
-        <nav className="mt-6 flex gap-1 overflow-x-auto rounded-full border border-fg/10 bg-fg/5 p-1">
+        <nav className="no-scrollbar mt-6 flex gap-1 overflow-x-auto rounded-full border border-fg/10 bg-fg/5 p-1">
           {tabs.map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)} className={`shrink-0 rounded-full px-4 py-2 text-[13px] ${tab === id ? "bg-fg text-bg" : "text-fg/60 hover:text-fg"}`}>
               {label}
@@ -132,9 +132,9 @@ function Overview({ d, goBilling }: { d: Data; goBilling: () => void }) {
             {d.checklist.map((c) => (
               <li key={c.key} className="flex items-center gap-3 py-2.5 text-[14px]">
                 <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] ${c.done ? "bg-[#ff5b37] text-[#111]" : "border border-fg/25 text-transparent"}`}>✓</span>
-                <span className={c.done ? "text-fg/45 line-through" : ""}>{c.label}</span>
+                <span className={c.done ? "text-fg/50" : ""}>{c.label}</span>
                 {!c.done && c.href && (
-                  <Link href={c.href} className="ml-auto text-[12px] font-semibold text-[#c8431f] underline underline-offset-4">
+                  <Link href={c.href} className="ml-auto shrink-0 whitespace-nowrap py-1 pl-2 text-[12px] font-semibold text-[#c8431f] underline underline-offset-4">
                     Do it
                   </Link>
                 )}

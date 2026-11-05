@@ -5,6 +5,8 @@ export interface ImportedLink {
   url: string;
   /** Group heading the link sits under, if the platform has groups or sections. */
   folder?: string;
+  /** https address of the link's own thumbnail, if the platform shows one. */
+  image?: string;
 }
 
 export interface ImportedProduct {

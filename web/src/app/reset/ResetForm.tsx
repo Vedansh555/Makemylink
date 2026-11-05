@@ -26,7 +26,7 @@ export function ResetForm() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-4 py-12 text-fg">
       <div className="mb-8"><Logo /></div>
-      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-8 sm:p-10">
+      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-6 sm:p-10">
         <h1 className="text-center font-display text-[36px] italic leading-tight">Choose a new password</h1>
         {error && <div className="mt-5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-[13px] text-red-500">{error}</div>}
         <form onSubmit={submit} className="mt-6 flex flex-col gap-4">

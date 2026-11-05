@@ -17,7 +17,7 @@ export default async function StartPage({ searchParams }: { searchParams: Promis
       <main className="relative overflow-x-clip bg-bg text-fg">
         <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[480px] max-w-[900px] bg-[radial-gradient(closest-side,var(--hero-glow),transparent)] opacity-90" />
         <div className="relative mx-auto max-w-6xl px-4 pb-24 pt-36 sm:px-6">
-          <p className="text-[12px] uppercase tracking-[0.35em] text-fg/45">Step 1 of 2</p>
+          <p className="text-[12px] uppercase tracking-[0.35em] text-fg/45">Step 1 of 3</p>
           <h1 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,8vw,96px)] leading-[0.92] tracking-[-0.01em]">What should your page do?</h1>
           <p className="mt-5 max-w-[520px] text-[17px] leading-relaxed text-fg/65">Pick one. You get a page that already looks finished, and you just change the words. You can add the rest later.</p>
           <div className="mt-10">

@@ -75,6 +75,22 @@ export function starterFor(goal: Goal): Profile {
   }
 }
 
+/** Design families that suit each goal. The first theme of each family is free on every plan. */
+const LOOK_FAMILIES: Record<Exclude<Goal, "import">, string[]> = {
+  booking: ["luxury", "editorial", "minimal", "glass", "mono", "brutalist"],
+  products: ["pop", "gradient", "glass", "editorial", "neon", "chrome"],
+  email: ["minimal", "editorial", "luxury", "mono", "gradient", "brutalist"],
+};
+
+/** Six theme ids to offer for a goal, each the first (free) theme of its family. */
+export function looksFor(goal: Goal): { id: string; label: string }[] {
+  if (goal === "import") return [];
+  return LOOK_FAMILIES[goal]
+    .map((f) => themeList.find((t) => t.family === f))
+    .filter((t): t is NonNullable<typeof t> => !!t)
+    .map((t) => ({ id: t.id, label: t.label }));
+}
+
 /** True when a profile is still the empty starter, so applying a template can't overwrite real work. */
 export function isBlankProfile(p: Profile): boolean {
   const realLinks = p.links.filter((l) => (l.url && l.url !== "https://") || l.kind === "booking");

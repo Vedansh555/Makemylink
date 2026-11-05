@@ -55,6 +55,8 @@ export interface BioLink {
   /** "booking" renders a paid 1:1 booking card instead of a plain link. */
   kind?: "link" | "booking";
   booking?: BookingConfig;
+  /** Optional small picture shown beside the title (https address or inline image). Without it the link is a plain button. */
+  image?: string;
   /** Card size in the Bento grid. Pro only; Free is always 1x1. */
   size?: BlockSize;
   /** Epoch ms. The link appears from this moment... */

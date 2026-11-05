@@ -29,7 +29,7 @@ export const linktree: Importer = {
       for (const l of all) {
         if (!l.title || !l.url || l.type === "GROUP") continue;
         if (l.type === "COMMERCE_PRODUCT") result.products.push({ title: l.title, url: l.url, image: l.thumbnail });
-        else result.links.push({ title: l.title, url: l.url, folder: l.parent ? group.get(String(l.parent.id)) : undefined });
+        else result.links.push({ title: l.title, url: l.url, folder: l.parent ? group.get(String(l.parent.id)) : undefined, image: l.thumbnail });
       }
       const urls = ((Array.isArray(props.socialLinks) ? props.socialLinks : []) as { url?: string }[]).map((s) => s.url ?? "").filter(Boolean);
       result.socials = splitSocials(urls).socials;

@@ -10,7 +10,7 @@ import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { OPERATOR } from "@/lib/legal";
 import { BookingModal, bookingPrice } from "./BookingModal";
-import { fontClass, getTheme, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
+import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
 import { safeHref } from "@/lib/security";
 import { SocialIcon, socialUrl, type SocialKey } from "./SocialIcon";
@@ -247,7 +247,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
       // Phone mockups are for looking at: scroll and hover work, but links, buttons and forms do nothing.
       onClickCapture={embedded ? (e) => { if ((e.target as HTMLElement).closest("a, button, input, textarea")) e.preventDefault(); } : undefined}
       onSubmitCapture={embedded ? (e) => e.preventDefault() : undefined}
-      style={profile.accentOverride ? { ...theme.style, "--t-accent": profile.accentOverride } as React.CSSProperties : theme.style}
+      style={profile.accentOverride ? { ...theme.style, "--t-accent": profile.accentOverride, "--t-on-accent": readableOn(profile.accentOverride, theme.def.onAccent) } as React.CSSProperties : theme.style}
       className={`relative isolate overflow-hidden ${family === "mono" ? "grain" : ""} ${t.root} ${embedded ? "min-h-full" : "min-h-screen"}`}
     >
       <Background theme={theme} />
@@ -311,11 +311,27 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
               let idx = 0;
               const renderLink = (l: BioLink) => {
                 const n = idx++;
-                const inner = (
+                // With a picture: it sits at the left and the title beside it (Linktree style). On half and tall cards it goes on top instead.
+                const stack = !!l.image && (l.size === "1x1" || l.size === "2x2");
+                const arrow = <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />;
+                const thumb = l.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-lg object-cover" : "h-12 w-12 shrink-0 rounded-lg object-cover"} />
+                ) : null;
+                const inner = stack ? (
+                  <span className="flex w-full flex-col gap-2.5">
+                    {thumb}
+                    <span className="flex items-center gap-2">
+                      <span className="flex-1 text-left">{l.title}</span>
+                      {arrow}
+                    </span>
+                  </span>
+                ) : (
                   <>
                     {numbered && <span className="font-sans text-[10px] tracking-[0.2em] opacity-50">{String(n + 1).padStart(2, "0")}</span>}
+                    {thumb}
                     <span className="flex-1 text-left">{l.title}</span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    {arrow}
                   </>
                 );
                 const href = safeUrl(l.url);
@@ -326,6 +342,10 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
                       <button type="button" onClick={() => setBooking(l)} className={`${t.featured} w-full cursor-pointer`}>
+                        {l.image && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={l.image} alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
+                        )}
                         <span className="flex-1 text-left">
                           {l.title}
                           <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">
@@ -496,7 +516,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
           role="dialog"
           aria-modal="true"
           onClick={() => setQrOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
         >
           <div
             onClick={(e) => e.stopPropagation()}

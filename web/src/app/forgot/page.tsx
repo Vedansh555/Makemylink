@@ -20,7 +20,7 @@ export default function ForgotPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-4 py-12 text-fg">
       <div className="mb-8"><Logo /></div>
-      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-8 sm:p-10">
+      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-6 sm:p-10">
         <h1 className="text-center font-display text-[36px] italic leading-tight">Forgot your password?</h1>
         {sent ? (
           <p className="mt-5 text-center text-[14px] text-fg/70">If an account exists for <b>{email}</b>, we have emailed a link to choose a new password. It works for 1 hour. Check your spam folder too.</p>

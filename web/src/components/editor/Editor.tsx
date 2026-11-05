@@ -59,7 +59,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Panel({ title, children, action, hint }: { title: string; children: React.ReactNode; action?: React.ReactNode; hint?: string }) {
   return (
     <section className="rounded-2xl sm:rounded-3xl border border-fg/10 bg-fg/[0.025] p-4 sm:p-6 shadow-sm">
-      <div className={`${hint ? "mb-2" : "mb-4 sm:mb-5"} flex items-center justify-between`}>
+      <div className={`${hint ? "mb-2" : "mb-4 sm:mb-5"} flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5`}>
         <h2 className="font-display text-[22px] sm:text-[26px] italic leading-none">{title}</h2>
         {action}
       </div>
@@ -71,7 +71,7 @@ function Panel({ title, children, action, hint }: { title: string; children: Rea
 
 function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
-    <button type="button" onClick={() => onChange(!on)} className="flex items-center justify-between gap-4 text-left text-[14px] text-fg/80">
+    <button type="button" onClick={() => onChange(!on)} className="flex items-center justify-between gap-4 py-2 text-left text-[14px] text-fg/80">
       {label}
       <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${on ? "bg-[#ff5b37]" : "bg-fg/15"}`}>
         <span className={`absolute top-1 h-4 w-4 rounded-full transition-all ${on ? "left-6 bg-bg" : "left-1 bg-fg"}`} />
@@ -80,7 +80,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   );
 }
 
-function ImagePick({ onPick, children, className = "" }: { onPick: (dataUrl: string) => void; children: React.ReactNode; className?: string }) {
+function ImagePick({ onPick, children, className = "", max = 640 }: { onPick: (dataUrl: string) => void; children: React.ReactNode; className?: string; max?: number }) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <>
@@ -94,7 +94,7 @@ function ImagePick({ onPick, children, className = "" }: { onPick: (dataUrl: str
         hidden
         onChange={async (e) => {
           const f = e.target.files?.[0];
-          if (f) onPick(await storeImage(await readImage(f)));
+          if (f) onPick(await storeImage(await readImage(f, max)));
           e.target.value = "";
         }}
       />
@@ -138,7 +138,7 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
             <option className="bg-bg" value="INR">₹ INR</option>
             <option className="bg-bg" value="USD">$ USD</option>
           </select>
-          <input type="number" min={0} className={inputCls} value={b.price} onChange={(e) => up({ price: Math.max(0, Math.round(+e.target.value)) })} />
+          <input type="number" min={0} className={`${inputCls} min-w-0`} value={b.price} onChange={(e) => up({ price: Math.max(0, Math.round(+e.target.value)) })} />
         </div>
       </Field>
       <Field label="Length (minutes)">
@@ -168,10 +168,10 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
         </div>
       </Field>
       <Field label="Hours (24h) and time zone">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <input type="number" min={0} max={23} className={`${inputCls} !w-16`} value={b.startHour} onChange={(e) => up({ startHour: +e.target.value })} />
           <input type="number" min={1} max={24} className={`${inputCls} !w-16`} value={b.endHour} onChange={(e) => up({ endHour: +e.target.value })} />
-          <input className={inputCls} value={b.timeZone} onChange={(e) => up({ timeZone: e.target.value })} />
+          <input className={`${inputCls} min-w-[9rem] flex-1`} value={b.timeZone} onChange={(e) => up({ timeZone: e.target.value })} />
         </div>
       </Field>
       <div className="sm:col-span-2">
@@ -230,7 +230,8 @@ export function Editor() {
                 const saved = pageData.profile as Profile;
                 // A brand-new account holds an empty page; keep the starter the person chose instead of overwriting it with that.
                 if (isGoal(goal) && !isBlankProfile(saved)) setNotice("You already have a page, so we opened it. A goal's starting page is only used for new pages.");
-                setP(isGoal(goal) && isBlankProfile(saved) ? { ...starterFor(goal), handle: saved.handle, name: saved.name } : saved);
+                const chosenTheme = new URLSearchParams(window.location.search).get("theme");
+                setP(isGoal(goal) && isBlankProfile(saved) ? { ...starterFor(goal), ...(chosenTheme ? { theme: chosenTheme } : {}), handle: saved.handle, name: saved.name } : saved);
               }
             });
         }
@@ -552,6 +553,16 @@ export function Editor() {
             </div>
           </div>
 
+          {notice && (
+            <div role="status" className="flex items-start gap-3 rounded-2xl border border-fg/10 bg-fg/[0.04] p-4 text-[13px] leading-snug text-fg/80">
+              <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#ff5b37] text-[11px] font-bold text-[#111]">i</span>
+              <p className="flex-1">{notice}</p>
+              <button type="button" onClick={() => setNotice("")} aria-label="Dismiss message" className="-m-2 shrink-0 p-2 text-fg/45 transition hover:text-fg">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
           {/* Mobile: live preview pinned above the theme list so a style can be tapped and seen at once */}
           {tab === "look" && (
             <div className="sticky top-[107px] z-20 -mx-4 flex items-center gap-4 border-b border-fg/10 bg-bg/90 px-4 py-2 backdrop-blur-xl lg:hidden">
@@ -567,7 +578,6 @@ export function Editor() {
           <div className={tab === "look" ? "block" : "hidden"}>
             <Panel title="Theme" hint="Pick how your page looks. Your content stays exactly the same." action={<span className="text-[12px] text-fg/45">{themeList.length} styles</span>}>
               <ThemePicker value={p.theme} onChange={(id) => set("theme", id)} maxHeight="lg:max-h-[460px]" plan={plan} onLocked={(id) => { set("theme", id); proNote("This theme"); }} />
-              {notice && <p className="text-[13px] text-[#ff5b37]">{notice}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4">
                 <div>
                   <p className="text-[13px] font-medium">Accent color</p>
@@ -694,31 +704,32 @@ export function Editor() {
           <div id="section-links" className={`${tab === "content" ? "block" : "hidden"} order-[1]`}>
             <Panel
               title="Links and bookings"
-              hint="The buttons people tap. Add a booking card to get paid for calls. Open Layout and schedule on a card to make it half, full or tall."
+              hint="The buttons people tap. Tap the Picture square on a card to show a small image beside its title. Add a booking card to get paid for calls."
               action={
                 <div className="flex gap-2">
                   <button
                     onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) proNote("Paid bookings"); }}
-                    className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
+                    className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
-                    <Plus className="h-3.5 w-3.5" /> Booking{!isPro && " · Pro"}
+                    <Plus className="h-3.5 w-3.5" /> Booking
                   </button>
                   <button
                     onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
-                    className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
+                    className="flex items-center gap-1 whitespace-nowrap rounded-full bg-fg px-3.5 py-2 text-[12px] font-semibold text-bg"
                   >
                     <Plus className="h-3.5 w-3.5" /> Add link
                   </button>
                 </div>
               }
             >
-              <div className="flex gap-2">
-                <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import your existing page: paste its link" />
-                <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
-                  {importing ? "Importing…" : "Import"}
-                </button>
-              </div>
-              {notice && <p className="text-[13px] text-[#ff5b37]">{notice}</p>}
+              {p.links.length > 3 && (
+                <div className="flex gap-2">
+                  <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import more: paste a page link" />
+                  <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
+                    {importing ? "Importing…" : "Import"}
+                  </button>
+                </div>
+              )}
               {!isPro && p.links.length > FREE_LIMITS.links && (
                 <p className="text-[13px] text-fg/55">Free pages show the first {FREE_LIMITS.links} links. The rest are kept and appear when you go Pro.</p>
               )}
@@ -726,6 +737,24 @@ export function Editor() {
               {p.links.map((l, i) => (
                 <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="relative h-14 w-14 shrink-0" title="Add a small picture to this card">
+                      <ImagePick onPick={(v) => setLink(l.id, { image: v })} max={240} className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl border border-dashed border-fg/25 text-fg/40 transition hover:border-fg/50 hover:text-fg/70">
+                        {l.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={l.image} alt="Card picture" className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="flex flex-col items-center gap-0.5 text-[10px] leading-none">
+                            <ImagePlus className="h-4 w-4" />
+                            Picture
+                          </span>
+                        )}
+                      </ImagePick>
+                      {l.image && (
+                        <button type="button" aria-label="Remove picture" onClick={() => setLink(l.id, { image: undefined })} className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-fg text-bg shadow">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   <div className={`grid flex-1 gap-2 ${l.kind === "booking" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                     <input className={inputCls} value={l.title} onChange={(e) => setLink(l.id, { title: e.target.value })} placeholder="Title" />
                     {l.kind !== "booking" && <input className={inputCls} value={l.url} onChange={(e) => setLink(l.id, { url: e.target.value })} placeholder="https://" />}
@@ -755,7 +784,7 @@ export function Editor() {
                   <button
                     type="button"
                     onClick={() => setOpenOpts((cur) => { const n = new Set(cur); if (n.has(l.id)) n.delete(l.id); else n.add(l.id); return n; })}
-                    className="flex w-full items-center gap-2 text-left text-[12px] text-fg/55 transition hover:text-fg"
+                    className="flex w-full items-center gap-2 py-2.5 text-left text-[13px] text-fg/55 transition hover:text-fg"
                     aria-expanded={openOpts.has(l.id)}
                   >
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${openOpts.has(l.id) ? "rotate-180" : ""}`} />
@@ -866,7 +895,7 @@ export function Editor() {
                                 aria-label={`Colour ${h}`}
                                 onClick={() => setLook(look.id, { hue: h })}
                                 style={{ background: `hsl(${h} 72% 62%)` }}
-                                className={`h-7 w-7 rounded-full transition ${active ? "scale-110 ring-2 ring-fg ring-offset-2 ring-offset-bg" : "opacity-80 hover:opacity-100"}`}
+                                className={`h-8 w-8 rounded-full transition ${active ? "scale-110 ring-2 ring-fg ring-offset-2 ring-offset-bg" : "opacity-80 hover:opacity-100"}`}
                               />
                             );
                           })}

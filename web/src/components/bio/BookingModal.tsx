@@ -71,7 +71,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
   const field = "w-full rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 text-[14px] text-white outline-none placeholder:text-white/30 focus:border-white/40";
 
   return (
-    <div role="dialog" aria-modal="true" onClick={onClose} className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+    <div role="dialog" aria-modal="true" onClick={onClose} className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
       <div onClick={(e) => e.stopPropagation()} className="relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-white/15 bg-[#141518] p-6 text-white shadow-2xl sm:rounded-3xl">
         <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-4 rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white">
           <X className="h-4 w-4" />
@@ -125,7 +125,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
         ) : (
           <form onSubmit={submit} className="mt-5 space-y-4">
             {!live && <p className="rounded-lg bg-white/10 px-3 py-2 text-[12px] text-white/70">Demo: try it. Nothing is booked or charged.</p>}
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
               {days.map((d) => (
                 <button
                   type="button"

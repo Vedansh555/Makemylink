@@ -52,7 +52,7 @@ export default function SignupPage() {
         <Logo />
       </div>
 
-      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-8 backdrop-blur-sm sm:p-10">
+      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-6 backdrop-blur-sm sm:p-10">
         <h1 className="font-display text-[36px] italic leading-tight text-center">
           Claim your link
         </h1>

@@ -106,7 +106,7 @@ export async function POST(req: Request) {
     }
 
     const links = result.links
-      .map((l) => ({ title: l.title.trim().slice(0, 120), url: safeHref(l.url), folder: l.folder?.trim().slice(0, 60) || undefined }))
+      .map((l) => ({ title: l.title.trim().slice(0, 120), url: safeHref(l.url), folder: l.folder?.trim().slice(0, 60) || undefined, image: l.image && /^https:\/\//i.test(l.image) && l.image.length < 2000 ? l.image : undefined }))
       .filter((l) => l.title && l.url !== "#")
       .slice(0, 100)
       .map((l, i) => ({ id: `imp${i}`, ...l }));
