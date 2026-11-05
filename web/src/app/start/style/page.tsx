@@ -35,7 +35,8 @@ export default async function StylePage({ searchParams }: { searchParams: Promis
 
           <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-6">
             {looks.map((l) => (
-              <Link key={l.id} href={`/create?goal=${goal}&theme=${l.id}${q}`} className="group flex flex-col items-center gap-3 text-center">
+              <div key={l.id} className="group relative flex flex-col items-center gap-3 text-center">
+                <Link href={`/create?goal=${goal}&theme=${l.id}${q}`} aria-label={`Use the ${l.label} look`} className="absolute inset-0 z-20 rounded-[34px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5b37]" />
                 <div className="rounded-[34px] transition duration-300 group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5">
                   <PhoneFrame interactive={false} profile={{ ...base, theme: l.id }} scale={0.4} />
                 </div>
@@ -43,7 +44,7 @@ export default async function StylePage({ searchParams }: { searchParams: Promis
                 <span className="-mt-2 inline-flex items-center gap-1 text-[12px] text-fg/50 group-hover:text-fg">
                   Use this look <ArrowRight className="h-3 w-3" />
                 </span>
-              </Link>
+              </div>
             ))}
           </div>
 
