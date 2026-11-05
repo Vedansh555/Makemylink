@@ -7,7 +7,7 @@ import { grantPro } from "@/lib/billing";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const site = process.env.NEXT_PUBLIC_SITE_URL || url.origin;
-  const back = (q: string) => NextResponse.redirect(`${site}/dashboard?tab=plan&paid=${q}`);
+  const back = (q: string) => NextResponse.redirect(`${site}/dashboard?${q === "1" ? "upgraded=1" : "tab=billing&paid=failed"}`);
   const session = await getSession();
   const orderId = url.searchParams.get("token");
   if (!session?.userId || !orderId) return back("failed");

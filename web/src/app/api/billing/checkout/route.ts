@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     }
     if (!stripeConfigured() && paypalConfigured()) {
       const site = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-      const o = await paypalCreateOrder({ amountMajor: amount, userId: session.userId, period, returnUrl: `${site}/api/billing/paypal/return`, cancelUrl: `${site}/dashboard?tab=plan&paid=cancelled` });
+      const o = await paypalCreateOrder({ amountMajor: amount, userId: session.userId, period, returnUrl: `${site}/api/billing/paypal/return`, cancelUrl: `${site}/dashboard?tab=billing` });
       return NextResponse.json({ provider: "paypal", url: o.url });
     }
     if (!stripeConfigured()) {
