@@ -18,11 +18,16 @@ export function GoalCards({ handle }: { handle?: string }) {
         // The import card shows a finished example page, since it starts from the person's own.
         const preview = g.id === "import" ? getDemoProfile("kai")! : starterFor(g.id);
         return (
-          <Link
+          <div
             key={g.id}
-            href={g.id === "import" ? `/create?goal=import${q}` : `/start/style?goal=${g.id}${q}`}
             className="group relative flex flex-col overflow-hidden rounded-[28px] border border-fg/10 bg-fg/[0.04] p-6 transition hover:border-fg/30 hover:bg-fg/[0.06] sm:min-h-[320px] sm:flex-row sm:p-8"
           >
+            {/* One link covers the whole card. It sits beside the preview phone, not around it, so links never nest. */}
+            <Link
+              href={g.id === "import" ? `/create?goal=import${q}` : `/start/style?goal=${g.id}${q}`}
+              aria-label={`${g.title}: ${g.blurb}`}
+              className="absolute inset-0 z-20 rounded-[28px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5b37]"
+            />
             <div className="relative z-10 flex flex-col sm:max-w-[54%]">
               <div className="flex items-center gap-3">
                 <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#ff5b37] text-[#111]">
@@ -44,7 +49,7 @@ export function GoalCards({ handle }: { handle?: string }) {
                 <PhoneFrame interactive={false} profile={preview} scale={0.46} />
               </div>
             </div>
-          </Link>
+          </div>
         );
       })}
     </div>
