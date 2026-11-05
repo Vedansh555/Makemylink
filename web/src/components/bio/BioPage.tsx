@@ -212,7 +212,7 @@ function safeUrl(input?: string): string {
   return safeHref(input);
 }
 
-export function BioPage({ profile, embedded = false, plan = "pro", live = false }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean }) {
+export function BioPage({ profile, embedded = false, plan = "pro", live = false, seeAll }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean; seeAll?: string }) {
   const [qrOpen, setQrOpen] = useState(false);
   const [booking, setBooking] = useState<BioLink | null>(null);
   const [chat, setChat] = useState<BioLink | null>(null);
@@ -517,6 +517,14 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
           <motion.section variants={rise} custom={i++} className="flex flex-col gap-3">
             <h2 className={t.section}>Join my list</h2>
             <Subscribe t={t} handle={profile.handle} live={live} />
+          </motion.section>
+        )}
+
+        {seeAll && (
+          <motion.section variants={rise} custom={i++}>
+            <Link href={seeAll} className={`${t.button} block text-center`}>
+              See everything by {profile.name}
+            </Link>
           </motion.section>
         )}
 

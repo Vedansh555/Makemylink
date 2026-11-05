@@ -15,6 +15,7 @@ import {
   Palette,
   Pencil,
   Plus,
+  Share2,
   Star,
   Trash2,
   X,
@@ -33,6 +34,7 @@ const fontOptions: [string, string][] = [
 ];
 import type { ArtKind, BioLink, BlockSize, BookingConfig, Look, Profile, Store } from "@/lib/types";
 import { FREE_LIMITS, isFreeTheme, type PlanId } from "@/lib/plans";
+import { shareSlug } from "@/lib/share";
 import { isBlankProfile, isGoal, starterFor } from "@/lib/templates";
 import { detectRegion, formatPrice } from "@/lib/pricing";
 import { LookArt } from "../bio/LookArt";
@@ -125,6 +127,21 @@ const newBooking = (): BioLink => ({
     timeZone: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "Asia/Kolkata",
   },
 });
+
+function ShareBtn({ url }: { url: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <IconBtn
+      label={done ? "Link copied" : "Copy a link to just this card"}
+      active={done}
+      onClick={() => {
+        navigator.clipboard?.writeText(url).then(() => { setDone(true); setTimeout(() => setDone(false), 2000); }).catch(() => window.prompt("Copy this link", url));
+      }}
+    >
+      <Share2 className="h-4 w-4" />
+    </IconBtn>
+  );
+}
 
 const newWhatsApp = (): BioLink => ({ id: uid(), title: "Chat with me on WhatsApp", url: "", kind: "whatsapp", whatsapp: { phone: "", message: "Hi! I found you on Showz and I'd like to talk about " } });
 const newYoutube = (): BioLink => ({ id: uid(), title: "My latest video", url: "", kind: "youtube" });
@@ -781,6 +798,7 @@ export function Editor() {
                     />
                   </div>
                   <div className="flex items-center gap-1 self-end sm:self-auto">
+                    <ShareBtn url={`${SITE_URL}/${p.handle}/${shareSlug(l, p.links)}`} />
                     <IconBtn label="Highlight" active={l.featured} onClick={() => setLink(l.id, { featured: !l.featured })}>
                       <Star className="h-4 w-4" />
                     </IconBtn>
@@ -934,7 +952,8 @@ export function Editor() {
                       </button>
                     )}
                   </div>
-                  <div className="self-end sm:self-start">
+                  <div className="flex items-center gap-1 self-end sm:flex-col sm:self-start">
+                    <ShareBtn url={`${SITE_URL}/${p.handle}/${look.id}`} />
                     <IconBtn label="Delete" onClick={() => set("looks", p.looks.filter((x) => x.id !== look.id))}>
                       <Trash2 className="h-4 w-4" />
                     </IconBtn>
