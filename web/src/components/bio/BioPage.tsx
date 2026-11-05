@@ -43,7 +43,7 @@ function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
     case "mono":
       return (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-6 top-24 select-none font-grotesk text-[150px] font-bold uppercase leading-none tracking-tighter text-transparent [-webkit-text-stroke:1px_color-mix(in_srgb,var(--t-fg)_14%,transparent)] [writing-mode:vertical-rl]">
+          <div className="absolute -right-6 top-24 select-none font-grotesk text-[150px] font-bold uppercase leading-none tracking-tighter text-transparent [-webkit-text-stroke:1px_color-mix(in_srgb,var(--t-fg)_7%,transparent)] [writing-mode:vertical-rl]">
             {def.label.split(" ")[0]}
           </div>
         </div>
@@ -281,34 +281,51 @@ function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
   }
 }
 
-const wave = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="80" height="24" viewBox="0 0 80 24"><path d="M0 12 Q20 0 40 12 T80 12" fill="none" stroke="rgba(128,128,128,0.32)" stroke-width="1.2"/></svg>`);
-const plus = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><path d="M18 14v8M14 18h8" stroke="rgba(128,128,128,0.4)" stroke-width="1.4" stroke-linecap="round"/></svg>`);
-const fgMix = (pct: number) => `color-mix(in srgb, var(--t-fg) ${pct}%, transparent)`;
+/** A seamless noise texture drawn by the browser (no image files). `alpha` shapes it: paper grain, marble veins, concrete, brushed metal. */
+function noise(opts: { freq: string; octaves: number; type?: "fractalNoise" | "turbulence"; alpha: string; rgb: number; size: number }) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${opts.size}" height="${opts.size}"><filter id="n" x="0" y="0" width="100%" height="100%"><feTurbulence type="${opts.type ?? "fractalNoise"}" baseFrequency="${opts.freq}" numOctaves="${opts.octaves}" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${opts.rgb} 0 0 0 0 ${opts.rgb} 0 0 0 0 ${opts.rgb} 0 0 0 1 0"/><feComponentTransfer><feFuncA type="table" tableValues="${opts.alpha}"/></feComponentTransfer></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
 
-/** Subtle pattern styles. Each theme gets one of them, chosen from its id, so 140+ themes do not share one flat look. */
-const PATTERNS: React.CSSProperties[] = [
-  { backgroundImage: `radial-gradient(${fgMix(22)} 1.2px, transparent 1.6px)`, backgroundSize: "18px 18px" },
-  { backgroundImage: `linear-gradient(${fgMix(9)} 1px, transparent 1px), linear-gradient(90deg, ${fgMix(9)} 1px, transparent 1px)`, backgroundSize: "34px 34px" },
-  { backgroundImage: `repeating-linear-gradient(45deg, ${fgMix(9)} 0 1px, transparent 1px 15px)` },
-  { backgroundImage: `url("data:image/svg+xml,${wave}")`, backgroundSize: "80px 24px" },
-  { backgroundImage: `url("data:image/svg+xml,${plus}")`, backgroundSize: "36px 36px" },
-  { backgroundImage: `conic-gradient(${fgMix(7)} 25%, transparent 0 50%, ${fgMix(7)} 0 75%, transparent 0)`, backgroundSize: "44px 44px" },
-  { backgroundImage: `repeating-radial-gradient(circle at 100% 0, ${fgMix(12)} 0 1px, transparent 1px 18px)` },
-  { backgroundImage: `radial-gradient(${fgMix(26)} 1px, transparent 1.4px), radial-gradient(${fgMix(16)} 2px, transparent 2.6px)`, backgroundSize: "26px 26px, 61px 61px", backgroundPosition: "0 0, 13px 17px" },
-  { backgroundImage: `linear-gradient(45deg, ${fgMix(8)} 1px, transparent 1px), linear-gradient(135deg, ${fgMix(8)} 1px, transparent 1px)`, backgroundSize: "28px 28px" },
-  { backgroundImage: `repeating-linear-gradient(0deg, ${fgMix(7)} 0 1px, transparent 1px 9px)` },
-];
-// These families already have a busy backdrop of their own.
-const OWN_PATTERN = new Set(["pop", "sticker", "zine", "catalog", "mono", "terminal", "minimal"]);
+type Surface = "paper" | "marble" | "brushed" | "concrete" | "grain";
 
+/** Which real-world surface suits which design family. Families not listed stay clean on purpose. */
+const SURFACE: Partial<Record<string, Surface>> = {
+  editorial: "paper", organic: "paper", deco: "paper", frame: "paper", stamp: "paper", badge: "paper", poster: "paper", ribbon: "paper", vinyl: "grain",
+  luxury: "marble", chrome: "brushed", studio: "concrete", brutalist: "concrete",
+  gradient: "grain", glass: "grain", duotone: "grain", neon: "grain",
+};
+
+const isLight = (hex: string) => {
+  const h = hex.replace("#", "");
+  const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6);
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16));
+  return 0.299 * r! + 0.587 * g! + 0.114 * b! > 140;
+};
+
+function surfaceStyle(kind: Surface, light: boolean): React.CSSProperties {
+  const rgb = light ? 0.12 : 0.92; // dark specks on light pages, pale specks on dark ones
+  switch (kind) {
+    case "paper":
+      return { backgroundImage: noise({ freq: "0.85", octaves: 3, alpha: "0 0 0.25 0.5 0.35", rgb, size: 240 }), opacity: light ? 0.3 : 0.2 };
+    case "grain":
+      return { backgroundImage: noise({ freq: "1.1", octaves: 2, alpha: "0 0 0.2 0.45", rgb, size: 200 }), opacity: light ? 0.28 : 0.18 };
+    case "concrete":
+      return { backgroundImage: noise({ freq: "0.04", octaves: 5, alpha: "0 0.18 0.06 0.32 0.12", rgb, size: 420 }), opacity: light ? 0.5 : 0.3 };
+    case "brushed":
+      return { backgroundImage: noise({ freq: "0.002 0.55", octaves: 3, alpha: "0 0.15 0.35 0.2 0.4", rgb, size: 400 }), opacity: light ? 0.4 : 0.3 };
+    case "marble":
+      return { backgroundImage: noise({ freq: "0.007 0.02", octaves: 5, type: "turbulence", alpha: "0 0 0 0 0.9 0 0 0 0 0", rgb, size: 520 }), opacity: light ? 0.28 : 0.2 };
+  }
+}
+
+/** The page background: the family's own backdrop, plus a real surface texture only where it suits the design. */
 export function Background({ theme }: { theme: ResolvedTheme }) {
-  let h = 0;
-  for (const c of theme.def.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const pat = OWN_PATTERN.has(theme.def.family) ? null : PATTERNS[h % PATTERNS.length]!;
+  const kind = SURFACE[theme.def.family];
   return (
     <>
       <FamilyBackground theme={theme} />
-      {pat && <div className="pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(to_bottom,#000,rgba(0,0,0,0.35)_60%,transparent)]" style={pat} />}
+      {kind && <div className="pointer-events-none absolute inset-0" style={surfaceStyle(kind, isLight(theme.def.bg))} />}
     </>
   );
 }
@@ -477,9 +494,9 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 if (l.kind === "whatsapp" && l.whatsapp) {
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
-                      <Tilt max={6} className="rounded-2xl">
-                      <button type="button" onClick={() => setChat(l)} className={`${t.featured} w-full cursor-pointer`}>
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-[0_10px_22px_-6px_#25d366,0_1px_0_rgba(255,255,255,0.4)_inset] sm:h-11 sm:w-11">
+                      <Tilt max={4} className="rounded-2xl">
+                      <button type="button" onClick={() => setChat(l)} className={`${t.link} w-full cursor-pointer`}>
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-[0_6px_12px_-6px_rgba(0,0,0,0.5)] sm:h-11 sm:w-11">
                           <WhatsAppIcon className="h-5 w-5" />
                         </span>
                         <span className="flex-1 text-left">
@@ -681,7 +698,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
             </Link>
           )}
           {live && (
-            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100`}>
+            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-75 hover:opacity-100`}>
               Report this page
             </a>
           )}
