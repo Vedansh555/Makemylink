@@ -23,7 +23,7 @@ const rise = {
   show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.06 * i, duration: 0.6, ease: [0.2, 0.7, 0.2, 1] as const } }),
 };
 
-export function Background({ theme }: { theme: ResolvedTheme }) {
+function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
   const { def } = theme;
   switch (def.family) {
     case "chrome":
@@ -160,6 +160,118 @@ export function Background({ theme }: { theme: ResolvedTheme }) {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_color-mix(in_srgb,var(--t-accent)_8%,transparent)_0%,_transparent_60%)]" />
         </div>
       );
+    case "editorial":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--t-accent)_16%,transparent),transparent_65%)]" />
+          <div className="absolute -left-32 top-[55%] h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--t-accent2)_12%,transparent),transparent_65%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_70%,color-mix(in_srgb,var(--t-fg)_5%,transparent))]" />
+        </div>
+      );
+    case "studio":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_0%,color-mix(in_srgb,var(--t-fg)_14%,transparent),transparent)]" />
+          <div className="absolute inset-x-0 bottom-0 h-72 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--t-accent)_18%,transparent),transparent)]" />
+        </div>
+      );
+    case "sticker":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(color-mix(in_srgb,var(--t-fg)_14%,transparent)_1px,transparent_1px)] [background-size:16px_16px]" />
+          {[
+            "left-5 top-16 h-14 w-14 bg-t-accent rotate-12",
+            "right-6 top-40 h-10 w-10 bg-t-accent2 -rotate-6",
+            "left-8 top-[52%] h-8 w-8 bg-t-accent2",
+            "right-7 bottom-44 h-16 w-16 bg-t-accent -rotate-12",
+          ].map((c, i) => (
+            <span key={i} className={`absolute rounded-[38%] border-2 border-t-fg shadow-[3px_3px_0_var(--t-fg)] [animation:float_6s_ease-in-out_infinite] ${c}`} style={{ animationDelay: `${i * -1.7}s` }} />
+          ))}
+        </div>
+      );
+    case "poster":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-16 -top-16 h-[360px] w-[360px] rounded-full bg-[radial-gradient(var(--t-accent)_2px,transparent_2.5px)] opacity-40 [background-size:14px_14px] [mask-image:radial-gradient(circle,#000,transparent_70%)]" />
+          <div className="absolute inset-x-0 top-0 h-2 bg-t-accent" />
+          <div className="absolute inset-x-0 bottom-0 h-2 bg-t-accent2" />
+        </div>
+      );
+    case "vinyl":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full opacity-[0.18] [background:repeating-radial-gradient(circle,var(--t-fg)_0_1px,transparent_1px_7px)]" />
+          <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-t-accent opacity-30 blur-2xl" />
+        </div>
+      );
+    case "ribbon":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-20 top-10 h-12 w-[140%] -rotate-6 bg-t-accent opacity-90 shadow-[0_14px_30px_-12px_rgba(0,0,0,0.5)]" />
+          <div className="absolute -left-20 top-[88px] h-3 w-[140%] -rotate-6 bg-t-accent2 opacity-80" />
+        </div>
+      );
+    case "frame":
+      return (
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-3 border border-t-fg/40" />
+          <div className="absolute inset-[18px] border border-t-fg/20" />
+          {["left-3 top-3", "right-3 top-3", "left-3 bottom-3", "right-3 bottom-3"].map((c) => (
+            <span key={c} className={`absolute h-3 w-3 bg-t-accent ${c}`} />
+          ))}
+        </div>
+      );
+    case "badge":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {[
+            "-left-10 top-20 h-36 w-36",
+            "-right-14 top-[45%] h-44 w-44",
+            "left-10 -bottom-16 h-40 w-40",
+          ].map((c, i) => (
+            <span key={i} className={`absolute rounded-full border-[6px] border-t-accent/40 ${c}`}>
+              <span className="absolute inset-4 rounded-full border-2 border-dashed border-t-accent2/50" />
+            </span>
+          ))}
+        </div>
+      );
+    case "split":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-[260px] bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--t-accent)_26%,transparent),transparent)]" />
+          <div className="absolute inset-x-0 top-[250px] h-px bg-t-fg/20" />
+        </div>
+      );
+    case "zine":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(color-mix(in_srgb,var(--t-fg)_10%,transparent)_1px,transparent_1px)] [background-size:12px_12px]" />
+          <span className="absolute left-6 top-6 h-5 w-20 -rotate-6 bg-t-accent/70" />
+          <span className="absolute right-8 top-10 h-5 w-16 rotate-12 bg-t-accent2/70" />
+          <span className="absolute -right-4 bottom-40 h-5 w-24 -rotate-12 bg-t-accent/60" />
+        </div>
+      );
+    case "stamp":
+      return (
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-2 rounded-[14px] border-[3px] border-dashed border-t-fg/40" />
+          <div className="absolute -right-10 top-24 h-32 w-32 rotate-12 rounded-full border-[4px] border-t-accent/50" />
+        </div>
+      );
+    case "carnival":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-5 [background:repeating-linear-gradient(90deg,var(--t-accent)_0_22px,var(--t-accent2)_22px_44px)]" />
+          <div className="absolute inset-x-0 top-5 h-3 opacity-80 [background:repeating-linear-gradient(90deg,var(--t-accent)_0_22px,var(--t-accent2)_22px_44px)] [mask-image:radial-gradient(circle_at_11px_0,#000_10px,transparent_11px)] [mask-size:22px_12px]" />
+        </div>
+      );
+    case "catalog":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 [background:linear-gradient(color-mix(in_srgb,var(--t-fg)_8%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--t-fg)_8%,transparent)_1px,transparent_1px)] [background-size:28px_28px]" />
+          <div className="absolute inset-x-0 top-0 h-52 bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--t-accent)_14%,transparent),transparent)]" />
+        </div>
+      );
     default:
       return (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -167,6 +279,38 @@ export function Background({ theme }: { theme: ResolvedTheme }) {
         </div>
       );
   }
+}
+
+const wave = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="80" height="24" viewBox="0 0 80 24"><path d="M0 12 Q20 0 40 12 T80 12" fill="none" stroke="rgba(128,128,128,0.32)" stroke-width="1.2"/></svg>`);
+const plus = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><path d="M18 14v8M14 18h8" stroke="rgba(128,128,128,0.4)" stroke-width="1.4" stroke-linecap="round"/></svg>`);
+const fgMix = (pct: number) => `color-mix(in srgb, var(--t-fg) ${pct}%, transparent)`;
+
+/** Subtle pattern styles. Each theme gets one of them, chosen from its id, so 140+ themes do not share one flat look. */
+const PATTERNS: React.CSSProperties[] = [
+  { backgroundImage: `radial-gradient(${fgMix(22)} 1.2px, transparent 1.6px)`, backgroundSize: "18px 18px" },
+  { backgroundImage: `linear-gradient(${fgMix(9)} 1px, transparent 1px), linear-gradient(90deg, ${fgMix(9)} 1px, transparent 1px)`, backgroundSize: "34px 34px" },
+  { backgroundImage: `repeating-linear-gradient(45deg, ${fgMix(9)} 0 1px, transparent 1px 15px)` },
+  { backgroundImage: `url("data:image/svg+xml,${wave}")`, backgroundSize: "80px 24px" },
+  { backgroundImage: `url("data:image/svg+xml,${plus}")`, backgroundSize: "36px 36px" },
+  { backgroundImage: `conic-gradient(${fgMix(7)} 25%, transparent 0 50%, ${fgMix(7)} 0 75%, transparent 0)`, backgroundSize: "44px 44px" },
+  { backgroundImage: `repeating-radial-gradient(circle at 100% 0, ${fgMix(12)} 0 1px, transparent 1px 18px)` },
+  { backgroundImage: `radial-gradient(${fgMix(26)} 1px, transparent 1.4px), radial-gradient(${fgMix(16)} 2px, transparent 2.6px)`, backgroundSize: "26px 26px, 61px 61px", backgroundPosition: "0 0, 13px 17px" },
+  { backgroundImage: `linear-gradient(45deg, ${fgMix(8)} 1px, transparent 1px), linear-gradient(135deg, ${fgMix(8)} 1px, transparent 1px)`, backgroundSize: "28px 28px" },
+  { backgroundImage: `repeating-linear-gradient(0deg, ${fgMix(7)} 0 1px, transparent 1px 9px)` },
+];
+// These families already have a busy backdrop of their own.
+const OWN_PATTERN = new Set(["pop", "sticker", "zine", "catalog", "mono", "terminal", "minimal"]);
+
+export function Background({ theme }: { theme: ResolvedTheme }) {
+  let h = 0;
+  for (const c of theme.def.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const pat = OWN_PATTERN.has(theme.def.family) ? null : PATTERNS[h % PATTERNS.length]!;
+  return (
+    <>
+      <FamilyBackground theme={theme} />
+      {pat && <div className="pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(to_bottom,#000,rgba(0,0,0,0.35)_60%,transparent)]" style={pat} />}
+    </>
+  );
 }
 
 function Avatar({ profile, t, font }: { profile: Profile; t: ThemeTokens; font: string }) {
