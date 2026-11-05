@@ -45,7 +45,9 @@ export async function runLinkCheck(): Promise<number> {
       const u = publicHttpUrl(l.url);
       if (!u) continue;
       const status = await probe(u);
-      const ok = status !== null && status < 400;
+      // Broken means the page is gone (404, 410), the server is failing (5xx), or nothing answered.
+      // 401/403/429 and similar only mean the site refuses automated visitors, which says nothing about real ones, so those pass.
+      const ok = status !== null && status !== 404 && status !== 410 && status < 500;
       checked++;
       await run(
         "INSERT INTO link_health (page_id, link_id, url, status, ok, checked_at) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (page_id, link_id) DO UPDATE SET url = $3, status = $4, ok = $5, checked_at = $6",
