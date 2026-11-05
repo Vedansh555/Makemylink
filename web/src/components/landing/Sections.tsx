@@ -367,12 +367,12 @@ export function Features() {
         <Reveal className="md:col-span-2" delay={0.08}>
           <Card className="h-full">
             <h3 className="text-[22px] font-semibold">Bring your page with you</h3>
-            <p className="mt-2 text-fg/55">Paste your Linktree link. We copy your picture, links, groups, socials and shop items. Pick a new look for it in one tap.</p>
+            <p className="mt-2 text-fg/55">Paste the link to your page. We copy your picture, links, groups, socials and shop items, then you pick a new look.</p>
             <form onSubmit={handleImport} className="mt-6 flex flex-col gap-2.5 text-[14px]">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="linktr.ee/yourname"
+                  placeholder="Paste your page link"
                   value={importInput}
                   onChange={(e) => setImportInput(e.target.value)}
                   className="w-full rounded-full border border-fg/15 bg-bg/60 px-4 py-3 text-[13px] text-fg placeholder:text-fg/40 outline-none focus:border-[#ff5b37] transition"
@@ -383,7 +383,7 @@ export function Features() {
                 disabled={importing}
                 className="flex items-center justify-between rounded-full bg-fg px-5 py-3 font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
               >
-                <span>{importing ? "Opening editor…" : "Import my Linktree"}</span>
+                <span>{importing ? "Opening editor…" : "Import my page"}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
@@ -575,7 +575,7 @@ export function Compare() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
       <Reveal>
-        <Eyebrow>Why Makemylink</Eyebrow>
+        <Eyebrow>Why Showz</Eyebrow>
         <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">A link page that pays for itself.</h2>
       </Reveal>
       <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -594,13 +594,13 @@ export function Compare() {
 }
 
 const faqs: [string, string][] = [
-  ["Who is Makemylink for?", "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you."],
+  ["Who is Showz for?", "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you."],
   ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays your UPI ID (or your own payment link for dollars). You confirm payment and they get your meeting link by email. We take no cut."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
   ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
-  ["Can I bring my existing page?", "Yes, from Linktree today: paste its link and we copy your picture, links, groups, social handles and shop items. Another tool's design can't be copied, so you pick one of our styles. Support for more tools can come later."],
-  ["Can I sell digital products or courses?", "Not directly yet. Makemylink focuses on paid 1:1 bookings, product links and your email list. You can link to a store, a course site or a download from your page."],
-  ["Is the free plan really free?", "Yes, forever, with no card. Free includes 10 themes, 8 links and a Makemylink badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits."],
+  ["Can I bring my existing page?", "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, or almost any public link page, and we copy your picture, links, groups, social handles and shop items. Some sites, like Beacons, block automated reading, so for those you add links by hand. Another tool's design can't be copied, so you pick one of our styles."],
+  ["Can I sell digital products or courses?", "Not directly yet. Showz focuses on paid 1:1 bookings, product links and your email list. You can link to a store, a course site or a download from your page."],
+  ["Is the free plan really free?", "Yes, forever, with no card. Free includes 10 themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits."],
 ];
 
 export function FAQ() {
@@ -681,7 +681,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-fg/10 pt-6 text-[12px] sm:flex-row">
-        <p>© {new Date().getFullYear()} Makemylink. The link in bio built to earn.</p>
+        <p>© {new Date().getFullYear()} Showz. The link in bio built to earn.</p>
         <p>Made by {OPERATOR.names} · {OPERATOR.place}</p>
       </div>
     </footer>

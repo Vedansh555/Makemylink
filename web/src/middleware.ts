@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const OWN_HOST = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://makemylink75.vercel.app").host;
+const OWN_HOST = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://showz.me").host;
 const isOwn = (h: string) => h === OWN_HOST || h.startsWith("localhost") || h.startsWith("127.0.0.1") || h.endsWith(".onrender.com") || h.endsWith(".vercel.app");
 
 // hostname -> handle, remembered briefly so a visit does not need a lookup every time

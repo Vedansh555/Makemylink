@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
   if (!found) return {};
   const { profile } = found;
   const title = `${profile.name} (@${profile.handle})`;
-  const description = profile.bio || `${profile.name}'s links, shop and bookings on Makemylink.`;
+  const description = profile.bio || `${profile.name}'s links, shop and bookings on Showz.`;
   return {
     title,
     description,

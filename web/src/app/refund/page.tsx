@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/landing/LegalPage";
 import { LEGAL_UPDATED, OPERATOR } from "@/lib/legal";
 
-export const metadata: Metadata = { title: "Refund and Cancellation Policy · Makemylink" };
+export const metadata: Metadata = { title: "Refund and Cancellation Policy · Showz" };
 
 export default function Refund() {
   return (

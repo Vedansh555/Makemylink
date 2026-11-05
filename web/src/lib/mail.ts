@@ -11,7 +11,7 @@ export async function sendMail(to: string, subject: string, html: string): Promi
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: process.env.MAIL_FROM ?? `Makemylink <hello@${new URL(SITE_URL).hostname}>`, to, subject, html }),
+      body: JSON.stringify({ from: process.env.MAIL_FROM ?? `Showz <hello@${new URL(SITE_URL).hostname}>`, to, subject, html }),
     });
     return res.ok;
   } catch (e) {

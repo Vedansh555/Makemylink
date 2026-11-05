@@ -7,9 +7,9 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link href="/" className={`flex items-center gap-2 ${className}`}>
       <span className="grid h-8 w-8 place-items-center rounded-full bg-[conic-gradient(from_200deg,#8a8f99,#fff,#6f747d,#e9ebef,#8a8f99)] text-[13px] font-black tracking-tight text-[#111]">
-        M
+        S
       </span>
-      <span className="font-display text-[26px] italic leading-none">Makemylink</span>
+      <span className="font-display text-[26px] italic leading-none">Showz</span>
     </Link>
   );
 }

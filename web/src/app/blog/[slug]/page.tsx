@@ -39,8 +39,8 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       datePublished: post.date,
       dateModified: post.updated ?? post.date,
       mainEntityOfPage: url,
-      author: { "@type": "Organization", name: "Makemylink", url: SITE_URL },
-      publisher: { "@type": "Organization", name: "Makemylink", url: SITE_URL },
+      author: { "@type": "Organization", name: "Showz", url: SITE_URL },
+      publisher: { "@type": "Organization", name: "Showz", url: SITE_URL },
     },
     {
       "@context": "https://schema.org",

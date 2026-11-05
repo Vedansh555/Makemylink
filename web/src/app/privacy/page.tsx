@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/landing/LegalPage";
 import { LEGAL_UPDATED, OPERATOR } from "@/lib/legal";
 
-export const metadata: Metadata = { title: "Privacy Policy · Makemylink" };
+export const metadata: Metadata = { title: "Privacy Policy · Showz" };
 
 export default function Privacy() {
   return (
     <LegalPage title="Privacy Policy" updated={LEGAL_UPDATED}>
       <p>
-        This policy explains what Makemylink, operated by {OPERATOR.names} ({OPERATOR.place}), collects and why. It follows the principles of India&apos;s Digital Personal Data Protection Act, 2023 and the IT Act, 2000.
+        This policy explains what Showz, operated by {OPERATOR.names} ({OPERATOR.place}), collects and why. It follows the principles of India&apos;s Digital Personal Data Protection Act, 2023 and the IT Act, 2000.
       </p>
       <h2>What we collect</h2>
       <ul>
@@ -21,7 +21,7 @@ export default function Privacy() {
       <h2>How we use it</h2>
       <p>To run your account, publish your page, send account and booking emails, show your analytics, prevent abuse, and keep the service secure. We do not sell your personal data.</p>
       <h2>Who we share it with</h2>
-      <p>Only the services that help us run Makemylink: our hosting provider (Render), database provider (Neon), image storage (Cloudflare), email provider (Resend), and payment providers (Razorpay in India, Stripe elsewhere). They process data on our behalf. We may also disclose information if the law requires it.</p>
+      <p>Only the services that help us run Showz: our hosting provider (Render), database provider (Neon), image storage (Cloudflare), email provider (Resend), and payment providers (Razorpay in India, Stripe elsewhere). They process data on our behalf. We may also disclose information if the law requires it.</p>
       <h2>Cookies</h2>
       <p>We use a login cookie to keep you signed in and a small cookie that remembers your pricing region (₹ or $). We do not use advertising cookies.</p>
       <h2>Your page is public</h2>
@@ -31,7 +31,7 @@ export default function Privacy() {
       <h2>Your rights</h2>
       <p>You can ask to access, correct or delete your data, or withdraw consent, at any time by emailing us. We will reply within a reasonable time, usually within 30 days.</p>
       <h2>Children</h2>
-      <p>Makemylink is not meant for people under 18 without a parent or guardian.</p>
+      <p>Showz is not meant for people under 18 without a parent or guardian.</p>
       <h2>Grievance officer</h2>
       <p>{OPERATOR.grievanceOfficer}, {OPERATOR.place}. Email: <a href={`mailto:${OPERATOR.supportEmail}`} className="underline">{OPERATOR.supportEmail}</a></p>
       <h2>Changes</h2>

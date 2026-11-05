@@ -30,13 +30,13 @@ export const posts: Post[] = [
     answer: "If you already have an audience, you can take paid 1:1 bookings on your own page for a flat monthly fee and keep 100% of each session, instead of paying a commission to a marketplace on every call.",
     body: [
       { h2: "How marketplace booking pages make money", p: ["Booking marketplaces typically take a percentage of each paid session. That is fair when the marketplace sends you the customer. It is expensive when your own audience on Instagram, LinkedIn or YouTube is the one booking you.", "A percentage also grows with your success: the more you earn, the more you pay, for the same software."] },
-      { h2: "What a flat fee changes", p: ["With a flat monthly plan, a ₹3,000 session costs you the same to host as a ₹300 one. Makemylink Pro is ₹299 a month in India and $8 elsewhere, with 0% commission on bookings."] },
+      { h2: "What a flat fee changes", p: ["With a flat monthly plan, a ₹3,000 session costs you the same to host as a ₹300 one. Showz Pro is ₹299 a month in India and $8 elsewhere, with 0% commission on bookings."] },
       { h2: "What you need on a booking page", ul: ["Your available days and hours, in your own time zone", "A price per session in rupees or dollars", "Automatic confirmation email with the meeting link", "A page that looks like you, not like every other mentor"] },
-      { h2: "How payment works on Makemylink", p: ["For rupee sessions the buyer pays your UPI ID directly, so the money never passes through us. For dollar sessions you add your own payment link. You confirm payment in your dashboard and the meeting link is emailed to the buyer."] },
+      { h2: "How payment works on Showz", p: ["For rupee sessions the buyer pays your UPI ID directly, so the money never passes through us. For dollar sessions you add your own payment link. You confirm payment in your dashboard and the meeting link is emailed to the buyer."] },
       { h2: "When a marketplace is still the better choice", p: ["If you have no audience and want a platform to find you clients, a marketplace's discovery can be worth its commission. Compare current pricing on each site before you decide."] },
     ],
     faq: [
-      { q: "Does Makemylink charge a commission on bookings?", a: "No. Pro is a flat ₹299 per month in India or $8 per month elsewhere, and bookings carry 0% platform commission." },
+      { q: "Does Showz charge a commission on bookings?", a: "No. Pro is a flat ₹299 per month in India or $8 per month elsewhere, and bookings carry 0% platform commission." },
       { q: "How do buyers pay for a session?", a: "Rupee sessions are paid to your UPI ID. Dollar sessions use a payment link you provide. You confirm payment and the meeting link is emailed automatically." },
     ],
   },
@@ -46,7 +46,7 @@ export const posts: Post[] = [
     description: "Bento.me was shut down on 13 February 2026 after Linktree acquired it. Here is what to look for in a replacement, and how to move your page in a few minutes.",
     date: "2026-11-02",
     category: "Comparisons",
-    answer: "Makemylink is a link-in-bio builder with Bento-style grid cards and 135 designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.",
+    answer: "Showz is a link-in-bio builder with Bento-style grid cards and 135 designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.",
     body: [
       { h2: "What people liked about Bento.me", p: ["Bento pages were popular because they looked like a designed portfolio, not a list of buttons: cards of different sizes in a grid."] },
       { h2: "What to look for in a replacement", ul: ["Cards of different sizes (half-width and full-width tiles)", "Themes you can change without rebuilding", "A free plan so you can try before paying", "Export of your email list so you are never locked in"] },
@@ -54,7 +54,7 @@ export const posts: Post[] = [
       { h2: "Not locked in", p: ["Pro includes a CSV export of everyone who joined your email list, so you can take your audience with you at any time."] },
     ],
     faq: [
-      { q: "Is Makemylink free?", a: "Yes. There is a free plan with 8 links and 10 themes. Pro adds all 135 themes, bookings, grid card sizes, analytics and a custom badge-free page." },
+      { q: "Is Showz free?", a: "Yes. There is a free plan with 8 links and 10 themes. Pro adds all 135 themes, bookings, grid card sizes, analytics and a custom badge-free page." },
       { q: "Can I import my existing links?", a: "You can import a public Linktree page by pasting its address. Other links can be added by hand." },
     ],
   },
@@ -71,10 +71,10 @@ export const posts: Post[] = [
       { h2: "3. Who owns your email list?", p: ["Your subscribers are your business. Look for a plan that lets you export them."] },
       { h2: "4. Fees on your sales", p: ["Some tools take a percentage of what you sell on lower plans. Read the pricing page for the plan you will actually use."] },
       { h2: "5. Does it look like you?", p: ["Themes and layout matter, especially for fashion, beauty and photography creators."] },
-      { h2: "Where Makemylink fits", p: ["Makemylink has rupee pricing (₹299 per month for Pro), UPI-paid bookings, a real email list with CSV export, and 135 themes. The free plan is enough to start."] },
+      { h2: "Where Showz fits", p: ["Showz has rupee pricing (₹299 per month for Pro), UPI-paid bookings, a real email list with CSV export, and 135 themes. The free plan is enough to start."] },
     ],
     faq: [
-      { q: "What is the best link-in-bio tool for Indian creators?", a: "The best tool is the one that supports UPI, bills in rupees, lets you export your audience and does not take a commission on your sales. Makemylink is built around those four points." },
+      { q: "What is the best link-in-bio tool for Indian creators?", a: "The best tool is the one that supports UPI, bills in rupees, lets you export your audience and does not take a commission on your sales. Showz is built around those four points." },
     ],
   },
   {

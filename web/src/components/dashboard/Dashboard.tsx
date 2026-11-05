@@ -263,7 +263,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
       order_id: o.orderId,
       amount: o.amount,
       currency: o.currency,
-      name: "Makemylink Pro",
+      name: "Showz Pro",
       description: period === "yearly" ? "1 year" : "1 month",
       prefill: { email },
       theme: { color: "#ff5b37" },

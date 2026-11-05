@@ -54,7 +54,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="mt-2 text-center text-[14px] text-fg/50">
-          Log in to manage and edit your Makemylink profile.
+          Log in to manage and edit your Showz profile.
         </p>
 
         {error && (

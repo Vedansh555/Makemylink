@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ provider: "razorpay", orderId: order.id, amount: order.amount, currency: order.currency, keyId: process.env.RAZORPAY_KEY_ID, email: user.email });
     }
     if (!stripeConfigured()) return NextResponse.json({ error: "Payments are not switched on yet. Add Stripe keys." }, { status: 503 });
-    const s = await stripeCreateCheckout({ amountMajor: amount, name: `Makemylink Pro (${period})`, email: user.email, userId: session.userId, period });
+    const s = await stripeCreateCheckout({ amountMajor: amount, name: `Showz Pro (${period})`, email: user.email, userId: session.userId, period });
     return NextResponse.json({ provider: "stripe", url: s.url });
   } catch (e) {
     console.error("checkout error", e);
