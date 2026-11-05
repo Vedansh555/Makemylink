@@ -741,7 +741,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-fg/10 pt-6 text-[12px] sm:flex-row">
-        <p>© {new Date().getFullYear()} Showz. The link in bio built to earn.</p>
+        <p>© {new Date().getFullYear()} Showz. Your whole business in one link.</p>
         <p>Made by {OPERATOR.names} · {OPERATOR.place}</p>
       </div>
     </footer>

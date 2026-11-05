@@ -11,7 +11,7 @@ const jsonLd = [
     "@type": "WebSite",
     name: "Showz",
     url: SITE_URL,
-    description: "The link in bio built to earn. Take paid bookings, sell products and grow your email list.",
+    description: "Your whole business in one link: paid bookings, products, WhatsApp and email leads, all on a beautiful page.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${SITE_URL}/{handle}`,

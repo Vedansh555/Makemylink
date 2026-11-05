@@ -44,13 +44,13 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6">
         <div>
           <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
-            Your link in bio,
+            Your whole business,
             <br />
-            built to <span className="chrome-text [text-shadow:none]">earn.</span>
+            in one <span className="chrome-text [text-shadow:none]">link.</span>
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
-            Take paid bookings, show off your products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.
+            Get paid for calls, sell your products, collect leads on WhatsApp and email, and share any single card on its own. One beautiful page, 0% commission on Pro, free to start.
           </p>
 
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-5 [animation-delay:.24s] [text-shadow:none]">
