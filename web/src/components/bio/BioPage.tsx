@@ -1,7 +1,6 @@
 "use client";
 
 import { SITE_URL, SITE_HOST } from "@/lib/site";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
@@ -17,8 +16,6 @@ import { SocialIcon, socialUrl, type SocialKey } from "./SocialIcon";
 import { Tilt } from "../ui/Tilt";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
 
-const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
-
 const rise = {
   hidden: { opacity: 0, y: 18 },
   show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.06 * i, duration: 0.6, ease: [0.2, 0.7, 0.2, 1] as const } }),
@@ -31,9 +28,6 @@ function Background({ theme }: { theme: ResolvedTheme }) {
       return (
         <>
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,var(--c2)_30%,transparent),transparent_60%)]" />
-          <div className="pointer-events-none absolute inset-x-0 top-2 h-[210px]">
-            <ChromeScene color={def.blob} />
-          </div>
         </>
       );
     case "glass":
@@ -146,9 +140,6 @@ function Background({ theme }: { theme: ResolvedTheme }) {
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/50 via-transparent to-transparent" />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[380px]">
-            <ChromeScene variant="bakes" color="#fef8ea" accentColor={def.accent} />
-          </div>
         </>
       );
     case "clay":
@@ -157,9 +148,6 @@ function Background({ theme }: { theme: ResolvedTheme }) {
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-t-accent opacity-15 blur-3xl" />
             <div className="absolute -left-20 bottom-32 h-80 w-80 rounded-full bg-t-accent2 opacity-20 blur-3xl" />
-          </div>
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[360px]">
-            <ChromeScene variant="clay" color={def.bg} accentColor={def.accent} />
           </div>
         </>
       );
@@ -255,7 +243,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
       <motion.main
         initial="hidden"
         animate="show"
-        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 ${family === "chrome" ? "pt-24" : "pt-12"}`}
+        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 pt-12`}
       >
         {/* Cover photo — a real photo behind the header, the one thing every real creator page has that a generated theme can't fake. */}
         {profile.coverImage && (
