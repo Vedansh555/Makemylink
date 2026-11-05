@@ -190,11 +190,12 @@ function matchShots(themeId: string | undefined, n: number): Shot[] {
   const score = (s: Shot) => {
     let c = 0;
     if (neutralTheme) c += s.hue === null ? 0 : 0.9;
-    else if (s.hue === null) c += 0.4;
+    else if (s.hue === null) c += dark ? 0.12 : 0.4;
     else {
       const d = Math.abs(s.hue - h);
-      c += Math.min(d, 360 - d) / 180;
+      c += (Math.min(d, 360 - d) / 180) * 1.4;
     }
+    if (dark && s.tone === "dark") c -= 0.1;
     if (dark && s.tone === "light") c += 0.18;
     if (!dark && s.tone === "dark") c += 0.12;
     return c;
