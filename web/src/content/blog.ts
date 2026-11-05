@@ -43,7 +43,7 @@ export const posts: Post[] = [
   {
     slug: "bento-me-alternative",
     title: "Bento.me alternative: a designer link-in-bio page that is still here",
-    description: "Bento.me shut down in February 2026. Here is what to look for in a replacement, and how to move your page in a few minutes.",
+    description: "Bento.me was shut down on 13 February 2026 after Linktree acquired it. Here is what to look for in a replacement, and how to move your page in a few minutes.",
     date: "2026-11-02",
     category: "Comparisons",
     answer: "Makemylink is a link-in-bio builder with Bento-style grid cards and 135 designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.",

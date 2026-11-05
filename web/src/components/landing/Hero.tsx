@@ -47,7 +47,7 @@ export function Hero() {
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
-            Take paid bookings, sell products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.
+            Take paid bookings, show off your products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.
           </p>
 
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-5 [animation-delay:.24s] [text-shadow:none]">

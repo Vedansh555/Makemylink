@@ -620,6 +620,37 @@ export const demoProfiles: Profile[] = [
     showMediaKit: true,
     showSubscribe: true,
   },
+  {
+    handle: "rohan",
+    name: "Rohan Mehta",
+    bio: "Career coach for engineers. Mock interviews, resume reviews and offer negotiation. Ex-Google.",
+    location: "Bengaluru",
+    theme: "navy-ink",
+    socials: { youtube: "rohanmehta", email: "hello@rohanmehta.in" },
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80",
+    links: [
+      {
+        id: "b1",
+        title: "Career strategy call",
+        url: "",
+        kind: "booking",
+        featured: true,
+        booking: { price: 999, currency: "INR", durationMin: 30, description: "Get a clear plan for your next role, promotion or switch.", meetingUrl: "https://meet.google.com/", days: [1, 2, 3, 4, 5, 6], startHour: 10, endHour: 19, timeZone: "Asia/Kolkata", upiId: "rohan@okbank" },
+      },
+      {
+        id: "b2",
+        title: "Mock interview + feedback",
+        url: "",
+        kind: "booking",
+        booking: { price: 1499, currency: "INR", durationMin: 45, description: "A real interview for your target role, then a written report.", meetingUrl: "https://meet.google.com/", days: [1, 2, 3, 4, 5, 6], startHour: 10, endHour: 19, timeZone: "Asia/Kolkata", upiId: "rohan@okbank" },
+      },
+      { id: "l1", title: "Free: the 1-page resume checklist", url: "#" },
+      { id: "l2", title: "My YouTube channel", url: "#" },
+    ],
+    looks: [],
+    showMediaKit: false,
+    showSubscribe: true,
+  },
 ];
 
 export function getDemoProfile(handle: string) {

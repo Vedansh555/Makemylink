@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Makemylink: the link in bio built to earn",
   description:
-    "Take paid bookings, sell products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.",
+    "Take paid bookings, show off your products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.",
   openGraph: {
     title: "Makemylink: the link in bio built to earn",
     description: "Paid bookings, products and an email list on one beautiful page. 0% commission on Pro.",
