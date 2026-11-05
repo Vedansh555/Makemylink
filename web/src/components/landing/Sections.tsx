@@ -561,6 +561,47 @@ export function Features() {
             </div>
           </Card>
         </Reveal>
+
+        {/* Bento grid layout */}
+        <Reveal className="md:col-span-6" delay={0.04}>
+          <Card>
+            <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-[22px] font-semibold">Bento grid layout</h3>
+                  <span className="rounded-full bg-[#ff5b37] px-2.5 py-0.5 text-[11px] font-bold text-[#111]">Pro</span>
+                </div>
+                <p className="mt-2 max-w-[44ch] text-fg/55">Mix half-width, full-width and tall cards, so your page looks designed instead of like a list of buttons. Pick each card&apos;s size with one tap in the editor.</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Link href="/rohan" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2 text-[12px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                    See it live <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link href="/create?focus=links" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
+                    Try it in the editor <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-[13px] font-semibold">
+                <div className="col-span-2 flex h-14 items-center justify-between rounded-2xl border border-fg/10 bg-bg/50 px-4">
+                  <span>Book a 1:1 call</span>
+                  <span className="text-fg/45">Full</span>
+                </div>
+                <div className="flex h-20 flex-col justify-between rounded-2xl border border-fg/10 bg-bg/50 p-3.5">
+                  <span>Free checklist</span>
+                  <span className="text-[11px] font-normal uppercase tracking-[0.15em] text-fg/45">Half</span>
+                </div>
+                <div className="flex h-20 flex-col justify-between rounded-2xl border border-fg/10 bg-bg/50 p-3.5">
+                  <span>My YouTube</span>
+                  <span className="text-[11px] font-normal uppercase tracking-[0.15em] text-fg/45">Half</span>
+                </div>
+                <div className="col-span-2 flex h-28 flex-col justify-end rounded-2xl bg-[#ff5b37] p-4 text-[#111]">
+                  <span className="text-[16px]">Featured: my newest video</span>
+                  <span className="text-[11px] font-normal uppercase tracking-[0.15em] opacity-60">Tall</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Reveal>
       </div>
     </section>
   );
