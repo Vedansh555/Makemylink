@@ -507,14 +507,9 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 if (l.kind === "whatsapp" && l.whatsapp) {
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
-                      <button type="button" onClick={() => setChat(l)} className={`${t.featured} w-full cursor-pointer`}>
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-sm sm:h-11 sm:w-11">
-                          <WhatsAppIcon className="h-5 w-5" />
-                        </span>
-                        <span className="flex-1 text-left">
-                          {l.title}
-                          <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">Chat on WhatsApp</span>
-                        </span>
+                      <button type="button" onClick={() => setChat(l)} className={`${t.link} w-full cursor-pointer`}>
+                        <WhatsAppIcon className="h-7 w-7 shrink-0 text-[#25d366]" />
+                        <span className="min-w-0 flex-1 truncate text-left">{l.title}</span>
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </button>
                     </div>

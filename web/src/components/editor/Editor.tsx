@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
+  AlignLeft,
   ArrowDown,
   ArrowUp,
+  CalendarDays,
   ChevronDown,
   Eye,
   ImagePlus,
@@ -18,6 +20,8 @@ import {
   Share2,
   Star,
   Trash2,
+  Video,
+  Wallet,
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
@@ -143,62 +147,136 @@ function ShareBtn({ url }: { url: string }) {
   );
 }
 
-const newWhatsApp = (): BioLink => ({ id: uid(), title: "Chat with me on WhatsApp", url: "", kind: "whatsapp", whatsapp: { phone: "", message: "Hi! I found you on Showz and I'd like to talk about " } });
+const newWhatsApp = (): BioLink => ({ id: uid(), title: "Chat on WhatsApp", url: "", kind: "whatsapp", whatsapp: { phone: "", message: "Hi! I found you on Showz and I'd like to talk about " } });
 const newYoutube = (): BioLink => ({ id: uid(), title: "My latest video", url: "", kind: "youtube" });
 
-const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
+
+const bkField = "w-full rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[14px] outline-none transition placeholder:text-fg/35 focus:border-[#ff5b37]/70 focus:ring-4 focus:ring-[#ff5b37]/10";
+const hourLabel = (h: number) => `${h % 12 === 0 ? 12 : h % 12}:00 ${h < 12 || h === 24 ? "am" : "pm"}`;
+const ZONES = ["Asia/Kolkata", "Asia/Dubai", "Asia/Singapore", "Europe/London", "Europe/Berlin", "America/New_York", "America/Chicago", "America/Los_Angeles", "Australia/Sydney"];
+
+function BookingSection({ icon, title, hint, children }: { icon: React.ReactNode; title: string; hint: string; children: React.ReactNode }) {
+  return (
+    <section className="grid gap-3 border-t border-fg/10 pt-5 first:border-0 first:pt-0">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#ff5b37]/12 text-[#c8431f]" aria-hidden="true">{icon}</span>
+        <div className="min-w-0">
+          <p className="text-[15px] font-semibold leading-tight">{title}</p>
+          <p className="mt-0.5 text-[12.5px] leading-snug text-fg/55">{hint}</p>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: BookingConfig) => void }) {
   const up = (patch: Partial<BookingConfig>) => onChange({ ...b, ...patch });
+  const sym = b.currency === "INR" ? "₹" : "$";
+  const lengths = [15, 20, 30, 45, 60, 90, 120];
+  if (!lengths.includes(b.durationMin)) lengths.push(b.durationMin);
+  lengths.sort((x, y) => x - y);
   return (
-    <div className="grid gap-2 rounded-xl border border-fg/10 bg-fg/[0.03] p-3 sm:grid-cols-2">
-      <Field label="Price (0 = free)">
-        <div className="flex gap-2">
-          <select className={`${inputCls} !w-24`} value={b.currency} onChange={(e) => up({ currency: e.target.value as "INR" | "USD" })}>
-            <option className="bg-bg" value="INR">₹ INR</option>
-            <option className="bg-bg" value="USD">$ USD</option>
-          </select>
-          <input type="number" min={0} className={`${inputCls} min-w-0`} value={b.price} onChange={(e) => up({ price: Math.max(0, Math.round(+e.target.value)) })} />
-        </div>
-      </Field>
-      <Field label="Length (minutes)">
-        <input type="number" min={10} max={240} step={5} className={inputCls} value={b.durationMin} onChange={(e) => up({ durationMin: +e.target.value })} />
-      </Field>
-      <Field label="Meeting link (sent after booking)">
-        <input className={inputCls} value={b.meetingUrl} onChange={(e) => up({ meetingUrl: e.target.value })} placeholder="https://meet.google.com/…" />
-      </Field>
-      <Field label="Your UPI ID (Indian buyers pay you directly)">
-        <input className={inputCls} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
-      </Field>
-      <Field label="Card / PayPal payment link (international buyers)">
-        <input className={inputCls} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://buy.stripe.com/…" />
-      </Field>
-      <Field label="Days">
-        <div className="flex gap-1">
-          {DAY_LABELS.map((d, i) => (
-            <button
-              type="button"
-              key={i}
-              onClick={() => up({ days: b.days.includes(i) ? b.days.filter((x) => x !== i) : [...b.days, i] })}
-              className={`h-9 w-9 rounded-lg text-[12px] font-semibold ${b.days.includes(i) ? "bg-fg text-bg" : "border border-fg/15 text-fg/60"}`}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      </Field>
-      <Field label="Hours (24h) and time zone">
-        <div className="flex flex-wrap gap-2">
-          <input type="number" min={0} max={23} className={`${inputCls} !w-16`} value={b.startHour} onChange={(e) => up({ startHour: +e.target.value })} />
-          <input type="number" min={1} max={24} className={`${inputCls} !w-16`} value={b.endHour} onChange={(e) => up({ endHour: +e.target.value })} />
-          <input className={`${inputCls} min-w-[9rem] flex-1`} value={b.timeZone} onChange={(e) => up({ timeZone: e.target.value })} />
-        </div>
-      </Field>
-      <div className="sm:col-span-2">
-        <Field label="Short description (optional)">
-          <input className={inputCls} value={b.description ?? ""} maxLength={300} onChange={(e) => up({ description: e.target.value })} />
-        </Field>
+    <div className="grid gap-5 rounded-2xl border border-fg/10 bg-gradient-to-b from-fg/[0.04] to-transparent p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[13px] font-semibold text-fg/70">Booking settings</span>
+        <span className="rounded-full bg-[#ff5b37]/12 px-3 py-1 text-[12px] font-semibold text-[#c8431f]">
+          {b.price === 0 ? "Free" : `${sym}${b.price.toLocaleString("en-IN")}`} · {b.durationMin} min
+        </span>
       </div>
+
+      <BookingSection icon={<Wallet className="h-[18px] w-[18px]" />} title="Price and length" hint="What each call costs and how long it runs. Set the price to 0 for a free call.">
+        <div className="grid gap-3 sm:grid-cols-[auto_1fr_1fr]">
+          <div className="inline-flex self-end rounded-xl border border-fg/15 bg-fg/[0.04] p-0.5" role="group" aria-label="Currency">
+            {(["INR", "USD"] as const).map((c) => (
+              <button
+                type="button"
+                key={c}
+                onClick={() => up({ currency: c })}
+                aria-pressed={b.currency === c}
+                className={`rounded-[10px] px-3.5 py-2 text-[13px] transition ${b.currency === c ? "bg-bg font-semibold shadow-sm" : "text-fg/55 hover:text-fg"}`}
+              >
+                {c === "INR" ? "₹ INR" : "$ USD"}
+              </button>
+            ))}
+          </div>
+          <Field label="Price">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-fg/45">{sym}</span>
+              <input type="number" min={0} className={`${bkField} pl-8`} value={b.price} onChange={(e) => up({ price: Math.max(0, Math.round(+e.target.value)) })} />
+            </div>
+          </Field>
+          <Field label="Length">
+            <select className={bkField} value={b.durationMin} onChange={(e) => up({ durationMin: +e.target.value })}>
+              {lengths.map((m) => (
+                <option key={m} value={m}>{m} minutes</option>
+              ))}
+            </select>
+          </Field>
+        </div>
+      </BookingSection>
+
+      <BookingSection icon={<Video className="h-[18px] w-[18px]" />} title="Where you meet" hint="We email this link to the person once their booking is confirmed.">
+        <input className={bkField} value={b.meetingUrl} onChange={(e) => up({ meetingUrl: e.target.value })} placeholder="https://meet.google.com/abc-defg-hij" aria-label="Meeting link" />
+      </BookingSection>
+
+      <BookingSection icon={<Wallet className="h-[18px] w-[18px]" />} title="How people pay you" hint="Money goes straight to you. Showz takes 0%. Fill in one or both.">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="UPI ID (for buyers in India)">
+            <input className={bkField} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
+          </Field>
+          <Field label="Card or PayPal link (for everyone else)">
+            <input className={bkField} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://paypal.me/yourname" />
+          </Field>
+        </div>
+      </BookingSection>
+
+      <BookingSection icon={<CalendarDays className="h-[18px] w-[18px]" />} title="When you are free" hint="People can only book inside these days and hours, in your time zone.">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Days you take calls">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => {
+            const on = b.days.includes(i);
+            return (
+              <button
+                type="button"
+                key={d}
+                aria-pressed={on}
+                onClick={() => up({ days: on ? b.days.filter((x) => x !== i) : [...b.days, i] })}
+                className={`h-10 min-w-[3.1rem] rounded-full px-3 text-[13px] font-semibold transition ${on ? "bg-[#ff5b37] text-[#111] shadow-[0_8px_16px_-8px_#ff5b37]" : "border border-fg/15 text-fg/60 hover:border-fg/40 hover:text-fg"}`}
+              >
+                {d}
+              </button>
+            );
+          })}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1.4fr]">
+          <Field label="From">
+            <select className={bkField} value={b.startHour} onChange={(e) => up({ startHour: +e.target.value })}>
+              {Array.from({ length: 24 }, (_, h) => (
+                <option key={h} value={h}>{hourLabel(h)}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="To">
+            <select className={bkField} value={b.endHour} onChange={(e) => up({ endHour: +e.target.value })}>
+              {Array.from({ length: 24 }, (_, h) => h + 1).map((h) => (
+                <option key={h} value={h}>{hourLabel(h)}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Time zone">
+            <input className={bkField} list="booking-zones" value={b.timeZone} onChange={(e) => up({ timeZone: e.target.value })} />
+            <datalist id="booking-zones">
+              {ZONES.map((z) => (
+                <option key={z} value={z} />
+              ))}
+            </datalist>
+          </Field>
+        </div>
+      </BookingSection>
+
+      <BookingSection icon={<AlignLeft className="h-[18px] w-[18px]" />} title="About this call" hint="One or two lines shown on your booking page. Optional.">
+        <textarea className={`${bkField} resize-none`} rows={2} value={b.description ?? ""} maxLength={300} onChange={(e) => up({ description: e.target.value })} placeholder="A focused 1:1 session. Bring your questions and leave with a clear plan." aria-label="Short description" />
+      </BookingSection>
     </div>
   );
 }
