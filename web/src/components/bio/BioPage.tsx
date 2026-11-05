@@ -28,9 +28,12 @@ function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
   switch (def.family) {
     case "chrome":
       return (
-        <>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,var(--c2)_30%,transparent),transparent_60%)]" />
-        </>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,color-mix(in_srgb,var(--c2)_30%,transparent),transparent_60%)]" />
+          <div className="absolute inset-x-0 top-0 h-[560px] bg-[radial-gradient(ellipse_60%_100%_at_50%_0%,rgba(255,255,255,0.22),transparent_72%)]" />
+          <div className="absolute -left-1/3 top-0 h-full w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+          <div className="absolute -right-1/4 top-[30%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--c1)_22%,transparent),transparent_65%)]" />
+        </div>
       );
     case "glass":
       return (
@@ -76,9 +79,10 @@ function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
     case "neon":
       return (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(color-mix(in_srgb,var(--t-accent)_10%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--t-accent)_10%,transparent)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
-          <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-t-accent opacity-25 blur-[80px]" />
-          <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-t-accent2 opacity-20 blur-[80px]" />
+          <div className="absolute -left-24 -top-24 h-[400px] w-[400px] rounded-full bg-t-accent opacity-30 blur-[110px]" />
+          <div className="absolute -right-28 top-[24%] h-[360px] w-[360px] rounded-full bg-t-accent2 opacity-25 blur-[110px]" />
+          <div className="absolute inset-x-0 bottom-0 h-[44%] [background:linear-gradient(color-mix(in_srgb,var(--t-accent)_40%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--t-accent)_40%,transparent)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(to_top,#000,transparent)] [transform-origin:bottom] [transform:perspective(420px)_rotateX(56deg)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_60%,color-mix(in_srgb,var(--t-bg)_70%,transparent))]" />
         </div>
       );
     case "minimal":
@@ -320,11 +324,21 @@ function surfaceStyle(kind: Surface, light: boolean): React.CSSProperties {
 }
 
 /** The page background: the family's own backdrop, plus a real surface texture only where it suits the design. */
+// Graphic, flat families stay flat on purpose. Every other family gets a soft key light from above and a vignette below.
+const FLAT = new Set(["mono", "brutalist", "terminal", "catalog", "zine", "stamp", "ticket", "minimal", "pop", "sticker"]);
+
 export function Background({ theme }: { theme: ResolvedTheme }) {
   const kind = SURFACE[theme.def.family];
+  const light = isLight(theme.def.bg);
   return (
     <>
       <FamilyBackground theme={theme} />
+      {!FLAT.has(theme.def.family) && (
+        <>
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[540px]" style={{ background: light ? "radial-gradient(ellipse 85% 75% at 50% 0%, rgba(255,255,255,0.7), transparent 72%)" : "radial-gradient(ellipse 85% 75% at 50% 0%, rgba(255,255,255,0.11), transparent 72%)" }} />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[420px]" style={{ background: light ? "linear-gradient(to top, color-mix(in srgb, var(--t-fg) 8%, transparent), transparent)" : "linear-gradient(to top, rgba(0,0,0,0.38), transparent)" }} />
+        </>
+      )}
       {kind && <div className="pointer-events-none absolute inset-0" style={surfaceStyle(kind, isLight(theme.def.bg))} />}
     </>
   );
@@ -407,7 +421,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
       <motion.main
         initial="hidden"
         animate="show"
-        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 pt-12`}
+        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-10 px-5 pb-12 pt-14`}
       >
         {/* Cover photo — a real photo behind the header, the one thing every real creator page has that a generated theme can't fake. */}
         {profile.coverImage && (
@@ -418,7 +432,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
         )}
 
         {/* Header */}
-        <motion.header variants={rise} custom={i++} className={`flex flex-col gap-4 ${centered ? "items-center text-center" : ""}`}>
+        <motion.header variants={rise} custom={i++} className={`flex flex-col gap-5 ${centered ? "items-center text-center" : ""}`}>
           {family === "editorial" && (
             <div className={`flex w-full items-center justify-between border-b border-t-fg/80 pb-2 ${t.meta}`}>
               <span>Nº 01</span>
@@ -444,7 +458,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
               </>
             )}
           </div>
-          {profile.bio && <p className={`${t.bio} max-w-[36ch]`}>{profile.bio}</p>}
+          {profile.bio && <p className={`${t.bio} max-w-[34ch] leading-relaxed [text-wrap:pretty]`}>{profile.bio}</p>}
           {socials.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {socials.map(([k, v]) => (
@@ -468,7 +482,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 const arrow = <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />;
                 const thumb = l.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-xl object-cover" : "h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5"} />
+                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-xl object-cover" : "h-12 w-12 shrink-0 rounded-xl object-cover shadow-[0_8px_18px_-8px_rgba(0,0,0,0.5)] ring-1 ring-black/10"} />
                 ) : null;
                 const inner = stack ? (
                   <span className="flex w-full flex-col gap-2.5">

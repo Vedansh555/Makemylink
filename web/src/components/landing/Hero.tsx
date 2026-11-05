@@ -6,31 +6,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getDemoProfile } from "@/lib/demo";
-import type { BioLink, Profile } from "@/lib/types";
 import { PhoneFrame } from "./PhoneFrame";
 
 const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
 
 const ease = [0.2, 0.7, 0.2, 1] as const;
-
-/**
- * Dresses a demo profile for the hero: one wide highlight, a bento booking tile that shows real free times,
- * then photo cards side by side, so each phone shows what the product does and not just a list of links.
- */
-function showcase(p: Profile, booking: { title: string; price: number; currency: "INR" | "USD"; min: number; text: string }): Profile {
-  const rest = p.links.filter((l) => l.kind !== "booking");
-  const [first, ...others] = rest;
-  const tile: BioLink = {
-    id: "hero-book",
-    title: booking.title,
-    url: "",
-    kind: "booking",
-    size: "2x1",
-    booking: { price: booking.price, currency: booking.currency, durationMin: booking.min, description: booking.text, meetingUrl: "", days: [1, 2, 3, 4, 5, 6], startHour: 10, endHour: 19, timeZone: "Asia/Kolkata" },
-  };
-  const halves: BioLink[] = others.slice(0, 2).map((l, i) => ({ ...l, size: "1x1" as const, featured: false, image: l.image ?? p.looks[i]?.image }));
-  return { ...p, links: [{ ...first!, size: "2x1" as const, featured: false }, tile, ...halves], looks: p.looks.slice(0, 2) };
-}
 
 const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "small shops"];
 
@@ -46,9 +26,9 @@ export function Hero() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
-  const left = showcase(getDemoProfile("kai")!, { title: "Book me for your event", price: 25000, currency: "INR", min: 30, text: "Private sets, launches and club nights." });
-  const center = showcase(getDemoProfile("bubbles")!, { title: "Style call with Mia", price: 499, currency: "INR", min: 20, text: "Thrift finds picked just for you." });
-  const right = showcase({ ...getDemoProfile("aria")!, theme: "violet-mist" }, { title: "1:1 styling session", price: 1499, currency: "INR", min: 45, text: "A wardrobe plan built around you." });
+  const left = getDemoProfile("kai")!;
+  const center = getDemoProfile("bubbles")!;
+  const right = { ...getDemoProfile("aria")!, theme: "violet-mist" };
 
   return (
     <section className="relative isolate pt-32 [clip-path:inset(-300px_-300px_0_-300px)] sm:pt-36">
@@ -121,38 +101,41 @@ export function Hero() {
         </div>
       )}
 
-      {/* Phones with real pages */}
-      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 sm:gap-6 [perspective:1600px] sm:mt-20">
-        <motion.div
-          initial={{ opacity: 0, y: 80, rotateY: 30 }}
-          animate={{ opacity: 1, y: 0, rotateY: 16 }}
-          transition={{ duration: 1.2, delay: 0.3, ease }}
-          className="-mr-12 translate-y-6 sm:mr-0 sm:translate-y-10"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          <div className="relative [animation:float_7s_ease-in-out_infinite]">
-            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#9aa0ad" }} />
-            <PhoneFrame interactive={false} profile={left} scale={wide ? 0.56 : 0.34} />
-          </div>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10 translate-y-6 sm:translate-y-0">
-          <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
-            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#ff5fb0" }} />
-            <PhoneFrame interactive={false} profile={center} scale={wide ? 0.66 : 0.5} />
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 80, rotateY: -30 }}
-          animate={{ opacity: 1, y: 0, rotateY: -16 }}
-          transition={{ duration: 1.2, delay: 0.4, ease }}
-          className="-ml-12 translate-y-6 sm:ml-0 sm:translate-y-10"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
-            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#b38aff" }} />
-            <PhoneFrame interactive={false} profile={right} scale={wide ? 0.56 : 0.34} />
-          </div>
-        </motion.div>
+      {/* Phones with real pages, on a lit stage */}
+      <div className="relative mx-auto mt-14 max-w-6xl px-4 sm:mt-20">
+        {/* Light behind the trio and a soft floor under it, so the phones sit in a space instead of floating on white */}
+        <div className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 -z-10 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,rgba(255,120,170,0.20),rgba(154,160,173,0.14)_45%,transparent_72%)]" />
+        <div className="pointer-events-none absolute inset-x-[10%] bottom-2 h-24 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.30),transparent_68%)] blur-xl sm:bottom-0" />
+
+        <div className="relative flex items-end justify-center sm:gap-4 [perspective:1800px]">
+          <motion.div
+            initial={{ opacity: 0, y: 80, rotateY: 30 }}
+            animate={{ opacity: 1, y: 0, rotateY: 14 }}
+            transition={{ duration: 1.2, delay: 0.3, ease }}
+            className="-mr-10 translate-y-4 sm:mr-0 sm:translate-y-8"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div className="relative [animation:float_7s_ease-in-out_infinite]">
+              <PhoneFrame interactive={false} profile={left} scale={wide ? 0.64 : 0.36} />
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10">
+            <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
+              <PhoneFrame interactive={false} profile={center} scale={wide ? 0.82 : 0.56} />
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 80, rotateY: -30 }}
+            animate={{ opacity: 1, y: 0, rotateY: -14 }}
+            transition={{ duration: 1.2, delay: 0.4, ease }}
+            className="-ml-10 translate-y-4 sm:ml-0 sm:translate-y-8"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
+              <PhoneFrame interactive={false} profile={right} scale={wide ? 0.64 : 0.36} />
+            </div>
+          </motion.div>
+        </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t sm:block from-bg to-transparent" />
     </section>

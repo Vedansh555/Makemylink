@@ -87,7 +87,7 @@ interface Persona {
   city: string;
   bio: string;
   /** Booking card title, price in rupees, minutes and a line about the call. */
-  call?: { title: string; price: number; min: number; text: string };
+  call?: { title: string; price: number; min: number; text: string; currency?: "INR" | "USD" };
   /** Link titles with a photo for each. */
   links: [string, string][];
   looks?: { title: string; price: string; store: Look["store"]; art: Look["art"]; hue: number; photo: string }[];
@@ -105,10 +105,12 @@ const PERSONAS: Record<Exclude<Goal, "import">, Persona[]> = {
     { name: "Dana Cole", handle: "danacole", avatar: u("1438761681033-6461ffad8d80"), city: "Lisbon", bio: "Travel photographer. I teach you to shoot trips you will want to print.", call: { title: "Portfolio review call", price: 1999, min: 40, text: "Share your best twelve photos. I will tell you what to keep and what to fix." }, links: [["My camera bag", u("1488646953014-85cb44e25828", 640)], ["Editing presets", u("1498050108023-c5249f4df085", 640)]] },
   ],
   products: [
-    { name: "Mira Kapoor", handle: "mirak", avatar: u("1544005313-94ddf0286df2"), city: "Mumbai", bio: "Outfits and picks I love. Tap anything to shop it.", links: [["Today's try-on haul", u("1515886657613-9f3515b0c78f", 640)], ["My full shop", u("1584917865442-de89df76afd3", 640)]], looks: [{ title: "Satin slip dress", price: "₹2,499", store: "Myntra", art: "dress", hue: 350, photo: u("1595777457583-95e059d581b8", 600) }, { title: "Red structured tote", price: "₹1,899", store: "Amazon", art: "bag", hue: 10, photo: u("1584917865442-de89df76afd3", 600) }, { title: "Cobalt block heels", price: "₹2,199", store: "Nykaa", art: "heel", hue: 215, photo: u("1543163521-1bf539c55dd2", 600) }, { title: "Camel wrap coat", price: "₹4,299", store: "Myntra", art: "jacket", hue: 32, photo: u("1515886657613-9f3515b0c78f", 600) }] },
-    { name: "Nisha Rao", handle: "nisharao", avatar: u("1580489944761-15a19d654956"), city: "Hyderabad", bio: "Sneaker obsessed. Honest reviews, no hype, real prices.", links: [["This week's drops", u("1542291026-7eec264c27ff", 640)], ["How I clean my whites", u("1491553895911-0055eca6402d", 640)]], looks: [{ title: "Crimson runners", price: "₹6,999", store: "Own store", art: "sneaker", hue: 5, photo: u("1542291026-7eec264c27ff", 600) }, { title: "Cloud-white trainers", price: "₹7,499", store: "Amazon", art: "sneaker", hue: 210, photo: u("1491553895911-0055eca6402d", 600) }, { title: "Electric blue pair", price: "₹8,299", store: "Own store", art: "sneaker", hue: 215, photo: u("1515955656352-a1fa3ffcd111", 600) }, { title: "Sage suede loafers", price: "₹3,999", store: "Myntra", art: "sneaker", hue: 150, photo: u("1560343090-f0409e92791a", 600) }] },
-    { name: "Isha Verma", handle: "ishav", avatar: u("1524504388940-b1c1722653e1"), city: "Pune", bio: "Small-flat home styling. Calm rooms, warm light, nothing you cannot afford.", links: [["Tour of my 1BHK", u("1493663284031-b7e3aefcae8e", 640)], ["Plants that survive me", u("1485955900006-10f4d324d411", 640)]], looks: [{ title: "Mustard accent chair", price: "₹9,999", store: "Amazon", art: "cup", hue: 45, photo: u("1586023492125-27b2c045efd7", 600) }, { title: "Teal cushion set", price: "₹1,299", store: "Amazon", art: "cup", hue: 185, photo: u("1493663284031-b7e3aefcae8e", 600) }, { title: "Mint pot with succulent", price: "₹599", store: "Own store", art: "cup", hue: 150, photo: u("1485955900006-10f4d324d411", 600) }, { title: "Cold-brew set", price: "₹1,799", store: "Amazon", art: "cup", hue: 28, photo: u("1495474472287-4d71bcdd2085", 600) }] },
-    { name: "Tara Singh", handle: "taras", avatar: u("1494790108377-be9c29b29330"), city: "Gurugram", bio: "Gadgets I actually use every day, tested for months before I recommend them.", links: [["My desk setup", u("1517694712202-14dd9538aa97", 640)], ["Headphones, ranked", u("1505740420928-5e560c06d30e", 640)]], looks: [{ title: "Studio headphones", price: "₹7,990", store: "Amazon", art: "camera", hue: 48, photo: u("1505740420928-5e560c06d30e", 600) }, { title: "Minimal smartwatch", price: "₹4,999", store: "Amazon", art: "camera", hue: 220, photo: u("1523275335684-37898b6baf30", 600) }, { title: "Laptop stand", price: "₹1,499", store: "Own store", art: "camera", hue: 200, photo: u("1498050108023-c5249f4df085", 600) }, { title: "Everyday tee", price: "₹799", store: "Myntra", art: "dress", hue: 0, photo: u("1521572163474-6864f9cf17ab", 600) }] },
+    { name: "Mira Kapoor", handle: "mirak", avatar: u("1544005313-94ddf0286df2"), city: "Mumbai", bio: "Things I love and actually use. Tap anything to shop it.", links: [] },
+    { name: "Chloe Bennett", handle: "chloeb", avatar: u("1508214751196-bcfd4ca60f91"), city: "London", bio: "My favourite finds, with honest notes. Tap anything to shop it.", links: [] },
+    { name: "Nisha Rao", handle: "nisharao", avatar: u("1580489944761-15a19d654956"), city: "Hyderabad", bio: "Picks I would tell a friend about. Real prices, no hype.", links: [] },
+    { name: "Jack Morgan", handle: "jackm", avatar: u("1507591064344-4c6ce005b128"), city: "Austin", bio: "Stuff I buy twice. Reviews you can trust, links below.", links: [] },
+    { name: "Isha Verma", handle: "ishav", avatar: u("1524504388940-b1c1722653e1"), city: "Pune", bio: "A small shop of things I rate. Tap anything to see it.", links: [] },
+    { name: "Grace Miller", handle: "gracem", avatar: u("1558898479-33c0057a5d12"), city: "Toronto", bio: "What is in my cart this month. Tap anything to shop it.", links: [] },
   ],
   email: [
     { name: "Leela Menon", handle: "leela", avatar: u("1438761681033-6461ffad8d80"), city: "Delhi", bio: "One useful email a week on money and careers. Join free below.", links: [["Read this week's issue", u("1512820790803-83ca734da794", 640)], ["Start here: 5 best issues", u("1498050108023-c5249f4df085", 640)]] },
@@ -117,24 +119,112 @@ const PERSONAS: Record<Exclude<Goal, "import">, Persona[]> = {
   ],
 };
 
+const EN: Record<Exclude<Goal, "import">, Persona[]> = {
+  booking: [
+    { name: "Emma Carter", handle: "emmac", avatar: u("1529626455594-4ff0802cfb7e"), city: "London", bio: "Life coach. One honest conversation to get you unstuck.", call: { title: "Clarity call", price: 80, min: 45, text: "Tell me what is stuck. We leave with three clear next steps.", currency: "USD" }, links: [["My morning routine", u("1495474472287-4d71bcdd2085", 640)], ["Free reflection guide", u("1512820790803-83ca734da794", 640)]] },
+    { name: "Daniel Brooks", handle: "danb", avatar: u("1530268729831-4b0b9e170218"), city: "Austin", bio: "Finance mentor. Plain-English money advice for freelancers.", call: { title: "Money review call", price: 120, min: 30, text: "Bring your numbers. I will tell you where the leaks are.", currency: "USD" }, links: [["Freelancer tax checklist", u("1498050108023-c5249f4df085", 640)], ["Books that changed my money", u("1512820790803-83ca734da794", 640)]] },
+    { name: "Olivia Hayes", handle: "oliviah", avatar: u("1534751516642-a1af1ef26a56"), city: "Sydney", bio: "Nutritionist. Eating well without the rules and the guilt.", call: { title: "Nutrition consult", price: 60, min: 30, text: "We look at your week and build meals you will actually enjoy.", currency: "USD" }, links: [["Easy weeknight meals", u("1495474472287-4d71bcdd2085", 640)], ["Grocery list, free", u("1485955900006-10f4d324d411", 640)]] },
+    { name: "James Walker", handle: "jwalker", avatar: u("1472099645785-5658abf4ff4e"), city: "Toronto", bio: "Executive coach. I help new managers lead with confidence.", call: { title: "Leadership session", price: 150, min: 50, text: "A private session on your hardest people problem right now.", currency: "USD" }, links: [["First 90 days guide", u("1517694712202-14dd9538aa97", 640)], ["My reading list", u("1512820790803-83ca734da794", 640)]] },
+    { name: "Sophie Turner", handle: "sophiet", avatar: u("1548142813-c348350df52b"), city: "Melbourne", bio: "Portrait photographer. I teach you to shoot people naturally.", call: { title: "Portfolio review", price: 90, min: 40, text: "Send twelve photos. I will tell you what to keep and what to fix.", currency: "USD" }, links: [["My camera bag", u("1488646953014-85cb44e25828", 640)], ["Editing presets", u("1498050108023-c5249f4df085", 640)]] },
+  ],
+  products: [
+    { name: "Ella Rivera", handle: "ellar", avatar: u("1488426862026-3ee34a7d66df"), city: "Los Angeles", bio: "Small-batch finds and daily favourites. Tap anything to shop.", links: [] },
+    { name: "Noah Fischer", handle: "noahf", avatar: u("1552058544-f2b08422138a"), city: "Berlin", bio: "Gear I have used for a year before recommending. Links below.", links: [] },
+  ],
+  email: [
+    { name: "Hannah Lee", handle: "hannahl", avatar: u("1488426862026-3ee34a7d66df"), city: "Seattle", bio: "One short email a week on design and focus. Join free below.", links: [["This week's issue", u("1517694712202-14dd9538aa97", 640)], ["Start here: best issues", u("1498050108023-c5249f4df085", 640)]] },
+    { name: "Oliver Grant", handle: "oliverg", avatar: u("1463453091185-61582044d556"), city: "Manchester", bio: "Writing about small business and slow mornings, once a week.", links: [["Latest letter", u("1495474472287-4d71bcdd2085", 640)], ["Free starter guide", u("1512820790803-83ca734da794", 640)]] },
+  ],
+};
+const mix = <T,>(a: T[], b: T[]): T[] => a.flatMap((x, i) => (b[i] ? [x, b[i]!] : [x])).concat(b.slice(a.length));
+const POOL: Record<Exclude<Goal, "import">, Persona[]> = { booking: mix(PERSONAS.booking, EN.booking), products: mix(PERSONAS.products, EN.products), email: mix(PERSONAS.email, EN.email) };
+
+/**
+ * Demo photos, each tagged with its main colour (hue, or null when it is neutral) and tone, so a page can
+ * show photos that belong to its own palette instead of clashing with it.
+ */
+interface Shot { id: string; hue: number | null; tone: "dark" | "light" | "mid"; title: string; price: string; store: Look["store"]; art: Look["art"]; caption: string }
+const SHOTS: Shot[] = [
+  { id: "1595777457583-95e059d581b8", hue: 5, tone: "mid", title: "Satin slip dress", price: "₹2,499", store: "Myntra", art: "dress", caption: "My favourite dress this season" },
+  { id: "1584917865442-de89df76afd3", hue: 8, tone: "mid", title: "Structured red tote", price: "₹1,899", store: "Amazon", art: "bag", caption: "The bag I carry every day" },
+  { id: "1543163521-1bf539c55dd2", hue: 205, tone: "light", title: "Cobalt block heels", price: "₹2,199", store: "Nykaa", art: "heel", caption: "Heels I can actually walk in" },
+  { id: "1515886657613-9f3515b0c78f", hue: 48, tone: "light", title: "Sunny co-ord set", price: "₹1,999", store: "Myntra", art: "dress", caption: "Today's try-on haul" },
+  { id: "1542291026-7eec264c27ff", hue: 2, tone: "mid", title: "Crimson runners", price: "₹6,999", store: "Own store", art: "sneaker", caption: "This week's drops" },
+  { id: "1491553895911-0055eca6402d", hue: null, tone: "light", title: "Everyday trainers", price: "₹7,499", store: "Amazon", art: "sneaker", caption: "How I keep my whites clean" },
+  { id: "1515955656352-a1fa3ffcd111", hue: 215, tone: "mid", title: "Electric blue pair", price: "₹8,299", store: "Own store", art: "sneaker", caption: "Colour-pop sneakers" },
+  { id: "1560343090-f0409e92791a", hue: 22, tone: "light", title: "Sage suede loafers", price: "₹3,999", store: "Myntra", art: "sneaker", caption: "Loafers for the office" },
+  { id: "1505740420928-5e560c06d30e", hue: 48, tone: "mid", title: "Studio headphones", price: "₹7,990", store: "Amazon", art: "camera", caption: "Headphones, ranked" },
+  { id: "1523275335684-37898b6baf30", hue: null, tone: "light", title: "Minimal smartwatch", price: "₹4,999", store: "Amazon", art: "camera", caption: "The watch I wear daily" },
+  { id: "1586023492125-27b2c045efd7", hue: 46, tone: "light", title: "Mustard accent chair", price: "₹9,999", store: "Amazon", art: "cup", caption: "Tour of my 1BHK" },
+  { id: "1493663284031-b7e3aefcae8e", hue: 185, tone: "light", title: "Teal cushion set", price: "₹1,299", store: "Amazon", art: "cup", caption: "My living room refresh" },
+  { id: "1485955900006-10f4d324d411", hue: 160, tone: "light", title: "Mint pot with succulent", price: "₹599", store: "Own store", art: "cup", caption: "Plants that survive me" },
+  { id: "1495474472287-4d71bcdd2085", hue: 28, tone: "dark", title: "Cold-brew set", price: "₹1,799", store: "Amazon", art: "cup", caption: "My morning coffee setup" },
+  { id: "1556228720-195a672e8a03", hue: 265, tone: "light", title: "Night repair cream", price: "₹1,299", store: "Nykaa", art: "lipstick", caption: "My 5-step routine" },
+  { id: "1534438327276-14e5300c3a48", hue: null, tone: "dark", title: "Adjustable dumbbells", price: "₹6,499", store: "Amazon", art: "camera", caption: "My home gym" },
+  { id: "1571019613454-1cb2f99b2d8b", hue: 20, tone: "light", title: "Yoga mat", price: "₹1,299", store: "Amazon", art: "cup", caption: "My morning workout" },
+  { id: "1498050108023-c5249f4df085", hue: 140, tone: "light", title: "Laptop stand", price: "₹1,499", store: "Own store", art: "camera", caption: "My desk setup" },
+  { id: "1521572163474-6864f9cf17ab", hue: null, tone: "mid", title: "Everyday tee", price: "₹799", store: "Myntra", art: "dress", caption: "Capsule basics" },
+];
+
+const hexRgb = (hex: string) => {
+  const h = hex.replace("#", "");
+  const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6);
+  return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16) / 255) as [number, number, number];
+};
+function hueSat(hex: string): { h: number; sat: number } {
+  const [r, g, b] = hexRgb(hex);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  if (d === 0) return { h: 0, sat: 0 };
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return { h: (h * 60 + 360) % 360, sat: d / (1 - Math.abs(max + min - 1)) };
+}
+const brightness = (hex: string) => { const [r, g, b] = hexRgb(hex); return 0.299 * r + 0.587 * g + 0.114 * b; };
+
+/** The photos that sit best on this theme: close in hue to its accent, neutral photos for grey themes, and the right tone for light or dark pages. */
+function matchShots(themeId: string | undefined, n: number): Shot[] {
+  const t = themeId ? themeList.find((x) => x.id === themeId) : undefined;
+  if (!t) return SHOTS.slice(0, n);
+  const { h, sat } = hueSat(t.accent);
+  const neutralTheme = sat < 0.2 || !!t.mono;
+  const dark = brightness(t.bg) < 0.4;
+  const score = (s: Shot) => {
+    let c = 0;
+    if (neutralTheme) c += s.hue === null ? 0 : 0.9;
+    else if (s.hue === null) c += 0.4;
+    else {
+      const d = Math.abs(s.hue - h);
+      c += Math.min(d, 360 - d) / 180;
+    }
+    if (dark && s.tone === "light") c += 0.18;
+    if (!dark && s.tone === "dark") c += 0.12;
+    return c;
+  };
+  return [...SHOTS].sort((a, b) => score(a) - score(b)).slice(0, n);
+}
+
 const seedOf = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 
 /** A lived-in version of the starter page for one goal. `seed` (a theme id, say) picks which made-up person, so a gallery shows variety. */
-export function previewFor(goal: Goal, seed = ""): Profile {
+export function previewFor(goal: Goal, seed = "", themeId?: string): Profile {
   const base = starterFor(goal);
   if (goal === "import") return base;
-  const pool = PERSONAS[goal];
+  const pool = POOL[goal];
   const who = pool[(/^\d+$/.test(seed) ? Number(seed) : seedOf(seed)) % pool.length]!;
+  const shots = goal === "products" ? matchShots(themeId ?? base.theme, 6) : [];
   let imgIdx = 0;
-  const links = base.links.map((l) => {
+  const links = base.links.map((l, i) => {
     if (l.kind === "booking" && who.call) {
-      return { ...l, title: who.call.title, booking: { ...l.booking!, price: who.call.price, durationMin: who.call.min, description: who.call.text } };
+      return { ...l, title: who.call.title, booking: { ...l.booking!, price: who.call.price, currency: who.call.currency ?? "INR", durationMin: who.call.min, description: who.call.text } };
+    }
+    if (goal === "products") {
+      const sh = shots[i % shots.length]!;
+      return { ...l, title: i === 0 ? sh.caption : "My full shop", image: u(sh.id, 640) };
     }
     const pick = who.links[imgIdx++ % who.links.length]!;
     return { ...l, title: pick[0], image: pick[1] };
   });
-  const looks = who.looks
-    ? who.looks.map((k, i) => ({ id: `k${i + 1}`, title: k.title, price: k.price, store: k.store, url: "https://", art: k.art, hue: k.hue, image: k.photo }))
+  const looks = goal === "products"
+    ? shots.slice(2, 6).map((k, i) => ({ id: `k${i + 1}`, title: k.title, price: k.price, store: k.store, url: "https://", art: k.art, hue: 0, image: u(k.id, 600) }))
     : base.looks;
   return { ...base, name: who.name, handle: who.handle, avatar: who.avatar, location: who.city, bio: who.bio, socials: { instagram: who.handle, youtube: who.handle }, links, looks };
 }

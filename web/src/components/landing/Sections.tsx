@@ -156,8 +156,8 @@ export function ThemeGallery() {
 /** Pick any style and watch a real page change instantly. */
 function StylePlayground() {
   // A made-up person with real photos, so every style shows at its best. The point here is the style, not the person.
-  const base = previewFor("products", "playground");
   const [theme, setTheme] = useState("atelier");
+  const base = previewFor("products", "playground", theme);
   const def = getTheme(theme).def;
   return (
     <div className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
