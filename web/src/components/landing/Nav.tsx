@@ -27,10 +27,10 @@ export function Nav() {
       <nav className="mx-auto mt-4 flex max-w-6xl items-center justify-between rounded-full border border-fg/10 bg-bg/75 px-4 py-2.5 backdrop-blur-xl sm:px-6">
         <Logo />
         <div className="hidden items-center gap-7 text-[13px] text-fg/70 md:flex">
-          <a href="#themes" className="hover:text-fg">Themes</a>
-          <a href="#features" className="hover:text-fg">Features</a>
-          <a href="#pricing" className="hover:text-fg">Pricing</a>
-          <a href="#faq" className="hover:text-fg">FAQ</a>
+          <Link href="/#themes" className="hover:text-fg">Themes</Link>
+          <Link href="/#features" className="hover:text-fg">Features</Link>
+          <Link href="/#pricing" className="hover:text-fg">Pricing</Link>
+          <Link href="/#faq" className="hover:text-fg">FAQ</Link>
           <Link href="/blog" className="hover:text-fg">Blog</Link>
         </div>
         <div className="flex items-center gap-2">

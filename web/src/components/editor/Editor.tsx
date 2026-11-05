@@ -610,7 +610,7 @@ export function Editor() {
           </div>
 
           {/* Profile Section */}
-          <div className={`${tab === "content" ? "block" : "hidden"} order-1`}>
+          <div className={`${tab === "content" ? "block" : "hidden"} order-[4]`}>
             <Panel title="Profile" hint="Your name, photo and bio. This is the top of your page.">
               <div className="flex items-center gap-4">
                 <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
@@ -691,7 +691,7 @@ export function Editor() {
           </div>
 
           {/* Links Section */}
-          <div id="section-links" className={`${tab === "content" ? "block" : "hidden"} order-2`}>
+          <div id="section-links" className={`${tab === "content" ? "block" : "hidden"} order-[1]`}>
             <Panel
               title="Links and bookings"
               hint="The buttons people tap. Add a booking card to get paid for calls. Open Layout and schedule on a card to make it half, full or tall."
@@ -799,7 +799,7 @@ export function Editor() {
           </div>
 
           {/* Shop Section */}
-          <div id="section-shop" className={`${tab === "content" ? "block" : "hidden"} order-3`}>
+          <div id="section-shop" className={`${tab === "content" ? "block" : "hidden"} order-[2]`}>
             <Panel
               title="Products"
               hint="A photo grid of things you sell or recommend. Each one opens its store link."
@@ -921,7 +921,7 @@ export function Editor() {
           </div>
 
           {/* Audience Section */}
-          <div className={`${tab === "content" ? "block" : "hidden"} order-4`}>
+          <div className={`${tab === "content" ? "block" : "hidden"} order-[3]`}>
             <Panel title="Email list" hint="Shows a sign-up box so visitors can join your list. You see the emails in your dashboard.">
               <Switch on={p.showSubscribe} onChange={(v) => set("showSubscribe", v)} label="Collect emails (newsletter sign-up)" />
               <Switch on={!!p.hideBadge} onChange={(v) => { set("hideBadge", v); if (v && !isPro) proNote("Hiding the badge"); }} label={`Hide the Showz badge${isPro ? "" : " (Pro)"}`} />

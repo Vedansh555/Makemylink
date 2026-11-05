@@ -5,7 +5,7 @@ import { OPERATOR } from "@/lib/legal";
 import Link from "next/link";
 import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, ArrowUpRight, ChevronDown, Minus, Plus } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
@@ -209,6 +209,15 @@ export function Features() {
   const [importing, setImporting] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("₹ INR");
   const [copiedLink, setCopiedLink] = useState(false);
+  // The QR shows the visitor's own address: their handle if signed in, otherwise whatever they type.
+  const [qrHandle, setQrHandle] = useState("");
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.user?.handle && setQrHandle(d.user.handle))
+      .catch(() => {});
+  }, []);
+  const qrName = qrHandle || "yourname";
   const [folderOpen, setFolderOpen] = useState(true);
   const [activeBar, setActiveBar] = useState<number | null>(7);
   const [boughtProduct, setBoughtProduct] = useState<string | null>(null);
@@ -495,23 +504,33 @@ export function Features() {
                 <p className="mt-2 text-fg/55">Every page gets one automatically — print it on a menu, a flyer or a business card.</p>
               </div>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row">
               <div className="rounded-2xl border border-fg/10 bg-white p-3 shadow-md">
-                <QRCodeCanvas text={`${SITE_URL}/aria`} size={100} />
+                <QRCodeCanvas text={`${SITE_URL}/${qrName}`} size={110} />
               </div>
-              <div className="flex flex-col gap-2 text-center sm:text-left">
-                <p className="text-[13px] font-semibold text-fg">{SITE_HOST}/aria</p>
-                <p className="text-[11px] text-fg/50">Point phone camera to test instant bio scan</p>
+              <div className="flex w-full min-w-0 flex-col gap-2.5 text-center sm:text-left">
+                <label className="text-[11px] uppercase tracking-[0.18em] text-fg/45" htmlFor="qr-handle">Type your handle</label>
+                <div className="flex items-center rounded-xl border border-fg/15 bg-bg/60 pl-3 text-[13px] focus-within:border-[#ff5b37]">
+                  <span className="max-w-[55%] shrink-0 truncate text-fg/40">{SITE_HOST}/</span>
+                  <input
+                    id="qr-handle"
+                    value={qrHandle}
+                    onChange={(e) => setQrHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+                    placeholder="yourname"
+                    className="min-w-0 flex-1 bg-transparent py-2.5 pr-3 outline-none placeholder:text-fg/30"
+                  />
+                </div>
+                <p className="text-[11px] text-fg/50">Scanning it opens that page, just like typing the link.</p>
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard?.writeText(`${SITE_URL}/aria`);
+                    navigator.clipboard?.writeText(`${SITE_URL}/${qrName}`);
                     setCopiedLink(true);
                     setTimeout(() => setCopiedLink(false), 2000);
                   }}
-                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-fg/15 bg-fg/[0.04] px-4 py-1.5 text-[12px] font-medium text-fg hover:border-fg/35 transition cursor-pointer"
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 self-center rounded-full border border-fg/15 bg-fg/[0.04] px-4 py-1.5 text-[12px] font-medium text-fg transition hover:border-fg/35 sm:self-start"
                 >
-                  {copiedLink ? "Copied to clipboard ✓" : "Copy link"}
+                  {copiedLink ? "Copied ✓" : "Copy link"}
                 </button>
               </div>
             </div>
@@ -710,8 +729,8 @@ export function Footer() {
       <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
         <Logo />
         <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-center sm:grid-cols-3 sm:text-left">
-          <a href="#themes" className={link}>Themes</a>
-          <a href="#pricing" className={link}>Pricing</a>
+          <Link href="/#themes" className={link}>Themes</Link>
+          <Link href="/#pricing" className={link}>Pricing</Link>
           <Link href="/blog" className={link}>Blog</Link>
           <Link href="/start" className={link}>Create</Link>
           <Link href="/contact" className={link}>Contact</Link>
