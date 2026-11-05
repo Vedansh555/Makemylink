@@ -1,5 +1,6 @@
 "use client";
 
+import { previewFor } from "@/lib/templates";
 import { SITE_URL, SITE_HOST } from "@/lib/site";
 import { OPERATOR } from "@/lib/legal";
 import Link from "next/link";
@@ -8,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, ArrowUpRight, ChevronDown, Minus, Plus } from "lucide-react";
-import { blankProfile, demoProfiles } from "@/lib/demo";
+import { demoProfiles } from "@/lib/demo";
 import { families, getTheme, themeList } from "@/lib/themes";
 import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
@@ -154,8 +155,8 @@ export function ThemeGallery() {
 
 /** Pick any style and watch a real page change instantly. */
 function StylePlayground() {
-  // A neutral placeholder, not any one creator's page — the point here is the style, not the person.
-  const base = blankProfile;
+  // A made-up person with real photos, so every style shows at its best. The point here is the style, not the person.
+  const base = previewFor("products", "playground");
   const [theme, setTheme] = useState("atelier");
   const def = getTheme(theme).def;
   return (
