@@ -8,8 +8,8 @@ const ICON: Record<Goal, typeof Mail> = { booking: CalendarCheck, products: Shop
 // A soft colour behind each phone, in the same spirit as the hero phones.
 // Each preview wears a light, airy glass look so the cards feel fresh and consistent.
 const LOOK: Record<Exclude<Goal, "import">, string> = { booking: "atelier", products: "peach-fuzz", email: "mint-glass" };
-// Who appears on each card: seeds that give a woman each time, with a different close-up portrait on every card.
-const WHO: Record<Exclude<Goal, "import">, string> = { booking: "0", products: "2", email: "1" };
+// Who appears on each card. Get booked and Grow my email list keep their original people; the products card shows Chloe Bennett.
+const WHO: Record<Exclude<Goal, "import">, string> = { booking: "", products: "2", email: "" };
 const GLOW: Record<Goal, string> = { booking: "#6d7fb8", products: "#ff5fb0", email: "#7ccfb2", import: "#ff5b37" };
 
 /** The four ways to start, each with a preview of the page you would get. Used on the home page and on /start. */
