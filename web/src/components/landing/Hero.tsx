@@ -2,10 +2,8 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Link2 } from "lucide-react";
 import { getDemoProfile } from "@/lib/demo";
 import { portrait } from "@/lib/avatar";
 import { PhoneFrame } from "./PhoneFrame";
@@ -17,8 +15,6 @@ const ease = [0.2, 0.7, 0.2, 1] as const;
 export function Hero() {
   // Desktop gets the big scene behind the headline; phones get a small one below the text.
   const [wide, setWide] = useState(false);
-  const router = useRouter();
-  const [pasted, setPasted] = useState("");
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 640px)");
     const update = () => setWide(mq.matches);
@@ -50,7 +46,7 @@ export function Hero() {
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
-            Get paid for calls, sell your products, collect leads on WhatsApp and email, and share any single card on its own. One beautiful page, 0% commission on Pro, free to start.
+            Paid bookings, products and leads on one beautiful page. 0% commission on Pro, free to start.
           </p>
 
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-5 [animation-delay:.24s] [text-shadow:none]">
@@ -62,32 +58,12 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="rise mx-auto mt-10 w-full max-w-[560px] text-left [animation-delay:.3s] [text-shadow:none]">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/start");
-              }}
-              className="group flex items-center gap-2 rounded-full border border-fg/10 bg-bg/85 p-2 pl-5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.35),0_1px_0_rgba(255,255,255,0.9)_inset] backdrop-blur-xl transition focus-within:border-[#ff5b37]/60 focus-within:shadow-[0_26px_60px_-22px_rgba(255,91,55,0.5)]"
-            >
-              <Link2 className="h-[18px] w-[18px] shrink-0 text-fg/40 transition group-focus-within:text-[#ff5b37]" aria-hidden />
-              <input
-                id="hero-import"
-                type="text"
-                inputMode="url"
-                aria-label="Link to your existing link-in-bio page"
-                value={pasted}
-                onChange={(e) => setPasted(e.target.value)}
-                placeholder="Switching? Paste your Linktree or Carrd link"
-                className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] text-fg outline-none placeholder:text-fg/45"
-              />
-              <button type="submit" className="shrink-0 rounded-full bg-[#ff5b37] px-5 py-3 text-[14px] font-semibold text-[#111] shadow-[0_14px_26px_-10px_#ff5b37] transition hover:-translate-y-0.5 active:translate-y-0 sm:px-6">
-                <span className="hidden sm:inline">Import my page</span>
-                <span className="sm:hidden">Import</span>
-              </button>
-            </form>
-            <p className="mt-3 text-center text-[12.5px] text-fg/55">Copies your photo, links and shop items. Works with Linktree, Carrd, Solo.to and more.</p>
-          </div>
+          <p className="rise mt-7 text-[14px] text-fg/60 [animation-delay:.3s] [text-shadow:none]">
+            Already on Linktree or Carrd?{" "}
+            <Link href="/create?goal=import" className="font-medium text-fg underline decoration-fg/30 underline-offset-[5px] transition hover:decoration-fg">
+              Import your page
+            </Link>
+          </p>
 
         </div>
       </div>
