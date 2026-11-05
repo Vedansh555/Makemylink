@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, Download, Mail, ShoppingBag } from "lucide-react";
 import { getDemoProfile } from "@/lib/demo";
-import { GOALS, starterFor, type Goal } from "@/lib/templates";
+import { GOALS, previewFor, type Goal } from "@/lib/templates";
 import { PhoneFrame } from "./PhoneFrame";
 
 const ICON: Record<Goal, typeof Mail> = { booking: CalendarCheck, products: ShoppingBag, email: Mail, import: Download };
@@ -16,7 +16,7 @@ export function GoalCards({ handle }: { handle?: string }) {
       {GOALS.map((g, i) => {
         const Icon = ICON[g.id];
         // The import card shows a finished example page, since it starts from the person's own.
-        const preview = g.id === "import" ? getDemoProfile("kai")! : starterFor(g.id);
+        const preview = g.id === "import" ? getDemoProfile("kai")! : previewFor(g.id);
         return (
           <div
             key={g.id}

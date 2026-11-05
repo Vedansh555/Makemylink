@@ -52,7 +52,7 @@ const inputCls =
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">{label}</span>
+      <span className="text-[13px] font-medium text-fg/70">{label}</span>
       {children}
     </label>
   );
@@ -252,7 +252,9 @@ export function Editor() {
                 // A brand-new account holds an empty page; keep the starter the person chose instead of overwriting it with that.
                 if (isGoal(goal) && !isBlankProfile(saved)) setNotice("You already have a page, so we opened it. A goal's starting page is only used for new pages.");
                 const chosenTheme = new URLSearchParams(window.location.search).get("theme");
-                setP(isGoal(goal) && isBlankProfile(saved) ? { ...starterFor(goal), ...(chosenTheme ? { theme: chosenTheme } : {}), handle: saved.handle, name: saved.name } : saved);
+                const base = isGoal(goal) && isBlankProfile(saved) ? { ...starterFor(goal), handle: saved.handle, name: saved.name } : saved;
+                setP(chosenTheme && getTheme(chosenTheme).def.id === chosenTheme ? { ...base, theme: chosenTheme } : base);
+                if (chosenTheme && !isBlankProfile(saved)) setNotice("We applied the look you picked to your page. Publish to keep it.");
               }
             });
         }
@@ -474,7 +476,7 @@ export function Editor() {
         </button>
       </div>
 
-      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-8 overflow-x-clip px-4 pb-28 pt-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-10">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-8 overflow-x-clip px-4 pb-28 pt-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:pb-28 lg:pt-10">
         {/* Controls */}
         <div className={`flex min-w-0 flex-col gap-4 sm:gap-5 ${mobileView === "preview" ? "hidden lg:flex" : ""}`}>
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
@@ -830,7 +832,7 @@ export function Editor() {
                   {openOpts.has(l.id) && (
                     <div className="grid gap-4 rounded-xl border border-fg/10 bg-fg/[0.03] p-3.5 sm:grid-cols-[auto_1fr] sm:items-start">
                       <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Size{!isPro && " · Pro"}</span>
+                        <span className="text-[13px] font-medium text-fg/70">Size{!isPro && " · Pro"}</span>
                         <div className="inline-flex rounded-lg border border-fg/10 bg-bg/40 p-0.5">
                           {([["1x1", "Half"], ["2x1", "Full"], ["2x2", "Tall"]] as [BlockSize, string][]).map(([v, label]) => (
                             <button

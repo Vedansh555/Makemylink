@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Footer } from "@/components/landing/Sections";
 import { Nav } from "@/components/landing/Nav";
 import { PhoneFrame } from "@/components/landing/PhoneFrame";
-import { GOALS, isGoal, looksFor, starterFor } from "@/lib/templates";
+import { GOALS, isGoal, looksFor, previewFor } from "@/lib/templates";
 
 export const metadata: Metadata = {
   title: "Pick a look",
@@ -18,7 +18,7 @@ export default async function StylePage({ searchParams }: { searchParams: Promis
   const meta = GOALS.find((g) => g.id === goal)!;
   const q = handle ? `&handle=${encodeURIComponent(handle)}` : "";
   const looks = looksFor(goal);
-  const base = starterFor(goal);
+  const base = previewFor(goal);
 
   return (
     <>

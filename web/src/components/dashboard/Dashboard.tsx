@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-const card = "rounded-2xl border border-fg/10 bg-fg/[0.03] p-5";
+const card = "rounded-3xl border border-fg/10 bg-gradient-to-br from-fg/[0.05] to-fg/[0.015] p-5 shadow-[0_24px_50px_-30px_rgba(0,0,0,0.35),0_1px_0_rgba(255,255,255,0.4)_inset]";
 
 export function Dashboard() {
   const router = useRouter();

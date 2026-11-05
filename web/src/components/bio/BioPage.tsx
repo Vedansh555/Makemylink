@@ -8,7 +8,8 @@ import { ArrowUpRight, ChevronDown, MapPin, Play, QrCode, X } from "lucide-react
 import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { OPERATOR } from "@/lib/legal";
-import { BookingModal, bookingPrice } from "./BookingModal";
+import { BookingModal } from "./BookingModal";
+import { BookingTile } from "./BookingTile";
 import { WhatsAppModal, WhatsAppIcon } from "./WhatsAppModal";
 import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
@@ -375,21 +376,12 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                   );
                 }
                 if (l.kind === "booking" && l.booking) {
+                  const compactTile = l.size === "1x1";
                   return (
-                    <div key={l.id} className={`${span} ${tall}`}>
-                      <button type="button" onClick={() => setBooking(l)} className={`${t.featured} w-full cursor-pointer`}>
-                        {l.image && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={l.image} alt="" loading="lazy" className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5" />
-                        )}
-                        <span className="flex-1 text-left">
-                          {l.title}
-                          <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">
-                            {l.booking.durationMin} min · {bookingPrice(l)}
-                          </span>
-                        </span>
-                        <ArrowUpRight className="h-4 w-4 shrink-0" />
-                      </button>
+                    <div key={l.id} className={`${compactTile ? "col-span-1" : "col-span-2"} flex`}>
+                      <Tilt max={4} className="w-full rounded-3xl">
+                        <BookingTile link={l} handle={profile.handle} live={live} compact={compactTile} onOpen={() => setBooking(l)} />
+                      </Tilt>
                     </div>
                   );
                 }

@@ -147,57 +147,8 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const raised = "shadow-[0_14px_26px_-14px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.28)_inset]";
   const card = `relative rounded-[28px] border border-t-fg/15 bg-gradient-to-br from-t-fg/[0.11] via-t-fg/[0.05] to-t-fg/[0.02] p-5 backdrop-blur-xl sm:p-7 ${lift}`;
   const field = `w-full ${t.input}`;
-  const pill = "inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 bg-t-fg/[0.06] px-3 py-1.5 text-[12px]";
   const cta = "rounded-full bg-t-accent px-6 py-3.5 text-center text-[15px] font-semibold text-t-on-accent shadow-[0_18px_40px_-12px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset] transition hover:-translate-y-0.5 active:translate-y-0";
   const enter = (i: number) => ({ initial: { opacity: 0, y: 28 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.08 * i, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] as const } });
-
-  const host = (
-    <div className={card}>
-      <Link href={`/${profile.handle}`} className={`${t.meta} inline-flex items-center gap-1.5 hover:opacity-100`}>
-        <ArrowLeft className="h-3.5 w-3.5" /> {profile.name}
-      </Link>
-      <div className="mt-5 flex items-center gap-3">
-        {profile.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={profile.avatar} alt="" className="h-16 w-16 rounded-full object-cover ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_14px_30px_-10px_var(--t-accent)]" />
-        ) : (
-          <span className="grid h-16 w-16 place-items-center rounded-full bg-t-accent text-[22px] font-semibold text-t-on-accent ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_14px_30px_-10px_var(--t-accent)]">{profile.name.charAt(0)}</span>
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold">{profile.name}</p>
-          <p className={`${t.meta} truncate`}>@{profile.handle}</p>
-        </div>
-      </div>
-      <h1 className={`${nameFont} mt-6 text-[34px] leading-[1.02] sm:text-[42px]`}>{link.title}</h1>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className={pill}><Clock className="h-3.5 w-3.5" /> {cfg.durationMin} min</span>
-        <span className={pill}><Video className="h-3.5 w-3.5" /> Video call</span>
-        <span className="inline-flex items-center rounded-full bg-t-accent px-3.5 py-1.5 text-[13px] font-bold text-t-on-accent shadow-[0_10px_24px_-8px_var(--t-accent)]">{price}</span>
-      </div>
-      {cfg.description && <p className="mt-4 text-[15px] leading-relaxed opacity-75">{cfg.description}</p>}
-
-      <ol className="mt-6 space-y-3 border-t border-t-fg/10 pt-5 text-[14px]">
-        {[
-          ["Pick a day and time", "Only times that are still free are shown."],
-          [free ? "Confirm your details" : `Pay ${price} to ${profile.name.split(" ")[0]} directly`, free ? "No payment needed." : "By UPI or card link. No platform fee is added."],
-          ["Get your meeting link", "It arrives by email as soon as the booking is confirmed."],
-        ].map(([a, b], n) => (
-          <li key={a} className="flex gap-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-t-accent text-[12px] font-bold text-t-on-accent shadow-[0_8px_18px_-6px_var(--t-accent)]">{n + 1}</span>
-            <span>
-              <span className="block font-medium">{a}</span>
-              <span className="block opacity-60">{b}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
-      {!free && (
-        <p className="mt-5 flex items-start gap-2 text-[12px] opacity-60">
-          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Your payment goes straight to the host. Showz takes 0%.
-        </p>
-      )}
-    </div>
-  );
 
   return (
     <div style={style} className={`relative isolate min-h-screen overflow-hidden ${t.root}`}>
@@ -247,125 +198,209 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
             </div>
           </motion.div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,350px)_minmax(0,1fr)] lg:gap-7">
-            <motion.div {...enter(0)} className="lg:sticky lg:top-8 lg:self-start">
-              <Tilt max={3} glare={false}>{host}</Tilt>
-            </motion.div>
-
-            <motion.div {...enter(1)} className="space-y-5">
-              <section className={card} aria-label="Choose a date and time">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h2 className="text-[17px] font-semibold">Select a date and time</h2>
-                  <span className={`${t.meta} flex items-center gap-1.5`}><Globe className="h-3.5 w-3.5" />{cfg.timeZone.replace("_", " ")}</span>
-                </div>
-
-                <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,220px)]">
-                  <div>
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="text-[15px] font-medium">{monthLabel}</p>
-                      <div className="flex gap-1">
-                        <button type="button" disabled={!canPrev} onClick={() => setView((v) => (v.m === 0 ? { y: v.y - 1, m: 11 } : { y: v.y, m: v.m - 1 }))} aria-label="Previous month" className="grid h-9 w-9 place-items-center rounded-full border border-t-fg/15 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
-                        <button type="button" disabled={!canNext} onClick={() => setView((v) => (v.m === 11 ? { y: v.y + 1, m: 0 } : { y: v.y, m: v.m + 1 }))} aria-label="Next month" className="grid h-9 w-9 place-items-center rounded-full border border-t-fg/15 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1 text-center">
-                      {["S", "M", "T", "W", "T", "F", "S"].map((w, i) => <span key={i} className={`${t.meta} py-1 !text-[10px]`}>{w}</span>)}
-                      {Array.from({ length: firstWeekday }).map((_, i) => <span key={`b${i}`} />)}
-                      {Array.from({ length: dim }, (_, i) => i + 1).map((d) => {
-                        const k = ymdOf(view.y, view.m, d);
-                        const info = days?.[k];
-                        const open = !!info && info.free > 0 && k >= todayYmd;
-                        const full = !!info && info.free === 0 && info.total > 0 && k >= todayYmd;
-                        const selected = k === day;
-                        return (
-                          <button
-                            type="button"
-                            key={k}
-                            disabled={!open}
-                            onClick={() => { setDay(k); setSlot(null); }}
-                            aria-label={`${k}${open ? "" : full ? ", fully booked" : ", unavailable"}`}
-                            aria-pressed={selected}
-                            className={`relative aspect-square rounded-full text-[14px] transition ${
-                              selected
-                                ? "scale-110 bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-8px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
-                                : open
-                                  ? `bg-t-fg/[0.10] font-medium hover:-translate-y-0.5 hover:bg-t-fg/[0.2] ${raised}`
-                                  : full
-                                    ? "opacity-35 line-through"
-                                    : "opacity-25"
-                            } ${k === todayYmd && !selected ? "ring-1 ring-t-fg/40" : ""}`}
-                          >
-                            {d}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {days === null && <p className={`${t.meta} mt-3`}>Loading availability…</p>}
-                    {days && !Object.values(days).some((x) => x.free > 0) && <p className="mt-3 text-[13px] opacity-60">No free days this month. Try the next one.</p>}
-                  </div>
-
-                  <div>
-                    <p className="mb-3 text-[15px] font-medium">{day ? fmtDay(new Date(`${day}T12:00:00Z`).getTime()) : "Pick a day"}</p>
-                    {!day ? (
-                      <p className="text-[13px] opacity-60">Days with a filled circle have times left.</p>
-                    ) : slotData === null ? (
-                      <p className="text-[13px] opacity-60">Loading times…</p>
-                    ) : slotData.all.length === 0 ? (
-                      <p className="text-[13px] opacity-60">No times on this day.</p>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
+            {/* Who you are booking */}
+            <motion.div {...enter(0)} className="col-span-2 lg:col-span-4">
+              <Tilt max={2} glare={false} className="h-full">
+                <div className={`${card} flex h-full flex-col justify-between gap-6`}>
+                  <Link href={`/${profile.handle}`} className={`${t.meta} inline-flex w-fit items-center gap-1.5 hover:opacity-100`}>
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back to {profile.name}
+                  </Link>
+                  <div className="flex items-center gap-4">
+                    {profile.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={profile.avatar} alt="" className="h-20 w-20 rounded-[24px] object-cover ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_18px_36px_-12px_var(--t-accent)] sm:h-24 sm:w-24" />
                     ) : (
-                      <div className="grid max-h-[320px] grid-cols-2 gap-2 overflow-y-auto pr-1 md:grid-cols-1">
-                        {slotData.all.map((s) => {
-                          const open = slotData.free.includes(s);
-                          return (
-                            <button
-                              type="button"
-                              key={s}
-                              disabled={!open}
-                              onClick={() => { setSlot(s); setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 60); }}
-                              className={`rounded-2xl border px-3 py-3 text-[14px] transition ${
-                                s === slot
-                                  ? "border-t-accent bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-10px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
-                                  : open
-                                    ? `border-t-fg/20 bg-t-fg/[0.07] hover:-translate-y-0.5 hover:border-t-fg/50 ${raised}`
-                                    : "border-t-fg/10 opacity-40"
-                              }`}
-                            >
-                              <span className={open ? "" : "line-through"}>{fmtTime(s)}</span>
-                              {!open && <span className="ml-2 text-[10px] uppercase tracking-wider">Booked</span>}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <span className="grid h-20 w-20 place-items-center rounded-[24px] bg-t-accent text-[28px] font-semibold text-t-on-accent ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_18px_36px_-12px_var(--t-accent)] sm:h-24 sm:w-24">{profile.name.charAt(0)}</span>
                     )}
-                    {!sameZone && <p className={`${t.meta} mt-3 !normal-case !tracking-normal`}>Times are in the host&apos;s zone. You are in {viewerTz.replace("_", " ")}.</p>}
+                    <div className="min-w-0">
+                      <p className="truncate text-[17px] font-semibold">{profile.name}</p>
+                      <p className={`${t.meta} truncate`}>@{profile.handle}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h1 className={`${nameFont} text-[34px] leading-[1.02] sm:text-[46px]`}>{link.title}</h1>
+                    {cfg.description && <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed opacity-75">{cfg.description}</p>}
                   </div>
                 </div>
-              </section>
-
-              <section ref={formRef} className={`${card} transition-opacity ${slot ? "" : "opacity-60"}`} aria-label="Your details">
-                <h2 className="text-[17px] font-semibold">Your details</h2>
-                {slot ? (
-                  <p className="mt-1 text-[14px] opacity-70">
-                    {fmtDay(slot)} · {fmtTime(slot)}{!sameZone && ` (${fmtTime(slot, viewerTz)} your time)`}
-                  </p>
-                ) : (
-                  <p className="mt-1 text-[14px] opacity-60">Choose a time above first.</p>
-                )}
-                <form id="bookform" onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {!live && <p className="rounded-xl bg-t-fg/10 px-3 py-2 text-[12px] opacity-80 sm:col-span-2">Demo: try it. Nothing is booked or charged.</p>}
-                  <input required disabled={!slot} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} autoComplete="name" />
-                  <input required disabled={!slot} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} autoComplete="email" />
-                  <textarea disabled={!slot} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What would you like to talk about? (optional)" maxLength={500} rows={3} className={`${field} sm:col-span-2`} />
-                  {err && <p className="text-[13px] text-red-500 sm:col-span-2">{err}</p>}
-                  <button disabled={!slot || busy} className={`${cta} hidden w-full disabled:opacity-40 disabled:shadow-none sm:col-span-2 lg:block`}>
-                    {busy ? "Booking…" : free ? "Confirm booking" : `Continue · ${price}`}
-                  </button>
-                </form>
-              </section>
-              <p className={`${t.meta} text-center`}>
-                <Link href={`/${profile.handle}`} className="underline underline-offset-4">See everything by {profile.name}</Link> · <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className="underline underline-offset-4">Made with Showz</Link>
-              </p>
+              </Tilt>
             </motion.div>
+
+            {/* Price */}
+            <motion.div {...enter(1)} className="col-span-2 lg:col-span-2">
+              <div className="relative flex h-full min-h-[150px] flex-col justify-between overflow-hidden rounded-[28px] bg-gradient-to-br from-t-accent to-t-accent2 p-6 text-t-on-accent shadow-[0_40px_80px_-30px_var(--t-accent),0_2px_0_rgba(255,255,255,0.35)_inset]">
+                <span className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/25 blur-2xl" />
+                <span className="relative text-[13px] font-medium opacity-80">{free ? "Free session" : "One session"}</span>
+                <div className="relative">
+                  <p className="text-[48px] font-bold leading-none tracking-tight sm:text-[56px]">{price}</p>
+                  <p className="mt-2 text-[13px] opacity-80">{free ? "No payment needed" : "Paid straight to the host. Showz takes 0%."}</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Quick facts */}
+            <motion.div {...enter(2)} className="col-span-1 lg:col-span-2">
+              <div className="flex h-full min-h-[120px] flex-col justify-between rounded-[28px] bg-t-fg p-5 text-t-bg shadow-[0_30px_60px_-28px_rgba(0,0,0,0.7)] transition duration-300 hover:-translate-y-1">
+                <Clock className="h-5 w-5 opacity-70" />
+                <div>
+                  <p className="text-[36px] font-bold leading-none">{cfg.durationMin}</p>
+                  <p className="mt-1 text-[13px] opacity-70">minutes</p>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div {...enter(2.5)} className="col-span-1 lg:col-span-2">
+              <div className={`${card} flex h-full min-h-[120px] flex-col justify-between !p-5 transition duration-300 hover:-translate-y-1`}>
+                <Video className="h-5 w-5 opacity-70" />
+                <div>
+                  <p className="text-[19px] font-semibold leading-tight">Video call</p>
+                  <p className="mt-1 text-[13px] opacity-60">Link sent by email</p>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div {...enter(3)} className="col-span-2 lg:col-span-2">
+              <div className={`${card} flex h-full min-h-[120px] flex-col justify-between !p-5 transition duration-300 hover:-translate-y-1`}>
+                <Globe className="h-5 w-5 opacity-70" />
+                <div>
+                  <p className="text-[19px] font-semibold leading-tight">{cfg.timeZone.replace("_", " ")}</p>
+                  <p className="mt-1 text-[13px] opacity-60">{sameZone ? "Same as your time zone" : `You are in ${viewerTz.replace("_", " ")}`}</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Calendar */}
+            <motion.section {...enter(4)} className={`${card} col-span-2 lg:col-span-3`} aria-label="Choose a date">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-[17px] font-semibold">{monthLabel}</h2>
+                <div className="flex gap-1.5">
+                  <button type="button" disabled={!canPrev} onClick={() => setView((v) => (v.m === 0 ? { y: v.y - 1, m: 11 } : { y: v.y, m: v.m - 1 }))} aria-label="Previous month" className={`grid h-10 w-10 place-items-center rounded-full border border-t-fg/15 bg-t-fg/[0.06] disabled:opacity-30 ${raised}`}><ChevronLeft className="h-4 w-4" /></button>
+                  <button type="button" disabled={!canNext} onClick={() => setView((v) => (v.m === 11 ? { y: v.y + 1, m: 0 } : { y: v.y, m: v.m + 1 }))} aria-label="Next month" className={`grid h-10 w-10 place-items-center rounded-full border border-t-fg/15 bg-t-fg/[0.06] disabled:opacity-30 ${raised}`}><ChevronRight className="h-4 w-4" /></button>
+                </div>
+              </div>
+              <div className="grid grid-cols-7 gap-1.5 text-center">
+                {["S", "M", "T", "W", "T", "F", "S"].map((w, i) => <span key={i} className="py-1 text-[11px] font-medium opacity-50">{w}</span>)}
+                {Array.from({ length: firstWeekday }).map((_, i) => <span key={`b${i}`} />)}
+                {Array.from({ length: dim }, (_, i) => i + 1).map((d) => {
+                  const k = ymdOf(view.y, view.m, d);
+                  const info = days?.[k];
+                  const open = !!info && info.free > 0 && k >= todayYmd;
+                  const full = !!info && info.free === 0 && info.total > 0 && k >= todayYmd;
+                  const selected = k === day;
+                  return (
+                    <button
+                      type="button"
+                      key={k}
+                      disabled={!open}
+                      onClick={() => { setDay(k); setSlot(null); }}
+                      aria-label={`${k}${open ? "" : full ? ", fully booked" : ", unavailable"}`}
+                      aria-pressed={selected}
+                      className={`relative aspect-square rounded-2xl text-[14px] transition ${
+                        selected
+                          ? "scale-105 bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-8px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
+                          : open
+                            ? `bg-t-fg/[0.10] font-medium hover:-translate-y-0.5 hover:bg-t-fg/[0.2] ${raised}`
+                            : full
+                              ? "opacity-35 line-through"
+                              : "opacity-25"
+                      } ${k === todayYmd && !selected ? "ring-1 ring-t-fg/40" : ""}`}
+                    >
+                      {d}
+                    </button>
+                  );
+                })}
+              </div>
+              {days === null && <p className="mt-3 text-[13px] opacity-60">Loading availability…</p>}
+              {days && !Object.values(days).some((x) => x.free > 0) && <p className="mt-3 text-[13px] opacity-60">No free days this month. Try the next one.</p>}
+            </motion.section>
+
+            {/* Times */}
+            <motion.section {...enter(5)} className={`${card} col-span-2 lg:col-span-3`} aria-label="Choose a time">
+              <h2 className="text-[17px] font-semibold">{day ? fmtDay(new Date(`${day}T12:00:00Z`).getTime()) : "Pick a day first"}</h2>
+              <p className="mt-1 text-[13px] opacity-60">{day ? "Taken times are crossed out." : "Days that are filled in have times left."}</p>
+              <div className="mt-4">
+                {!day ? (
+                  <div className="grid place-items-center rounded-2xl border border-dashed border-t-fg/20 py-12 text-[14px] opacity-60">Choose a day in the calendar</div>
+                ) : slotData === null ? (
+                  <p className="text-[13px] opacity-60">Loading times…</p>
+                ) : slotData.all.length === 0 ? (
+                  <p className="text-[13px] opacity-60">No times on this day.</p>
+                ) : (
+                  <div className="grid max-h-[340px] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
+                    {slotData.all.map((s) => {
+                      const open = slotData.free.includes(s);
+                      return (
+                        <button
+                          type="button"
+                          key={s}
+                          disabled={!open}
+                          onClick={() => { setSlot(s); setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 60); }}
+                          className={`rounded-2xl border px-3 py-3 text-[14px] transition ${
+                            s === slot
+                              ? "border-t-accent bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-10px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
+                              : open
+                                ? `border-t-fg/20 bg-t-fg/[0.07] hover:-translate-y-0.5 hover:border-t-fg/50 ${raised}`
+                                : "border-t-fg/10 opacity-40"
+                          }`}
+                        >
+                          <span className={open ? "" : "line-through"}>{fmtTime(s)}</span>
+                          {!open && <span className="mt-0.5 block text-[10px] uppercase tracking-wider no-underline">Booked</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.section>
+
+            {/* How it works (after the form on phones) */}
+            <motion.section {...enter(6)} className={`${card} order-[9] col-span-2 lg:order-none lg:col-span-3`} aria-label="How it works">
+              <h2 className="text-[17px] font-semibold">How it works</h2>
+              <ol className="mt-4 space-y-4 text-[14px]">
+                {[
+                  ["Pick a day and time", "Only times that are still free can be chosen."],
+                  [free ? "Confirm your details" : `Pay ${price} to ${profile.name.split(" ")[0]} directly`, free ? "No payment needed." : "By UPI or a card link. No platform fee is added."],
+                  ["Get your meeting link", "It arrives by email as soon as the booking is confirmed."],
+                ].map(([a, b], n) => (
+                  <li key={a} className="flex gap-3.5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-t-accent text-[13px] font-bold text-t-on-accent shadow-[0_10px_20px_-6px_var(--t-accent)]">{n + 1}</span>
+                    <span>
+                      <span className="block font-medium">{a}</span>
+                      <span className="block opacity-60">{b}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              {!free && (
+                <p className="mt-5 flex items-start gap-2 text-[12px] opacity-60">
+                  <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Your payment goes straight to the host.
+                </p>
+              )}
+            </motion.section>
+
+            {/* Details */}
+            <motion.section {...enter(7)} ref={formRef} className={`${card} col-span-2 transition-opacity lg:col-span-3 ${slot ? "" : "opacity-70"}`} aria-label="Your details">
+              <h2 className="text-[17px] font-semibold">Your details</h2>
+              {slot ? (
+                <p className="mt-1 text-[14px] opacity-75">
+                  {fmtDay(slot)} · {fmtTime(slot)}{!sameZone && ` (${fmtTime(slot, viewerTz)} your time)`}
+                </p>
+              ) : (
+                <p className="mt-1 text-[14px] opacity-60">Choose a time first.</p>
+              )}
+              <form id="bookform" onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-2">
+                {!live && <p className="rounded-xl bg-t-fg/10 px-3 py-2 text-[12px] opacity-80 sm:col-span-2">Demo: try it. Nothing is booked or charged.</p>}
+                <input required disabled={!slot} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} autoComplete="name" />
+                <input required disabled={!slot} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} autoComplete="email" />
+                <textarea disabled={!slot} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What would you like to talk about? (optional)" maxLength={500} rows={3} className={`${field} sm:col-span-2`} />
+                {err && <p className="text-[13px] text-red-500 sm:col-span-2">{err}</p>}
+                <button disabled={!slot || busy} className={`${cta} hidden w-full disabled:opacity-40 disabled:shadow-none sm:col-span-2 lg:block`}>
+                  {busy ? "Booking…" : free ? "Confirm booking" : `Continue · ${price}`}
+                </button>
+              </form>
+            </motion.section>
+
+            <p className={`${t.meta} order-[10] col-span-2 text-center lg:col-span-6`}>
+              <Link href={`/${profile.handle}`} className="underline underline-offset-4">See everything by {profile.name}</Link> · <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className="underline underline-offset-4">Made with Showz</Link>
+            </p>
           </div>
         )}
       </main>

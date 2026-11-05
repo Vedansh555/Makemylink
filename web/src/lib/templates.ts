@@ -75,6 +75,28 @@ export function starterFor(goal: Goal): Profile {
   }
 }
 
+/**
+ * What a visitor sees in the style gallery and goal cards: the starter page dressed with a made-up person, photo and links
+ * so each look shows its best. This is for looking at only. The editor starts from `starterFor`, which has none of it.
+ */
+export function previewFor(goal: Goal): Profile {
+  const base = starterFor(goal);
+  const photo = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=400&q=80`;
+  const mock: Partial<Profile> = {
+    name: goal === "booking" ? "Priya Sharma" : goal === "products" ? "Mira Kapoor" : "Arjun Rao",
+    handle: goal === "booking" ? "priya" : goal === "products" ? "mira" : "arjun",
+    avatar: photo(goal === "booking" ? "photo-1573496359142-b8d87734a5a2" : goal === "products" ? "photo-1534528741775-53994a69daeb" : "photo-1506794778202-cad84cf45f1d"),
+    location: goal === "booking" ? "Bengaluru" : goal === "products" ? "Mumbai" : "Delhi",
+    socials: { instagram: "yourname", youtube: "yourname" },
+  };
+  const links = base.links.map((l, i) =>
+    l.kind === "booking"
+      ? { ...l, title: "Career strategy call", booking: { ...l.booking!, description: "A focused 1:1 session. Bring your questions and leave with a clear plan." } }
+      : { ...l, title: ["Free CV checklist", "Watch: how I got my offer", "My latest video"][i % 3] ?? l.title },
+  );
+  return { ...base, ...mock, links, bio: base.bio };
+}
+
 /** Design families that suit each goal. The first theme of each family is free on every plan. */
 const LOOK_FAMILIES: Record<Exclude<Goal, "import">, string[]> = {
   booking: ["luxury", "editorial", "minimal", "glass", "mono", "brutalist"],
