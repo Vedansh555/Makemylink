@@ -6,7 +6,7 @@ import { PERIOD_MS, type Period } from "./payments";
  * Extends Pro by one period. Safe to call twice for the same payment (the browser callback and the
  * webhook both arrive): the provider reference is recorded once and the second call does nothing.
  */
-export async function grantPro(opts: { userId: string; period: Period; provider: "razorpay" | "stripe"; ref: string; amount: number; currency: string }) {
+export async function grantPro(opts: { userId: string; period: Period; provider: "razorpay" | "stripe" | "paypal"; ref: string; amount: number; currency: string }) {
   if (await one("SELECT id FROM payments WHERE provider = $1 AND provider_ref = $2", [opts.provider, opts.ref])) return false;
   const now = Date.now();
   await run("INSERT INTO payments (id, user_id, kind, provider, provider_ref, amount, currency, status, created_at) VALUES ($1,$2,'pro',$3,$4,$5,$6,'paid',$7)", [

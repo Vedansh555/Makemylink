@@ -12,7 +12,8 @@ export async function POST(req: Request) {
   const pay = evt.payload?.payment?.entity;
   if (evt.event === "payment.captured" && pay?.notes?.user_id && (pay.notes.period === "monthly" || pay.notes.period === "yearly")) {
     const period = pay.notes.period as Period;
-    await grantPro({ userId: pay.notes.user_id, period, provider: "razorpay", ref: pay.id, amount: PRO_PRICE.IN[period], currency: "INR" });
+    const region = pay.notes.region === "GLOBAL" ? "GLOBAL" : "IN";
+    await grantPro({ userId: pay.notes.user_id, period, provider: "razorpay", ref: pay.id, amount: PRO_PRICE[region][period], currency: PRO_PRICE[region].currency });
   }
   return NextResponse.json({ ok: true });
 }

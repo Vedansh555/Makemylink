@@ -276,7 +276,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
       setBusy(false);
       return setMsg(o.error ?? "Something went wrong");
     }
-    if (o.provider === "stripe") {
+    if (o.provider === "stripe" || o.provider === "paypal") {
       window.location.href = o.url;
       return;
     }
@@ -298,7 +298,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
         const v = await fetch("/api/billing/razorpay/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: r.razorpay_order_id, paymentId: r.razorpay_payment_id, signature: r.razorpay_signature, period }),
+          body: JSON.stringify({ orderId: r.razorpay_order_id, paymentId: r.razorpay_payment_id, signature: r.razorpay_signature }),
         });
         setBusy(false);
         setMsg(v.ok ? "You're on Pro. Thank you!" : "We received your payment but could not confirm it yet. It will switch on shortly.");
@@ -332,7 +332,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
           {region === "IN" ? "Pay in USD instead" : "Pay in ₹ (India) instead"}
         </button>
       </div>
-      <p className="mt-3 text-[12px] text-fg/40">{region === "IN" ? "UPI, cards and netbanking via Razorpay." : "Cards, Apple Pay and Google Pay via Stripe."} One-time payment. It does not auto-renew. By paying you agree to the <Link href="/terms" className="underline">Terms</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (7-day refund).</p>
+      <p className="mt-3 text-[12px] text-fg/40">{region === "IN" ? "UPI, cards and netbanking via Razorpay." : "Pay securely with PayPal or your card."} One-time payment. It does not auto-renew. By paying you agree to the <Link href="/terms" className="underline">Terms</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (7-day refund).</p>
       {msg && <p className="mt-4 text-[14px] text-fg">{msg}</p>}
     </div>
   );
