@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { Link2 } from "lucide-react";
 import { getDemoProfile } from "@/lib/demo";
 import { PhoneFrame } from "./PhoneFrame";
 
@@ -62,33 +63,34 @@ export function Hero() {
             </a>
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/start");
-            }}
-            className="rise mx-auto mt-8 flex w-full max-w-[460px] flex-col gap-2 text-left [animation-delay:.3s] [text-shadow:none]"
-          >
-            <label htmlFor="hero-import" className="px-1 text-[13px] text-fg/70">
-              Already on Linktree, Carrd or another link page? Paste it and we copy everything over in seconds.
-            </label>
-            <div className="flex gap-2 rounded-full border border-fg/15 bg-bg/70 p-1.5 backdrop-blur focus-within:border-[#ff5b37]">
+          <div className="rise mx-auto mt-10 w-full max-w-[560px] text-left [animation-delay:.3s] [text-shadow:none]">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/start");
+              }}
+              className="group flex items-center gap-2 rounded-full border border-fg/10 bg-bg/85 p-2 pl-5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.35),0_1px_0_rgba(255,255,255,0.9)_inset] backdrop-blur-xl transition focus-within:border-[#ff5b37]/60 focus-within:shadow-[0_26px_60px_-22px_rgba(255,91,55,0.5)]"
+            >
+              <Link2 className="h-[18px] w-[18px] shrink-0 text-fg/40 transition group-focus-within:text-[#ff5b37]" aria-hidden />
               <input
                 id="hero-import"
                 type="text"
                 inputMode="url"
+                aria-label="Link to your existing link-in-bio page"
                 value={pasted}
                 onChange={(e) => setPasted(e.target.value)}
-                placeholder="Paste your page link"
-                className="min-w-0 flex-1 bg-transparent px-4 text-[14px] text-fg outline-none placeholder:text-fg/40"
+                placeholder="Switching? Paste your Linktree or Carrd link"
+                className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] text-fg outline-none placeholder:text-fg/45"
               />
-              <button type="submit" className="shrink-0 rounded-full bg-fg px-5 py-2.5 text-[14px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
-                Import
+              <button type="submit" className="shrink-0 rounded-full bg-[#ff5b37] px-5 py-3 text-[14px] font-semibold text-[#111] shadow-[0_14px_26px_-10px_#ff5b37] transition hover:-translate-y-0.5 active:translate-y-0 sm:px-6">
+                <span className="hidden sm:inline">Import my page</span>
+                <span className="sm:hidden">Import</span>
               </button>
-            </div>
-          </form>
+            </form>
+            <p className="mt-3 text-center text-[12.5px] leading-relaxed text-fg/55">We copy your photo, links and shop items in seconds. Works with Linktree, Carrd, Solo.to, Bio.site, Taplink and more.</p>
+          </div>
 
-          <p className="rise mt-10 text-[13px] text-fg/55 [animation-delay:.36s]">
+          <p className="rise mt-8 text-[13px] text-fg/55 [animation-delay:.36s]">
             Made for {uses.join(", ")}.
           </p>
         </div>
