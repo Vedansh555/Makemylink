@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getDemoProfile } from "@/lib/demo";
@@ -15,6 +16,8 @@ const ease = [0.2, 0.7, 0.2, 1] as const;
 export function Hero() {
   // Desktop gets the big scene behind the headline; phones get a small one below the text.
   const [wide, setWide] = useState(false);
+  const router = useRouter();
+  const [pasted, setPasted] = useState("");
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 640px)");
     const update = () => setWide(mq.matches);
@@ -49,21 +52,32 @@ export function Hero() {
             Paid bookings, products and leads on one beautiful page. 0% commission on Pro, free to start.
           </p>
 
-          <div className="rise mt-9 flex flex-wrap items-center justify-center gap-5 [animation-delay:.24s] [text-shadow:none]">
-            <Link href="/start" className="rounded-xl bg-fg px-6 py-3.5 text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+          <div className="rise mx-auto mt-9 flex w-full max-w-[860px] flex-col items-stretch justify-center gap-3 [animation-delay:.24s] [text-shadow:none] sm:flex-row sm:items-center">
+            <Link href="/start" className="shrink-0 rounded-xl bg-fg px-6 py-3.5 text-center text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
               Create your free page
             </Link>
-            <a href="#themes" className="inline-block py-2.5 text-[15px] text-fg/80 underline decoration-fg/30 underline-offset-[6px] transition hover:text-fg hover:decoration-fg">
-              See examples
-            </a>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/create?goal=import");
+              }}
+              className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl border-2 border-[#ff5b37] bg-white p-1 shadow-[0_18px_40px_-20px_rgba(255,91,55,0.55)] transition focus-within:shadow-[0_18px_44px_-14px_rgba(255,91,55,0.7)]"
+            >
+              <input
+                id="hero-import"
+                type="text"
+                inputMode="url"
+                aria-label="Link to your Linktree or Carrd page"
+                value={pasted}
+                onChange={(e) => setPasted(e.target.value)}
+                placeholder="Paste your Linktree or Carrd link"
+                className="min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-[#111] outline-none placeholder:text-[#111]/45"
+              />
+              <button type="submit" className="shrink-0 rounded-lg bg-[#ff5b37] px-5 py-2.5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">
+                Import
+              </button>
+            </form>
           </div>
-
-          <p className="rise mt-7 text-[14px] text-fg/60 [animation-delay:.3s] [text-shadow:none]">
-            Already on Linktree or Carrd?{" "}
-            <Link href="/create?goal=import" className="font-medium text-fg underline decoration-fg/30 underline-offset-[5px] transition hover:decoration-fg">
-              Import your page
-            </Link>
-          </p>
 
         </div>
       </div>
