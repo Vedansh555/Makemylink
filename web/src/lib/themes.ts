@@ -1291,7 +1291,7 @@ const ratio = (a: string, b: string) => {
 /** Text colour for a button of colour `bg`: keep the theme's choice if it reads well, otherwise dark or light, whichever is clearer. */
 export function readableOn(bg: string, preferred: string): string {
   try {
-    if (ratio(preferred, bg) >= 3.5) return preferred;
+    if (ratio(preferred, bg) >= 4.5) return preferred;
     return ratio("#111111", bg) >= ratio("#ffffff", bg) ? "#111111" : "#ffffff";
   } catch {
     return preferred;

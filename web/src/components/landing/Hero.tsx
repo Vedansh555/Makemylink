@@ -6,11 +6,31 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { getDemoProfile } from "@/lib/demo";
+import type { BioLink, Profile } from "@/lib/types";
 import { PhoneFrame } from "./PhoneFrame";
 
 const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
 
 const ease = [0.2, 0.7, 0.2, 1] as const;
+
+/**
+ * Dresses a demo profile for the hero: one wide highlight, a bento booking tile that shows real free times,
+ * then photo cards side by side, so each phone shows what the product does and not just a list of links.
+ */
+function showcase(p: Profile, booking: { title: string; price: number; currency: "INR" | "USD"; min: number; text: string }): Profile {
+  const rest = p.links.filter((l) => l.kind !== "booking");
+  const [first, ...others] = rest;
+  const tile: BioLink = {
+    id: "hero-book",
+    title: booking.title,
+    url: "",
+    kind: "booking",
+    size: "2x1",
+    booking: { price: booking.price, currency: booking.currency, durationMin: booking.min, description: booking.text, meetingUrl: "", days: [1, 2, 3, 4, 5, 6], startHour: 10, endHour: 19, timeZone: "Asia/Kolkata" },
+  };
+  const halves: BioLink[] = others.slice(0, 2).map((l, i) => ({ ...l, size: "1x1" as const, featured: false, image: l.image ?? p.looks[i]?.image }));
+  return { ...p, links: [{ ...first!, size: "2x1" as const }, tile, ...halves], looks: p.looks.slice(0, 2) };
+}
 
 const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "small shops"];
 
@@ -26,9 +46,9 @@ export function Hero() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
-  const left = getDemoProfile("kai")!;
-  const center = getDemoProfile("bubbles")!;
-  const right = { ...getDemoProfile("aria")!, theme: "violet-mist" };
+  const left = showcase(getDemoProfile("kai")!, { title: "Book me for your event", price: 25000, currency: "INR", min: 30, text: "Private sets, launches and club nights." });
+  const center = showcase(getDemoProfile("bubbles")!, { title: "Style call with Mia", price: 499, currency: "INR", min: 20, text: "Thrift finds picked just for you." });
+  const right = showcase({ ...getDemoProfile("aria")!, theme: "violet-mist" }, { title: "1:1 styling session", price: 1499, currency: "INR", min: 45, text: "A wardrobe plan built around you." });
 
   return (
     <section className="relative isolate pt-32 [clip-path:inset(-300px_-300px_0_-300px)] sm:pt-36">

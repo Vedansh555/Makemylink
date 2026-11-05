@@ -27,7 +27,7 @@ export const demoProfiles: Profile[] = [
         url: "https://ltk.com",
         art: "jacket",
         hue: 32,
-        image: "https://images.unsplash.com/photo-1539533018447-63fcce667883?auto=format&fit=crop&w=600&q=80",
+        image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
