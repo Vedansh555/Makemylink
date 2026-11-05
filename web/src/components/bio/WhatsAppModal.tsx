@@ -38,18 +38,19 @@ export function WhatsAppModal({ link, handle, live, onClose }: { link: BioLink; 
 
   return (
     <div role="dialog" aria-modal="true" onClick={onClose} className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4">
-      <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-md rounded-t-3xl border border-white/15 bg-[#141518] p-6 text-white shadow-2xl sm:rounded-3xl">
+      <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-md overflow-hidden rounded-t-3xl border border-white/15 bg-gradient-to-br from-[#1d2a22] via-[#141518] to-[#141518] p-6 text-white shadow-[0_40px_90px_-30px_rgba(0,0,0,0.9)] sm:rounded-3xl">
         <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-4 rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white">
           <X className="h-4 w-4" />
         </button>
-        <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#25d366] text-white"><WhatsAppIcon className="h-6 w-6" /></span>
+        <span className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[#25d366]/25 blur-3xl" />
+        <span className="relative grid h-12 w-12 place-items-center rounded-2xl bg-[#25d366] text-white shadow-[0_14px_30px_-8px_#25d366,0_1px_0_rgba(255,255,255,0.4)_inset]"><WhatsAppIcon className="h-6 w-6" /></span>
         <h3 className="mt-3 pr-8 text-[20px] font-bold">{link.title}</h3>
         <p className="mt-1 text-[13px] text-white/55">Tell us who you are, then WhatsApp opens with your message ready to send.</p>
         <form onSubmit={submit} className="mt-5 space-y-3">
           <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} />
           <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} />
           {err && <p className="text-[13px] text-red-300">{err}</p>}
-          <button disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25d366] py-3 text-[14px] font-bold text-[#06371b] disabled:opacity-50">
+          <button disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25d366] py-3 text-[14px] font-bold text-[#06371b] shadow-[0_16px_34px_-10px_#25d366,0_1px_0_rgba(255,255,255,0.4)_inset] transition hover:-translate-y-0.5 disabled:opacity-50">
             <WhatsAppIcon className="h-4 w-4" />
             {busy ? "Opening…" : "Continue to WhatsApp"}
           </button>

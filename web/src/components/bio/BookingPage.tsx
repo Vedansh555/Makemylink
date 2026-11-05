@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Clock, Globe, ShieldCheck, Video } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
 import { bookingPrice } from "./BookingModal";
+import { Background } from "./BioPage";
+import { Tilt } from "../ui/Tilt";
 
 type Pay = { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
 type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
@@ -139,32 +142,37 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const card = "rounded-3xl border border-t-fg/15 bg-t-fg/[0.04] p-5 sm:p-7";
+  // Depth: every surface is lifted off the page with a soft long shadow and a bright top edge, so the page feels layered.
+  const lift = "shadow-[0_40px_90px_-40px_rgba(0,0,0,0.65),0_2px_0_rgba(255,255,255,0.10)_inset]";
+  const raised = "shadow-[0_14px_26px_-14px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.28)_inset]";
+  const card = `relative rounded-[28px] border border-t-fg/15 bg-gradient-to-br from-t-fg/[0.11] via-t-fg/[0.05] to-t-fg/[0.02] p-5 backdrop-blur-xl sm:p-7 ${lift}`;
   const field = `w-full ${t.input}`;
-  const pill = "inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 px-3 py-1 text-[12px]";
+  const pill = "inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 bg-t-fg/[0.06] px-3 py-1.5 text-[12px]";
+  const cta = "rounded-full bg-t-accent px-6 py-3.5 text-center text-[15px] font-semibold text-t-on-accent shadow-[0_18px_40px_-12px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset] transition hover:-translate-y-0.5 active:translate-y-0";
+  const enter = (i: number) => ({ initial: { opacity: 0, y: 28 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.08 * i, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] as const } });
 
   const host = (
-    <div className={`${card} lg:sticky lg:top-8`}>
+    <div className={card}>
       <Link href={`/${profile.handle}`} className={`${t.meta} inline-flex items-center gap-1.5 hover:opacity-100`}>
         <ArrowLeft className="h-3.5 w-3.5" /> {profile.name}
       </Link>
       <div className="mt-5 flex items-center gap-3">
         {profile.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={profile.avatar} alt="" className="h-14 w-14 rounded-full object-cover ring-1 ring-t-fg/20" />
+          <img src={profile.avatar} alt="" className="h-16 w-16 rounded-full object-cover ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_14px_30px_-10px_var(--t-accent)]" />
         ) : (
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-t-fg/10 text-[20px]">{profile.name.charAt(0)}</span>
+          <span className="grid h-16 w-16 place-items-center rounded-full bg-t-accent text-[22px] font-semibold text-t-on-accent ring-2 ring-t-accent ring-offset-4 ring-offset-t-bg shadow-[0_14px_30px_-10px_var(--t-accent)]">{profile.name.charAt(0)}</span>
         )}
         <div className="min-w-0">
           <p className="truncate text-[15px] font-semibold">{profile.name}</p>
           <p className={`${t.meta} truncate`}>@{profile.handle}</p>
         </div>
       </div>
-      <h1 className={`${nameFont} mt-5 text-[30px] leading-[1.05] sm:text-[36px]`}>{link.title}</h1>
+      <h1 className={`${nameFont} mt-6 text-[34px] leading-[1.02] sm:text-[42px]`}>{link.title}</h1>
       <div className="mt-4 flex flex-wrap gap-2">
         <span className={pill}><Clock className="h-3.5 w-3.5" /> {cfg.durationMin} min</span>
         <span className={pill}><Video className="h-3.5 w-3.5" /> Video call</span>
-        <span className={`${pill} font-semibold`}>{price}</span>
+        <span className="inline-flex items-center rounded-full bg-t-accent px-3.5 py-1.5 text-[13px] font-bold text-t-on-accent shadow-[0_10px_24px_-8px_var(--t-accent)]">{price}</span>
       </div>
       {cfg.description && <p className="mt-4 text-[15px] leading-relaxed opacity-75">{cfg.description}</p>}
 
@@ -175,7 +183,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
           ["Get your meeting link", "It arrives by email as soon as the booking is confirmed."],
         ].map(([a, b], n) => (
           <li key={a} className="flex gap-3">
-            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-t-fg/10 text-[11px] font-semibold">{n + 1}</span>
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-t-accent text-[12px] font-bold text-t-on-accent shadow-[0_8px_18px_-6px_var(--t-accent)]">{n + 1}</span>
             <span>
               <span className="block font-medium">{a}</span>
               <span className="block opacity-60">{b}</span>
@@ -192,17 +200,20 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   );
 
   return (
-    <div style={style} className={`relative min-h-screen ${t.root}`}>
-      <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-8 sm:px-6 sm:pt-12 lg:pb-16">
+    <div style={style} className={`relative isolate min-h-screen overflow-hidden ${t.root}`}>
+      <Background theme={theme} />
+      <div className="pointer-events-none absolute -left-24 top-0 h-[420px] w-[420px] rounded-full bg-t-accent/25 blur-[110px]" />
+      <div className="pointer-events-none absolute -right-24 top-[40%] h-[380px] w-[380px] rounded-full bg-t-accent2/20 blur-[110px]" />
+      <main className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-32 pt-8 sm:px-6 sm:pt-12 lg:pb-16">
         {done ? (
-          <div className="mx-auto max-w-lg">
+          <motion.div {...enter(0)} className="mx-auto max-w-lg pt-6 sm:pt-12">
             <div className={`${card} text-center`}>
-              <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-t-accent text-t-on-accent"><Check className="h-7 w-7" /></span>
+              <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-t-accent text-t-on-accent shadow-[0_20px_44px_-10px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"><Check className="h-8 w-8" /></span>
               {done.status === "demo" ? (
                 <>
                   <h1 className={`${nameFont} mt-5 text-[30px] leading-tight`}>This is how it works</h1>
                   <p className="mt-3 text-[15px] leading-relaxed opacity-75">Your visitor picks a time and pays the host directly. The host confirms and the meeting link arrives by email. Nothing was booked or charged here.</p>
-                  <Link href="/create?focus=booking" className={`${t.button} mt-6 block`}>Add a booking card to my page</Link>
+                  <Link href="/create?focus=booking" className={`${cta} mt-6 block`}>Add a booking card to my page</Link>
                 </>
               ) : (
                 <>
@@ -212,7 +223,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   {done.status === "confirmed" ? (
                     <div className="mt-6 space-y-3 text-[14px]">
                       <p className="opacity-70">We emailed you the details. Join with this link:</p>
-                      {done.meetingUrl && <a href={done.meetingUrl} target="_blank" rel="noreferrer" className={`${t.button} block break-all`}>Open meeting link</a>}
+                      {done.meetingUrl && <a href={done.meetingUrl} target="_blank" rel="noreferrer" className={`${cta} block break-all`}>Open meeting link</a>}
                     </div>
                   ) : (
                     <div className="mt-6 space-y-3 text-[14px]">
@@ -220,7 +231,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                       {done.pays.map((p) =>
                         p.kind === "upi" ? (
                           <div key="upi">
-                            <a href={p.link} className={`${t.button} block`}>Pay with UPI</a>
+                            <a href={p.link} className={`${cta} block`}>Pay with UPI</a>
                             <p className="mt-2 text-[13px] opacity-60">or UPI ID: <span className="select-all font-mono">{p.upiId}</span></p>
                           </div>
                         ) : (
@@ -234,12 +245,14 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
               )}
               <Link href={`/${profile.handle}`} className={`${t.meta} mt-7 inline-block underline underline-offset-4`}>Back to {profile.name}&apos;s page</Link>
             </div>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-7">
-            {host}
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,350px)_minmax(0,1fr)] lg:gap-7">
+            <motion.div {...enter(0)} className="lg:sticky lg:top-8 lg:self-start">
+              <Tilt max={3} glare={false}>{host}</Tilt>
+            </motion.div>
 
-            <div className="space-y-5">
+            <motion.div {...enter(1)} className="space-y-5">
               <section className={card} aria-label="Choose a date and time">
                 <div className="flex items-baseline justify-between gap-3">
                   <h2 className="text-[17px] font-semibold">Select a date and time</h2>
@@ -273,7 +286,13 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             aria-label={`${k}${open ? "" : full ? ", fully booked" : ", unavailable"}`}
                             aria-pressed={selected}
                             className={`relative aspect-square rounded-full text-[14px] transition ${
-                              selected ? "bg-t-accent font-semibold text-t-on-accent" : open ? "bg-t-fg/[0.08] font-medium hover:bg-t-fg/20" : full ? "opacity-35 line-through" : "opacity-25"
+                              selected
+                                ? "scale-110 bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-8px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
+                                : open
+                                  ? `bg-t-fg/[0.10] font-medium hover:-translate-y-0.5 hover:bg-t-fg/[0.2] ${raised}`
+                                  : full
+                                    ? "opacity-35 line-through"
+                                    : "opacity-25"
                             } ${k === todayYmd && !selected ? "ring-1 ring-t-fg/40" : ""}`}
                           >
                             {d}
@@ -303,8 +322,12 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                               key={s}
                               disabled={!open}
                               onClick={() => { setSlot(s); setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 60); }}
-                              className={`rounded-xl border px-3 py-2.5 text-[14px] transition ${
-                                s === slot ? "border-t-accent bg-t-accent font-semibold text-t-on-accent" : open ? "border-t-fg/25 hover:border-t-fg/60" : "border-t-fg/10 opacity-40"
+                              className={`rounded-2xl border px-3 py-3 text-[14px] transition ${
+                                s === slot
+                                  ? "border-t-accent bg-t-accent font-bold text-t-on-accent shadow-[0_14px_30px_-10px_var(--t-accent),0_1px_0_rgba(255,255,255,0.4)_inset]"
+                                  : open
+                                    ? `border-t-fg/20 bg-t-fg/[0.07] hover:-translate-y-0.5 hover:border-t-fg/50 ${raised}`
+                                    : "border-t-fg/10 opacity-40"
                               }`}
                             >
                               <span className={open ? "" : "line-through"}>{fmtTime(s)}</span>
@@ -319,7 +342,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                 </div>
               </section>
 
-              <section ref={formRef} className={`${card} ${slot ? "" : "opacity-60"}`} aria-label="Your details">
+              <section ref={formRef} className={`${card} transition-opacity ${slot ? "" : "opacity-60"}`} aria-label="Your details">
                 <h2 className="text-[17px] font-semibold">Your details</h2>
                 {slot ? (
                   <p className="mt-1 text-[14px] opacity-70">
@@ -334,7 +357,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   <input required disabled={!slot} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} autoComplete="email" />
                   <textarea disabled={!slot} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What would you like to talk about? (optional)" maxLength={500} rows={3} className={`${field} sm:col-span-2`} />
                   {err && <p className="text-[13px] text-red-500 sm:col-span-2">{err}</p>}
-                  <button disabled={!slot || busy} className={`${t.button} hidden w-full disabled:opacity-40 sm:col-span-2 lg:block`}>
+                  <button disabled={!slot || busy} className={`${cta} hidden w-full disabled:opacity-40 disabled:shadow-none sm:col-span-2 lg:block`}>
                     {busy ? "Booking…" : free ? "Confirm booking" : `Continue · ${price}`}
                   </button>
                 </form>
@@ -342,20 +365,20 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
               <p className={`${t.meta} text-center`}>
                 <Link href={`/${profile.handle}`} className="underline underline-offset-4">See everything by {profile.name}</Link> · <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className="underline underline-offset-4">Made with Showz</Link>
               </p>
-            </div>
+            </motion.div>
           </div>
         )}
       </main>
 
       {/* Phones and tablets: the price and the confirm button stay in reach */}
       {!done && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-t-fg/15 bg-t-bg/90 px-4 py-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-t-fg/15 bg-t-bg/85 px-4 py-3 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
           <div className="mx-auto flex max-w-md items-center gap-3">
             <div className="min-w-0 flex-1 text-[13px] leading-tight">
               <p className="truncate font-semibold">{slot ? `${fmtDay(slot).split(",")[0] ?? ""} · ${fmtTime(slot)}` : "Pick a time"}</p>
               <p className="opacity-60">{link.title} · {price}</p>
             </div>
-            <button form="bookform" disabled={!slot || busy} className={`${t.button} shrink-0 disabled:opacity-40`}>
+            <button form="bookform" disabled={!slot || busy} className={`${cta} shrink-0 !px-5 !py-3 disabled:opacity-40 disabled:shadow-none`}>
               {busy ? "Booking…" : free ? "Confirm" : "Continue"}
             </button>
           </div>

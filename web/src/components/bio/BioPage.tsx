@@ -22,7 +22,7 @@ const rise = {
   show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.06 * i, duration: 0.6, ease: [0.2, 0.7, 0.2, 1] as const } }),
 };
 
-function Background({ theme }: { theme: ResolvedTheme }) {
+export function Background({ theme }: { theme: ResolvedTheme }) {
   const { def } = theme;
   switch (def.family) {
     case "chrome":
@@ -332,8 +332,9 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 if (l.kind === "whatsapp" && l.whatsapp) {
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
+                      <Tilt max={6} className="rounded-2xl">
                       <button type="button" onClick={() => setChat(l)} className={`${t.featured} w-full cursor-pointer`}>
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-sm sm:h-11 sm:w-11">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-[0_10px_22px_-6px_#25d366,0_1px_0_rgba(255,255,255,0.4)_inset] sm:h-11 sm:w-11">
                           <WhatsAppIcon className="h-5 w-5" />
                         </span>
                         <span className="flex-1 text-left">
@@ -342,6 +343,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                         </span>
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </button>
+                      </Tilt>
                     </div>
                   );
                 }
@@ -352,11 +354,11 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                       <Tilt max={5} className="rounded-2xl">
                         <a href={yt} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className={`${t.link} !flex-col !items-stretch !gap-3 !py-3`}>
                           {l.video ? (
-                            <span className="relative block overflow-hidden rounded-xl">
+                            <span className="relative block overflow-hidden rounded-xl shadow-[0_18px_36px_-14px_rgba(0,0,0,0.65)] ring-1 ring-black/10">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`https://i.ytimg.com/vi/${l.video.id}/hqdefault.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />
                               <span className="absolute inset-0 grid place-items-center bg-black/15">
-                                <span className="grid h-12 w-12 place-items-center rounded-full bg-white/95 text-black shadow-lg"><Play className="h-5 w-5 translate-x-0.5 fill-current" /></span>
+                                <span className="grid h-14 w-14 place-items-center rounded-full bg-white/95 text-black shadow-[0_14px_34px_-6px_rgba(0,0,0,0.6)] transition group-hover:scale-110"><Play className="h-5 w-5 translate-x-0.5 fill-current" /></span>
                               </span>
                             </span>
                           ) : null}
