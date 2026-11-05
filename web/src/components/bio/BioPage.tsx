@@ -316,11 +316,12 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
                 const arrow = <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />;
                 const thumb = l.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-lg object-cover" : "h-12 w-12 shrink-0 rounded-lg object-cover"} />
+                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-xl object-cover" : "h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5"} />
                 ) : null;
                 const inner = stack ? (
                   <span className="flex w-full flex-col gap-2.5">
                     {thumb}
+
                     <span className="flex items-center gap-2">
                       <span className="flex-1 text-left">{l.title}</span>
                       {arrow}
@@ -328,8 +329,8 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
                   </span>
                 ) : (
                   <>
-                    {numbered && <span className="font-sans text-[10px] tracking-[0.2em] opacity-50">{String(n + 1).padStart(2, "0")}</span>}
-                    {thumb}
+                    {thumb ? thumb : numbered ? <span className="font-sans text-[10px] tracking-[0.2em] opacity-50">{String(n + 1).padStart(2, "0")}</span> : null}
+
                     <span className="flex-1 text-left">{l.title}</span>
                     {arrow}
                   </>
@@ -344,7 +345,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false 
                       <button type="button" onClick={() => setBooking(l)} className={`${t.featured} w-full cursor-pointer`}>
                         {l.image && (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={l.image} alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
+                          <img src={l.image} alt="" loading="lazy" className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5" />
                         )}
                         <span className="flex-1 text-left">
                           {l.title}

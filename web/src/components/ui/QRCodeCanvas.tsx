@@ -20,8 +20,8 @@ export function QRCodeCanvas({ text, size = 160, className = "" }: QRCodeCanvasP
     }
 
     QRCode.toDataURL(text, {
-      width: size * 2, // 2x for sharp retina rendering
-      margin: 2,
+      width: Math.round(size * 2), // 2x for sharp retina rendering
+      margin: 1,
       color: {
         dark: "#111111",
         light: "#ffffff",
@@ -43,8 +43,8 @@ export function QRCodeCanvas({ text, size = 160, className = "" }: QRCodeCanvasP
   if (!dataUrl) {
     return (
       <div
-        style={{ width: size, height: size }}
-        className={`grid place-items-center rounded-xl border border-fg/10 bg-white ${className}`}
+        style={{ width: `${size}px`, height: `${size}px`, aspectRatio: "1 / 1" }}
+        className={`grid place-items-center rounded-xl border border-fg/10 bg-white aspect-square shrink-0 ${className}`}
       >
         <span className="text-[11px] text-zinc-400">Loading QR...</span>
       </div>
@@ -58,8 +58,8 @@ export function QRCodeCanvas({ text, size = 160, className = "" }: QRCodeCanvasP
       alt={`QR code for ${text}`}
       width={size}
       height={size}
-      style={{ width: size, height: size }}
-      className={`rounded-xl border border-fg/10 bg-white p-1.5 shadow-sm ${className}`}
+      style={{ width: `${size}px`, height: `${size}px`, maxWidth: `${size}px`, maxHeight: `${size}px`, aspectRatio: "1 / 1" }}
+      className={`shrink-0 aspect-square object-contain block rounded-lg ${className}`}
     />
   );
 }

@@ -284,7 +284,7 @@ export function Features() {
                   ["dress", 340, "Amazon", "$74", "Satin Midi Slip Dress", "https://amazon.com"],
                   ["cup", 28, "Own store", "₹450", "Ceramic Artisan Coffee Mug", "https://myntra.com"],
                 ] as const
-              ).map(([art, hue, store, price, title, url], i) => (
+              ).map(([art, hue, store, price, title], i) => (
                 <Tilt key={art} max={14} className="rounded-2xl">
                   <div className="group overflow-hidden rounded-2xl border border-fg/10 bg-bg/30 transition hover:border-fg/30 hover:shadow-lg" style={{ transform: `translateY(${i % 2 ? 16 : 0}px)` }}>
                     <div className="relative aspect-[4/5] overflow-hidden">
@@ -505,7 +505,7 @@ export function Features() {
               </div>
             </div>
             <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row">
-              <div className="rounded-2xl border border-fg/10 bg-white p-3 shadow-md">
+              <div className="w-[134px] h-[134px] shrink-0 aspect-square rounded-2xl border border-fg/10 bg-white p-3 shadow-md flex items-center justify-center">
                 <QRCodeCanvas text={`${SITE_URL}/${qrName}`} size={110} />
               </div>
               <div className="flex w-full min-w-0 flex-col gap-2.5 text-center sm:text-left">

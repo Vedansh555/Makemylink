@@ -53,7 +53,7 @@ export function starterFor(goal: Goal): Profile {
         bio: "Outfits and picks I love. Tap anything to shop it.",
         shopTitle: "Shop my picks",
         showSubscribe: true,
-        links: [link("l1", "Today's video", { featured: true }), link("l2", "My full shop")],
+        links: [link("l1", "Today's video", { featured: true, image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=240&q=80" }), link("l2", "My full shop")],
         looks: [
           look("k1", "Everyday dress", "₹1,499", "Myntra", "dress", 340),
           look("k2", "Tote bag", "₹899", "Amazon", "bag", 30),
@@ -67,7 +67,7 @@ export function starterFor(goal: Goal): Profile {
         theme: firstThemeOf("minimal", "editorial"),
         bio: "One useful email a week. Join free below.",
         showSubscribe: true,
-        links: [link("l1", "Read my latest post", { featured: true }), link("l2", "Free starter guide"), link("l3", "About me")],
+        links: [link("l1", "Read my latest post", { featured: true, image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=240&q=80" }), link("l2", "Free starter guide"), link("l3", "About me")],
       };
     case "import":
     default:

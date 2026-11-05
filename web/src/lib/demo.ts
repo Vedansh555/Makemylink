@@ -9,7 +9,7 @@ export const demoProfiles: Profile[] = [
     theme: "editorial",
     socials: { instagram: "aria.laurent", tiktok: "arialaurent", pinterest: "arialaurent", email: "hello@aria.studio" },
     links: [
-      { id: "l1", title: "Fall capsule wardrobe — 24 pieces, 60 outfits", url: "#", featured: true },
+      { id: "l1", title: "Fall capsule wardrobe — 24 pieces, 60 outfits", url: "#", featured: true, image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Book a 1:1 styling session", url: "#" },
       { id: "l3", title: "The Sunday Edit newsletter", url: "#" },
       { id: "l4", title: "LTK shop", url: "#", folder: "Shop my picks" },
@@ -78,7 +78,7 @@ export const demoProfiles: Profile[] = [
     theme: "chrome",
     socials: { instagram: "kai.rossi", tiktok: "kairossi", youtube: "kairossi", email: "booking@kairossi.com" },
     links: [
-      { id: "l1", title: "Listen to my new EP", url: "#", featured: true },
+      { id: "l1", title: "Listen to my new EP", url: "#", featured: true, image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Tour dates 2026", url: "#" },
       { id: "l3", title: "Book me for your event", url: "#" },
     ],
@@ -146,7 +146,7 @@ export const demoProfiles: Profile[] = [
       { id: "l1", title: "Book a bridal trial", url: "#", featured: true },
       { id: "l2", title: "Price list", url: "#" },
       { id: "l3", title: "Chat on WhatsApp", url: "#" },
-      { id: "l4", title: "My 5-minute everyday look", url: "#" },
+      { id: "l4", title: "My 5-minute everyday look", url: "#", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "In my kit",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
@@ -210,9 +210,9 @@ export const demoProfiles: Profile[] = [
     theme: "noir",
     socials: { instagram: "vera.noir", pinterest: "veranoir", email: "book@veranoir.com" },
     links: [
-      { id: "l1", title: "Portfolio 2026", url: "#", featured: true },
+      { id: "l1", title: "Portfolio 2026", url: "#", featured: true, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Book a shoot", url: "#" },
-      { id: "l3", title: "Photo walk workshops", url: "#" },
+      { id: "l3", title: "Photo walk workshops", url: "#", image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "Prints & gear",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
@@ -266,7 +266,7 @@ export const demoProfiles: Profile[] = [
     theme: "candy",
     socials: { instagram: "miabubbles", tiktok: "miabubbles", youtube: "miabubbles" },
     links: [
-      { id: "l1", title: "$20 thrift haul challenge", url: "#", featured: true },
+      { id: "l1", title: "$20 thrift haul challenge", url: "#", featured: true, image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "My Amazon faves", url: "#" },
       { id: "l3", title: "Join my close friends club", url: "#" },
     ],
@@ -332,7 +332,7 @@ export const demoProfiles: Profile[] = [
     theme: "mint-glass",
     socials: { instagram: "pawsome.duo", tiktok: "pawsomeduo", youtube: "pawsomeduo" },
     links: [
-      { id: "l1", title: "Today's cute video", url: "#", featured: true },
+      { id: "l1", title: "Today's cute video", url: "#", featured: true, image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Book a grooming session", url: "#" },
       { id: "l3", title: "Our favourite treats", url: "#" },
     ],
