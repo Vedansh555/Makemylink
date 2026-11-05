@@ -260,24 +260,24 @@ export function Features() {
         {/* Sell or recommend products */}
         <Reveal className="md:col-span-4">
           <Card className="h-full">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h3 className="text-[22px] font-semibold">Show off your products</h3>
                 <p className="mt-2 max-w-[44ch] text-fg/55">
                   A photo grid of your merch, your shop, or things you love, linking to Amazon, LTK, Myntra or your own store. Visitors tap and buy there.
                 </p>
               </div>
-              <div className="hidden shrink-0 items-center gap-2 sm:flex">
-                <Link href="/aria" className="rounded-full border border-fg/15 bg-fg/[0.03] px-3.5 py-1.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <Link href="/aria" className="rounded-full border border-fg/15 bg-fg/[0.03] px-4 py-2.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg sm:py-1.5">
                   See an example
                 </Link>
-                <Link href="/create?goal=products" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                <Link href="/create?goal=products" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2.5 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111] sm:py-1.5">
                   Add products <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-3 gap-4 [perspective:1000px]">
+            <div className="mt-8 grid grid-cols-3 gap-2.5 sm:gap-4 [perspective:1000px]">
               {(
                 [
                   ["vinyl", 20, "Own store", "$25", "Special Edition Vinyl EP", "https://shopmy.us"],
@@ -293,7 +293,7 @@ export function Features() {
                     </div>
                     <div className="p-3">
                       <p className="truncate text-[12px] font-medium text-fg/75">{title}</p>
-                      <div className="mt-2 flex items-center justify-between text-[13px]">
+                      <div className="mt-2 flex flex-col items-start gap-1.5 text-[13px] sm:flex-row sm:items-center sm:justify-between">
                         <button
                           type="button"
                           onClick={() => {
@@ -332,7 +332,7 @@ export function Features() {
               <div className="chrome-text font-syne text-[100px] sm:text-[120px] font-extrabold leading-[0.8]">0%</div>
               <Link
                 href="/create"
-                className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-fg/80 underline decoration-fg/30 underline-offset-4 hover:text-[#ff5b37] hover:decoration-[#ff5b37] transition"
+                className="mb-2 inline-flex items-center gap-1 py-2 text-[13px] font-semibold text-fg/80 underline decoration-fg/30 underline-offset-4 hover:text-[#ff5b37] hover:decoration-[#ff5b37] transition"
               >
                 Start free <ArrowRight className="h-3.5 w-3.5" />
               </Link>
@@ -723,7 +723,7 @@ export function FinalCTA() {
 }
 
 export function Footer() {
-  const link = "hover:text-fg";
+  const link = "block py-2 hover:text-fg";
   return (
     <footer className="mx-auto max-w-6xl border-t border-fg/10 px-4 py-10 text-[13px] text-fg/45 sm:px-6">
       <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
@@ -733,11 +733,11 @@ export function Footer() {
           <Link href="/#pricing" className={link}>Pricing</Link>
           <Link href="/blog" className={link}>Blog</Link>
           <Link href="/start" className={link}>Create</Link>
-          <Link href="/contact" className={link}>Contact</Link>
-          <Link href="/terms" className={link}>Terms</Link>
-          <Link href="/privacy" className={link}>Privacy</Link>
-          <Link href="/refund" className={link}>Refunds</Link>
-          <Link href="/cookies" className={link}>Cookies</Link>
+          <Link href="/contact" rel="nofollow" className={link}>Contact</Link>
+          <Link href="/terms" rel="nofollow" className={link}>Terms</Link>
+          <Link href="/privacy" rel="nofollow" className={link}>Privacy</Link>
+          <Link href="/refund" rel="nofollow" className={link}>Refunds</Link>
+          <Link href="/cookies" rel="nofollow" className={link}>Cookies</Link>
         </div>
       </div>
       <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-fg/10 pt-6 text-[12px] sm:flex-row">

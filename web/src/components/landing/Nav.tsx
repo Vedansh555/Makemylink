@@ -35,11 +35,11 @@ export function Nav() {
         </div>
         <div className="flex items-center gap-2">
           {signedIn ? (
-            <Link href="/dashboard" className="rounded-lg border border-fg/15 px-4 py-2 text-[13px] font-semibold transition hover:border-fg/40">
+            <Link href="/dashboard" rel="nofollow" className="rounded-lg border border-fg/15 px-4 py-2 text-[13px] font-semibold transition hover:border-fg/40">
               Dashboard
             </Link>
           ) : (
-            <Link href="/login" className="px-3 py-2 text-[13px] text-fg/70 hover:text-fg">
+            <Link href="/login" rel="nofollow" className="px-3 py-2 text-[13px] text-fg/70 hover:text-fg">
               Log in
             </Link>
           )}

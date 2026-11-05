@@ -3,10 +3,118 @@ import { GoalCards } from "@/components/landing/GoalCards";
 import { Nav } from "@/components/landing/Nav";
 import { Pricing } from "@/components/landing/Pricing";
 import { Compare, FAQ, Features, FinalCTA, Footer, HowItWorks, Marquee, ThemeGallery } from "@/components/landing/Sections";
+import { SITE_URL } from "@/lib/site";
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Showz",
+    url: SITE_URL,
+    description: "The link in bio built to earn. Take paid bookings, sell products and grow your email list.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${SITE_URL}/{handle}`,
+      "query-input": "required name=handle",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Showz",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: [
+      {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        name: "Free Plan",
+      },
+      {
+        "@type": "Offer",
+        price: "299",
+        priceCurrency: "INR",
+        name: "Pro Plan (India)",
+      },
+      {
+        "@type": "Offer",
+        price: "8",
+        priceCurrency: "USD",
+        name: "Pro Plan (Global)",
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Showz",
+    url: SITE_URL,
+    logo: `${SITE_URL}/favicon.ico`,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Who is Showz for?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How do paid bookings work?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays your UPI ID (or your own payment link for dollars). You confirm payment and they get your meeting link by email. We take no cut.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do you take a cut of my sales?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can I bring my existing page?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, and we copy your picture, links, groups, social handles and shop items.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can I sell digital products or courses?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Not directly yet. Showz focuses on paid 1:1 bookings, product links and your email list. You can link to a store, a course site or a download from your page.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Is the free plan really free?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes, forever, with no card. Free includes 10 themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits.",
+        },
+      },
+    ],
+  },
+];
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Nav />
       <main className="overflow-x-clip">
         <Hero />
