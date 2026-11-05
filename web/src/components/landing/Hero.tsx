@@ -26,7 +26,7 @@ export function Hero() {
     return () => mq.removeEventListener("change", update);
   }, []);
   const left = getDemoProfile("kai")!;
-  const center = { ...getDemoProfile("bubbles")!, avatar: portrait("mia", "f", 2) };
+  const center = { ...getDemoProfile("bubbles")!, avatar: portrait("mia", "f", 10) };
   const right = { ...getDemoProfile("aria")!, theme: "violet-mist", avatar: portrait("aria", "f") };
 
   return (
@@ -53,7 +53,7 @@ export function Hero() {
           </p>
 
           <div className="rise mx-auto mt-9 flex w-full max-w-[860px] flex-col items-stretch justify-center gap-3 [animation-delay:.24s] [text-shadow:none] sm:flex-row sm:items-center">
-            <Link href="/start" className="shrink-0 rounded-xl bg-fg px-6 py-3.5 text-center text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+            <Link href="/start" className="flex h-[56px] shrink-0 items-center justify-center rounded-xl bg-fg px-6 text-center text-[15px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
               Create your free page
             </Link>
             <form
@@ -61,7 +61,7 @@ export function Hero() {
                 e.preventDefault();
                 router.push(pasted.trim() ? `/create?import=${encodeURIComponent(pasted.trim())}` : "/create?goal=import");
               }}
-              className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl border-2 border-[#ff5b37] bg-white p-1 shadow-[0_18px_40px_-20px_rgba(255,91,55,0.55)] transition focus-within:shadow-[0_18px_44px_-14px_rgba(255,91,55,0.7)]"
+              className="flex h-[56px] min-w-0 flex-1 items-center gap-1.5 rounded-xl border-2 border-[#ff5b37] bg-white p-1 shadow-[0_18px_40px_-20px_rgba(255,91,55,0.55)] transition focus-within:shadow-[0_18px_44px_-14px_rgba(255,91,55,0.7)]"
             >
               <input
                 id="hero-import"
@@ -71,9 +71,9 @@ export function Hero() {
                 value={pasted}
                 onChange={(e) => setPasted(e.target.value)}
                 placeholder="Paste your Linktree or Carrd link"
-                className="min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-[#111] outline-none placeholder:text-[#111]/45"
+                className="h-full min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-[#111] outline-none placeholder:text-[#111]/45"
               />
-              <button type="submit" className="shrink-0 rounded-lg bg-[#ff5b37] px-5 py-2.5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">
+              <button type="submit" className="h-full shrink-0 rounded-lg bg-[#ff5b37] px-5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">
                 Import
               </button>
             </form>
