@@ -195,6 +195,9 @@ export function Editor() {
   const [notice, setNotice] = useState("");
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
+  const [pulse, setPulse] = useState(false);
+  const [openOpts, setOpenOpts] = useState<Set<string>>(new Set());
+  const queryHandled = useRef(false);
   const [publishing, setPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [examplesOpen, setExamplesOpen] = useState(false);
@@ -288,6 +291,24 @@ export function Editor() {
     }
   };
 
+  // Deep links from the homepage: /create?focus=booking|shop|mediakit|links and /create?import=linktr.ee/name
+  useEffect(() => {
+    if (!p || queryHandled.current) return;
+    queryHandled.current = true;
+    const focus = params.get("focus");
+    const imp = params.get("import");
+    if (imp) importLinktree(imp);
+    if (focus) {
+      setMobileTab(focus === "shop" || focus === "mediakit" ? "shop" : "links");
+      if (focus === "booking") {
+        setPulse(true);
+        setTimeout(() => setPulse(false), 8000);
+      }
+      setTimeout(() => document.getElementById(`section-${focus === "booking" ? "links" : focus}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 500);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p]);
+
   if (!p) return <div className="min-h-screen bg-bg" />;
 
   // What the visitor will actually see: Free limits applied, so the preview never promises what Free can't publish.
@@ -296,15 +317,35 @@ export function Editor() {
   const shown = applyPlan(p, plan);
   const proOnly = (what: string) => setNotice(`${what} is on Pro. Upgrade from your dashboard to use it.`);
 
-  async function importLinktree() {
+  async function importLinktree(from: string = importUrl) {
     setImporting(true);
     setNotice("");
-    const res = await fetch("/api/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: importUrl }) });
+    const res = await fetch("/api/import", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: from }) });
     const d = await res.json().catch(() => ({}));
     setImporting(false);
     if (!res.ok) return setNotice(d.error ?? "Import failed");
-    setP((cur) => (cur ? { ...cur, name: cur.name && cur.name !== cur.handle ? cur.name : d.name, bio: cur.bio || d.bio, links: [...cur.links, ...d.links.map((l: BioLink) => ({ ...l, id: uid() }))] } : cur));
-    setNotice(`Imported ${d.links.length} links.`);
+    setP((cur) => {
+      if (!cur) return cur;
+      // Starter placeholders ("Your Name", "yourname", the empty sample link) give way to the imported values.
+      const isDefaultName = !cur.name || cur.name === blankProfile.name || cur.name.toLowerCase() === cur.handle.toLowerCase();
+      const realSocials = Object.fromEntries(Object.entries(cur.socials).filter(([k, v]) => v && v !== (blankProfile.socials as Record<string, string | undefined>)[k]));
+      const realLinks = cur.links.filter((l) => l.url.trim() && l.url.trim() !== "https://");
+      return {
+        ...cur,
+        name: isDefaultName ? d.name : cur.name,
+        bio: cur.bio && cur.bio !== blankProfile.bio ? cur.bio : d.bio || cur.bio,
+        avatar: cur.avatar || d.avatar,
+        socials: { ...d.socials, ...realSocials },
+        links: [...realLinks, ...d.links.map((l: BioLink) => ({ ...l, id: uid() }))],
+        looks: [...cur.looks, ...(d.looks ?? []).map((l: Look) => ({ ...l, id: uid() }))],
+        shopTitle: cur.shopTitle || ((d.looks ?? []).length ? "Shop" : cur.shopTitle),
+      };
+    });
+    const nLinks = d.links.length;
+    const nShop = (d.looks ?? []).length;
+    setNotice(
+      `Copied ${d.avatar ? "your picture, " : ""}${nLinks} link${nLinks === 1 ? "" : "s"}${nShop ? `, ${nShop} shop item${nShop === 1 ? "" : "s"} with photos` : ""} and your social handles. Linktree's look can't be copied, so pick a style on the left.`,
+    );
     setImportUrl("");
   }
 
@@ -453,7 +494,7 @@ export function Editor() {
                 <p className="text-[12px] text-fg/55">Paste your link and we copy your name, bio and links in seconds.</p>
               </div>
               <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="linktr.ee/yourname" />
-              <button disabled={!importUrl || importing} onClick={importLinktree} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
+              <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
                 {importing ? "Importing…" : "Import"}
               </button>
             </div>
@@ -624,14 +665,14 @@ export function Editor() {
           </div>
 
           {/* Links Section */}
-          <div className={mobileTab === "links" ? "block" : "hidden lg:block"}>
+          <div id="section-links" className={mobileTab === "links" ? "block" : "hidden lg:block"}>
             <Panel
               title="Links"
               action={
                 <div className="flex gap-2">
                   <button
                     onClick={() => (isPro ? set("links", [...p.links, newBooking()]) : proOnly("Paid bookings"))}
-                    className="flex items-center gap-1 rounded-full border border-fg/20 px-3 py-1.5 text-[12px] font-semibold"
+                    className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
                     <Plus className="h-3.5 w-3.5" /> Booking{!isPro && " · Pro"}
                   </button>
@@ -646,7 +687,7 @@ export function Editor() {
             >
               <div className="flex gap-2">
                 <input className={inputCls} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Import from Linktree: linktr.ee/yourname" />
-                <button disabled={!importUrl || importing} onClick={importLinktree} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
+                <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="shrink-0 rounded-xl border border-fg/20 px-4 text-[13px] font-semibold disabled:opacity-40">
                   {importing ? "Importing…" : "Import"}
                 </button>
               </div>
@@ -684,28 +725,45 @@ export function Editor() {
                   </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-fg/60">
-                    <label className="flex items-center gap-1.5">
-                      Size{!isPro && " (Pro)"}
-                      <select
-                        className={`${inputCls} !w-auto !py-1.5`}
-                        value={l.size ?? "2x1"}
-                        onChange={(e) => (isPro ? setLink(l.id, { size: e.target.value as BlockSize }) : proOnly("Grid card sizes"))}
-                      >
-                        <option className="bg-bg" value="1x1">Half width</option>
-                        <option className="bg-bg" value="2x1">Full width</option>
-                        <option className="bg-bg" value="2x2">Tall</option>
-                      </select>
-                    </label>
-                    <label className="flex items-center gap-1.5">
-                      Show from
-                      <input type="datetime-local" className={`${inputCls} !w-auto !py-1.5`} value={toLocalInput(l.startsAt)} onChange={(e) => setLink(l.id, { startsAt: fromLocalInput(e.target.value) })} />
-                    </label>
-                    <label className="flex items-center gap-1.5">
-                      Hide after
-                      <input type="datetime-local" className={`${inputCls} !w-auto !py-1.5`} value={toLocalInput(l.expiresAt)} onChange={(e) => setLink(l.id, { expiresAt: fromLocalInput(e.target.value) })} />
-                    </label>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOpenOpts((cur) => { const n = new Set(cur); if (n.has(l.id)) n.delete(l.id); else n.add(l.id); return n; })}
+                    className="flex w-full items-center gap-2 text-left text-[12px] text-fg/55 transition hover:text-fg"
+                    aria-expanded={openOpts.has(l.id)}
+                  >
+                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${openOpts.has(l.id) ? "rotate-180" : ""}`} />
+                    <span>Layout and schedule</span>
+                    {l.size && l.size !== "2x1" && <span className="rounded-full bg-fg/10 px-2 py-0.5 text-[10px] text-fg/70">{l.size === "1x1" ? "Half width" : "Tall"}</span>}
+                    {(l.startsAt || l.expiresAt) && <span className="rounded-full bg-[#ff5b37]/15 px-2 py-0.5 text-[10px] text-[#c8431f]">Scheduled</span>}
+                  </button>
+                  {openOpts.has(l.id) && (
+                    <div className="grid gap-4 rounded-xl border border-fg/10 bg-fg/[0.03] p-3.5 sm:grid-cols-[auto_1fr] sm:items-start">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Size{!isPro && " · Pro"}</span>
+                        <div className="inline-flex rounded-lg border border-fg/10 bg-bg/40 p-0.5">
+                          {([["1x1", "Half"], ["2x1", "Full"], ["2x2", "Tall"]] as [BlockSize, string][]).map(([v, label]) => (
+                            <button
+                              type="button"
+                              key={v}
+                              onClick={() => (isPro ? setLink(l.id, { size: v }) : proOnly("Grid card sizes"))}
+                              className={`rounded-md px-3.5 py-1.5 text-[12px] transition ${(l.size ?? "2x1") === v ? "bg-fg text-bg" : "text-fg/60 hover:text-fg"}`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label="Show from">
+                          <input type="datetime-local" className={inputCls} value={toLocalInput(l.startsAt)} onChange={(e) => setLink(l.id, { startsAt: fromLocalInput(e.target.value) })} />
+                        </Field>
+                        <Field label="Hide after">
+                          <input type="datetime-local" className={inputCls} value={toLocalInput(l.expiresAt)} onChange={(e) => setLink(l.id, { expiresAt: fromLocalInput(e.target.value) })} />
+                        </Field>
+                        <p className="text-[11px] text-fg/40 sm:col-span-2">Optional. Use it for a sale or a launch: the link appears and disappears by itself.</p>
+                      </div>
+                    </div>
+                  )}
 
                   {l.kind === "booking" && l.booking && <BookingFields b={l.booking} onChange={(b) => setLink(l.id, { booking: b })} />}
                 </div>
@@ -714,7 +772,7 @@ export function Editor() {
           </div>
 
           {/* Shop Section */}
-          <div className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
+          <div id="section-shop" className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
             <Panel
               title="Products"
               action={
@@ -768,15 +826,23 @@ export function Editor() {
                             </option>
                           ))}
                         </select>
-                        <input
-                          type="range"
-                          min={0}
-                          max={359}
-                          value={look.hue}
-                          onChange={(e) => setLook(look.id, { hue: +e.target.value })}
-                          className="h-2 flex-1 cursor-pointer appearance-none rounded-full [background:linear-gradient(90deg,red,yellow,lime,cyan,blue,magenta,red)]"
-                          aria-label="Colour"
-                        />
+                        <div className="flex flex-1 flex-wrap items-center gap-2" role="radiogroup" aria-label="Colour">
+                          {[8, 28, 48, 150, 185, 215, 262, 325].map((h) => {
+                            const active = Math.abs(look.hue - h) < 14;
+                            return (
+                              <button
+                                type="button"
+                                key={h}
+                                role="radio"
+                                aria-checked={active}
+                                aria-label={`Colour ${h}`}
+                                onClick={() => setLook(look.id, { hue: h })}
+                                style={{ background: `hsl(${h} 72% 62%)` }}
+                                className={`h-7 w-7 rounded-full transition ${active ? "scale-110 ring-2 ring-fg ring-offset-2 ring-offset-bg" : "opacity-80 hover:opacity-100"}`}
+                              />
+                            );
+                          })}
+                        </div>
                       </div>
                     ) : (
                       <button onClick={() => setLook(look.id, { image: undefined })} className="text-left text-[12px] text-fg/50 underline underline-offset-4 sm:col-span-2">
@@ -795,7 +861,7 @@ export function Editor() {
           </div>
 
           {/* Media Kit Section */}
-          <div className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
+          <div id="section-mediakit" className={mobileTab === "shop" ? "block" : "hidden lg:block"}>
             <Panel title="Media kit">
               <Switch on={p.showMediaKit && isPro} onChange={(v) => (isPro ? set("showMediaKit", v) : proOnly("The media kit"))} label={`Show media kit for brands${isPro ? "" : " (Pro)"}`} />
               {p.showMediaKit && (

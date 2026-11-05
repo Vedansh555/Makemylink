@@ -7,7 +7,7 @@ import { AutoScrollRow } from "./AutoScrollRow";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, Minus, Plus } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown, Minus, Plus } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
 import { families, getTheme, themeList } from "@/lib/themes";
 import { LookArt } from "../bio/LookArt";
@@ -60,7 +60,7 @@ export function Marquee() {
 export function HowItWorks() {
   const steps = [
     ["1", "Pick a style", "Choose one of our designs. Change the colours, fonts and photo until it feels like you."],
-    ["2", "Add what earns", "A bookable 1:1 call, your products and links, an email sign-up. Moving from Linktree? Paste your link and we copy your links over."],
+    ["2", "Add what earns", "A bookable 1:1 call, your product links, an email sign-up. Already have a page on Linktree? Paste its link and we copy your picture, links and shop items."],
     ["3", "Share one link", "Put it in your Instagram, LinkedIn or YouTube bio. Followers book, buy and subscribe. You see what works."],
   ];
   return (
@@ -236,8 +236,7 @@ export function Features() {
     }
     setImporting(true);
     setTimeout(() => {
-      const cleanHandle = importInput.trim().replace(/^.*linktr\.ee\//, "").replace(/[^a-zA-Z0-9._]/g, "");
-      router.push(`/create?handle=${cleanHandle || "creator"}`);
+      router.push(`/create?import=${encodeURIComponent(importInput.trim())}`);
     }, 400);
   };
 
@@ -254,17 +253,19 @@ export function Features() {
           <Card className="h-full">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-[22px] font-semibold">Sell or recommend products</h3>
+                <h3 className="text-[22px] font-semibold">Show off your products</h3>
                 <p className="mt-2 max-w-[44ch] text-fg/55">
-                  Show your merch, your shop, or things you love with affiliate links from Amazon, LTK, Myntra and more. Each one is a tap away.
+                  A photo grid of your merch, your shop, or things you love, linking to Amazon, LTK, Myntra or your own store. Visitors tap and buy there.
                 </p>
               </div>
-              <Link
-                href="/create"
-                className="hidden shrink-0 items-center gap-1.5 rounded-full border border-fg/15 bg-fg/[0.03] px-3.5 py-1.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg sm:inline-flex"
-              >
-                Try in editor <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
+              <div className="hidden shrink-0 items-center gap-2 sm:flex">
+                <Link href="/aria" className="rounded-full border border-fg/15 bg-fg/[0.03] px-3.5 py-1.5 text-[12px] font-medium text-fg/70 transition hover:border-fg/40 hover:text-fg">
+                  See an example
+                </Link>
+                <Link href="/create?focus=shop" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                  Add products <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
             </div>
 
             <div className="mt-8 grid grid-cols-3 gap-4 [perspective:1000px]">
@@ -351,20 +352,22 @@ export function Features() {
                 </div>
               ))}
             </div>
-            <Link
-              href="/create"
-              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-fg/12 bg-fg/[0.03] py-2 text-[12px] font-medium text-fg/70 hover:border-fg/30 hover:text-fg transition"
-            >
-              Add media kit to your bio <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Link href="/atlas" className="flex items-center justify-center rounded-xl border border-fg/12 bg-fg/[0.03] py-2 text-[12px] font-medium text-fg/70 transition hover:border-fg/30 hover:text-fg">
+                See an example
+              </Link>
+              <Link href="/create?focus=mediakit" className="flex items-center justify-center gap-1.5 rounded-xl bg-fg py-2 text-[12px] font-medium text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                Add yours <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </Card>
         </Reveal>
 
         {/* Import from Linktree */}
         <Reveal className="md:col-span-2" delay={0.08}>
           <Card className="h-full">
-            <h3 className="text-[22px] font-semibold">Import from Linktree</h3>
-            <p className="mt-2 text-fg/55">Paste your old link and we copy your links and socials over for you.</p>
+            <h3 className="text-[22px] font-semibold">Bring your page with you</h3>
+            <p className="mt-2 text-fg/55">Paste your Linktree link. We copy your picture, links, groups, socials and shop items. Pick a new look for it in one tap.</p>
             <form onSubmit={handleImport} className="mt-6 flex flex-col gap-2.5 text-[14px]">
               <div className="relative">
                 <input
@@ -380,7 +383,7 @@ export function Features() {
                 disabled={importing}
                 className="flex items-center justify-between rounded-full bg-fg px-5 py-3 font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
               >
-                <span>{importing ? "Importing…" : "Convert to Makemylink"}</span>
+                <span>{importing ? "Opening editor…" : "Import my Linktree"}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
@@ -459,8 +462,13 @@ export function Features() {
                 <h3 className="text-[22px] font-semibold">Paid 1:1 bookings</h3>
                 <p className="mt-2 text-fg/55">Followers pick a time and pay you directly. You keep 100%, with no commission.</p>
               </div>
-              <Link href="/create" className="hidden shrink-0 items-center gap-1 text-[12px] font-semibold text-fg/70 hover:text-fg sm:inline-flex">
-                Add a booking card <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link href="/rohan" className="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2 text-[12px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+                Try a live booking page <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link href="/create?focus=booking" className="inline-flex items-center gap-1.5 rounded-full border border-fg/15 px-4 py-2 text-[12px] font-medium text-fg/75 transition hover:border-fg/40 hover:text-fg">
+                Add one to my page <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
             <div className="mt-6 rounded-2xl border border-fg/10 bg-bg/40 p-4">
@@ -559,51 +567,28 @@ export function Features() {
 }
 
 export function Compare() {
-  const yes = <Check className="mx-auto h-5 w-5 text-[#ff5b37]" />;
-  const no = <Minus className="mx-auto h-5 w-5 text-fg/25" />;
-  const rows: [string, React.ReactNode, React.ReactNode, React.ReactNode, React.ReactNode][] = [
-    ["Paid plan from", "$8 · ₹299", "$8", "$29", "~$10"],
-    ["Fee on your sales", <b key="f" className="text-[#ff5b37]">0% on Pro</b>, "Up to 12%*", "0%", "Up to 9%*"],
-    ["UPI & rupee pricing", yes, no, no, no],
-    ["Designer themes with 3D", yes, no, no, no],
-    ["Product grid", yes, yes, yes, yes],
+  const points: [string, string, string][] = [
+    ["01", "Built to earn", "Paid 1:1 bookings, a product photo grid and an email list are part of your page, not extra apps to stitch together."],
+    ["02", "A flat price, not a cut", "Pro is one fixed price. We never take a percentage of your bookings or sales, however well they do."],
+    ["03", "Made for India first", "Prices in rupees, UPI for your buyers, and a page that loads fast on a phone."],
   ];
   return (
     <section className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
       <Reveal>
-        <Eyebrow>Compare</Eyebrow>
-        <h2 className="mt-4 font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">How we compare.</h2>
+        <Eyebrow>Why Makemylink</Eyebrow>
+        <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">A link page that pays for itself.</h2>
       </Reveal>
-      <Reveal delay={0.1}>
-        <div className="mt-12 overflow-x-auto rounded-[28px] border border-fg/10">
-          <table className="w-full min-w-[640px] text-left text-[14px]">
-            <thead>
-              <tr className="border-b border-fg/10 text-fg/50">
-                <th className="p-5 font-normal" />
-                <th className="bg-fg/[0.06] p-5 text-center font-display text-[22px] italic text-fg">Makemylink</th>
-                <th className="p-5 text-center font-normal">Linktree</th>
-                <th className="p-5 text-center font-normal">Stan</th>
-                <th className="p-5 text-center font-normal">Beacons</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(([label, ...cells]) => (
-                <tr key={label} className="border-b border-fg/5 last:border-0">
-                  <td className="p-5 text-fg/70">{label}</td>
-                  {cells.map((c, i) => (
-                    <td key={i} className={`p-5 text-center ${i === 0 ? "bg-fg/[0.06] text-fg" : "text-fg/55"}`}>
-                      {c}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-[12px] text-fg/35">
-          *On their cheaper plans. Their 0% plans cost about $30 to $35 a month. Competitor prices as published in October 2026 and may change.
-        </p>
-      </Reveal>
+      <div className="mt-12 grid gap-5 md:grid-cols-3">
+        {points.map(([n, title, body], i) => (
+          <Reveal key={n} delay={i * 0.08}>
+            <div className="h-full rounded-[28px] border border-fg/10 bg-fg/[0.04] p-7">
+              <span className="font-display text-[44px] leading-none text-[#ff5b37]">{n}</span>
+              <h3 className="mt-5 text-[22px] font-semibold">{title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-fg/60">{body}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }
@@ -613,7 +598,8 @@ const faqs: [string, string][] = [
   ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays your UPI ID (or your own payment link for dollars). You confirm payment and they get your meeting link by email. We take no cut."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
   ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
-  ["Can I move from Linktree?", "Yes. Paste your Linktree link and we copy your links and socials over."],
+  ["Can I bring my existing page?", "Yes, from Linktree today: paste its link and we copy your picture, links, groups, social handles and shop items. Another tool's design can't be copied, so you pick one of our styles. Support for more tools can come later."],
+  ["Can I sell digital products or courses?", "Not directly yet. Makemylink focuses on paid 1:1 bookings, product links and your email list. You can link to a store, a course site or a download from your page."],
   ["Is the free plan really free?", "Yes, forever, with no card. Free includes 10 themes, 8 links and a Makemylink badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits."],
 ];
 

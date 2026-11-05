@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import type { BioLink } from "@/lib/types";
+import Link from "next/link";
+import { slotsForDay } from "@/lib/booking";
 
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
 
 type Pay = { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
-type Result = { status: string; meetingUrl?: string; pays: Pay[] };
+type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
 
 export function BookingModal({ link, handle, live, onClose }: { link: BioLink; handle: string; live: boolean; onClose: () => void }) {
   const cfg = link.booking!;
@@ -33,7 +35,12 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
   const [done, setDone] = useState<Result | null>(null);
 
   useEffect(() => {
-    if (!day || !live) return;
+    if (!day) return;
+    // On demo pages there is no server record, so show the same time slots locally.
+    if (!live) {
+      setSlots(slotsForDay(cfg, day, []));
+      return;
+    }
     let cancelled = false;
     fetch(`/api/bookings?handle=${encodeURIComponent(handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}`)
       .then((r) => r.json())
@@ -42,11 +49,15 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
     return () => {
       cancelled = true;
     };
-  }, [day, handle, link.id, live]);
+  }, [day, handle, link.id, live, cfg]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!slot) return;
+    if (!live) {
+      setDone({ status: "demo", pays: [] });
+      return;
+    }
     setBusy(true);
     setErr("");
     const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, linkId: link.id, slot, name, email, note }) });
@@ -73,7 +84,13 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
 
         {done ? (
           <div className="mt-6 space-y-4 text-[14px]">
-            {done.status === "confirmed" ? (
+            {done.status === "demo" ? (
+              <>
+                <p className="text-[16px] font-semibold">This is how it works</p>
+                <p className="text-white/70">Your visitor picks a time and pays the creator directly by UPI or card link. The creator confirms, and the meeting link arrives by email. Nothing was booked or charged here.</p>
+                <Link href="/create?focus=booking" className="block rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">Add a booking card to my page</Link>
+              </>
+            ) : done.status === "confirmed" ? (
               <>
                 <p className="text-[16px] font-semibold">You&apos;re booked ✓</p>
                 <p className="text-white/70">We emailed you the details. Join with this link:</p>
@@ -105,10 +122,9 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
               </>
             )}
           </div>
-        ) : !live ? (
-          <p className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-[13px] text-white/60">Preview only. Visitors will pick a time and book here once your page is published on Pro.</p>
         ) : (
           <form onSubmit={submit} className="mt-5 space-y-4">
+            {!live && <p className="rounded-lg bg-white/10 px-3 py-2 text-[12px] text-white/70">Demo: try it. Nothing is booked or charged.</p>}
             <div className="flex gap-2 overflow-x-auto pb-1">
               {days.map((d) => (
                 <button
