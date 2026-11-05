@@ -26,7 +26,7 @@ export function Hero() {
     return () => mq.removeEventListener("change", update);
   }, []);
   const left = getDemoProfile("kai")!;
-  const center = getDemoProfile("bubbles")!;
+  const center = { ...getDemoProfile("bubbles")!, theme: "ocean-glass" };
   const right = { ...getDemoProfile("aria")!, theme: "violet-mist", avatar: portrait("aria", "f") };
 
   return (

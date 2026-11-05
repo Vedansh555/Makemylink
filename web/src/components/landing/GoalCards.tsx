@@ -6,6 +6,10 @@ import { PhoneFrame } from "./PhoneFrame";
 
 const ICON: Record<Goal, typeof Mail> = { booking: CalendarCheck, products: ShoppingBag, email: Mail, import: Download };
 // A soft colour behind each phone, in the same spirit as the hero phones.
+// Each preview wears a light, airy glass look so the cards feel fresh and consistent.
+const LOOK: Record<Exclude<Goal, "import">, string> = { booking: "atelier", products: "peach-fuzz", email: "mint-glass" };
+// Who appears on each card: seeds that give a woman each time, with a different close-up portrait on every card.
+const WHO: Record<Exclude<Goal, "import">, string> = { booking: "0", products: "2", email: "1" };
 const GLOW: Record<Goal, string> = { booking: "#6d7fb8", products: "#ff5fb0", email: "#7ccfb2", import: "#ff5b37" };
 
 /** The four ways to start, each with a preview of the page you would get. Used on the home page and on /start. */
@@ -16,7 +20,7 @@ export function GoalCards({ handle }: { handle?: string }) {
       {GOALS.map((g, i) => {
         const Icon = ICON[g.id];
         // The import card shows a finished example page, since it starts from the person's own.
-        const preview = g.id === "import" ? getDemoProfile("kai")! : previewFor(g.id);
+        const preview = g.id === "import" ? getDemoProfile("kai")! : { ...previewFor(g.id, WHO[g.id], LOOK[g.id]), theme: LOOK[g.id] };
         return (
           <div
             key={g.id}
