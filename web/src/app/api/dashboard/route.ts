@@ -6,14 +6,14 @@ import { FREE_LIMITS } from "@/lib/plans";
 import type { Profile } from "@/lib/types";
 
 // GET /api/dashboard — everything the dashboard shows, for the logged-in creator.
-export async function GET() {
+export async function GET(req: Request) {
   const session = await getSession();
   if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const page = await pageForUser(session.userId);
+  const page = await pageForUser(session.userId, new URL(req.url).searchParams.get("page"));
   if (!page) return NextResponse.json({ error: "No page" }, { status: 404 });
   const profile = JSON.parse(page.profile_json) as Profile;
   const plan = await planForUser(session.userId);
-  const pid = (await one<{ id: string }>("SELECT id FROM pages WHERE user_id = $1", [session.userId]))!.id;
+  const pid = page.id;
 
   const days = plan === "pro" ? 30 : FREE_LIMITS.analyticsDays;
   const since = Date.now() - days * 86_400_000;
@@ -50,6 +50,8 @@ export async function GET() {
   return NextResponse.json({
     checklist,
     plan,
+    bookingPage: hasBooking,
+    pageId: page.id,
     handle: page.handle,
     days,
     daily,

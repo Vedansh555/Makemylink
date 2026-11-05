@@ -11,6 +11,9 @@ export const FREE_LIMITS = {
   analyticsDays: 7,
 };
 
+/** How many pages one account can have. */
+export const PAGE_LIMITS = { free: 1, pro: 5 } as const;
+
 /** The first theme of each of the first ten families stays free, so Free still looks designed. */
 export const FREE_THEME_IDS: string[] = (() => {
   const seen = new Set<string>();

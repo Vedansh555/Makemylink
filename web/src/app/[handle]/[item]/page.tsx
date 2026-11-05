@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BioPage } from "@/components/bio/BioPage";
+import { BookingPage } from "@/components/bio/BookingPage";
 import { getDemoProfile } from "@/lib/demo";
 import { pageByHandle } from "@/lib/account";
 import { applyPlan, linkIsLive, publicProfile, type PlanId } from "@/lib/plans";
@@ -37,7 +38,7 @@ async function focus(handle: string, item: string) {
   } else if (look) {
     only = { ...only, looks: [look], shopTitle: "" };
   }
-  return { only, plan: found.plan, live: found.live, title: link?.title ?? look!.title, name: profile.name, handle: profile.handle };
+  return { only, booking: link?.kind === "booking" && link.booking ? link : null, plan: found.plan, live: found.live, title: link?.title ?? look!.title, name: profile.name, handle: profile.handle };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string; item: string }> }): Promise<Metadata> {
@@ -58,5 +59,6 @@ export default async function SharedItemPage({ params }: { params: Promise<{ han
   const { handle, item } = await params;
   const f = await focus(handle, item);
   if (!f) notFound();
+  if (f.booking) return <BookingPage profile={f.only} link={f.booking} live={f.live} />;
   return <BioPage profile={f.only} plan={f.plan} live={f.live} seeAll={`/${f.handle}`} />;
 }

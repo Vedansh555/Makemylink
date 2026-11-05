@@ -28,7 +28,7 @@ async function pointsHere(domain: string): Promise<boolean> {
 export async function GET() {
   const session = await getSession();
   if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const row = await one<{ custom_domain: string | null; custom_domain_verified: boolean }>("SELECT custom_domain, custom_domain_verified FROM pages WHERE user_id = $1", [session.userId]);
+  const row = await one<{ custom_domain: string | null; custom_domain_verified: boolean }>("SELECT custom_domain, custom_domain_verified FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1", [session.userId]);
   return NextResponse.json({ domain: row?.custom_domain ?? null, verified: !!row?.custom_domain_verified, target: SITE_HOST, auto: renderConfigured() });
 }
 
@@ -42,10 +42,10 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => ({}))) as { domain?: string; verify?: boolean };
   if (body.verify) {
-    const row = await one<{ custom_domain: string | null }>("SELECT custom_domain FROM pages WHERE user_id = $1", [session.userId]);
+    const row = await one<{ custom_domain: string | null }>("SELECT custom_domain FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1", [session.userId]);
     if (!row?.custom_domain) return NextResponse.json({ error: "Save a domain first" }, { status: 400 });
     const ok = await pointsHere(row.custom_domain);
-    await run("UPDATE pages SET custom_domain_verified = $1 WHERE user_id = $2", [ok, session.userId]);
+    await run("UPDATE pages SET custom_domain_verified = $1 WHERE id = (SELECT id FROM pages WHERE user_id = $2 ORDER BY created_at ASC LIMIT 1)", [ok, session.userId]);
     // DNS is right: ask Render to add the domain, and it issues the HTTPS certificate by itself.
     const certificate = ok && (await addRenderDomain(row.custom_domain)) ? "automatic" : "manual";
     return NextResponse.json({ verified: ok, certificate });
@@ -58,15 +58,15 @@ export async function POST(req: Request) {
   if (await one("SELECT id FROM pages WHERE custom_domain = $1 AND user_id <> $2", [domain, session.userId])) {
     return NextResponse.json({ error: "That domain is already connected to another page" }, { status: 409 });
   }
-  await run("UPDATE pages SET custom_domain = $1, custom_domain_verified = FALSE WHERE user_id = $2", [domain, session.userId]);
+  await run("UPDATE pages SET custom_domain = $1, custom_domain_verified = FALSE WHERE id = (SELECT id FROM pages WHERE user_id = $2 ORDER BY created_at ASC LIMIT 1)", [domain, session.userId]);
   return NextResponse.json({ ok: true, domain, verified: false, target: SITE_HOST });
 }
 
 export async function DELETE() {
   const session = await getSession();
   if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const row = await one<{ custom_domain: string | null }>("SELECT custom_domain FROM pages WHERE user_id = $1", [session.userId]);
+  const row = await one<{ custom_domain: string | null }>("SELECT custom_domain FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1", [session.userId]);
   if (row?.custom_domain) await removeRenderDomain(row.custom_domain);
-  await run("UPDATE pages SET custom_domain = NULL, custom_domain_verified = FALSE WHERE user_id = $1", [session.userId]);
+  await run("UPDATE pages SET custom_domain = NULL, custom_domain_verified = FALSE WHERE id = (SELECT id FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1)", [session.userId]);
   return NextResponse.json({ ok: true });
 }

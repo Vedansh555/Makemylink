@@ -7,13 +7,13 @@ import type { Profile } from "@/lib/types";
 import { rateLimit, sameOriginOnly, sanitizeProfile } from "@/lib/security";
 
 // GET /api/page — return the logged-in user's saved Profile JSON
-export async function GET() {
+export async function GET(req: Request) {
   const session = await getSession();
   if (!session?.userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const page = await pageForUser(session.userId);
+  const page = await pageForUser(session.userId, new URL(req.url).searchParams.get("page"));
   if (!page) {
     return NextResponse.json({ error: "Page not found" }, { status: 404 });
   }
@@ -47,7 +47,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Profile object is required" }, { status: 400 });
     }
 
-    const existing = await pageForUser(session.userId);
+    const existing = await pageForUser(session.userId, new URL(req.url).searchParams.get("page"));
     if (!existing) {
       return NextResponse.json({ error: "Page not found for user" }, { status: 404 });
     }
@@ -63,7 +63,7 @@ export async function PUT(req: Request) {
     const plan = await planForUser(session.userId);
     clean = applyPlan(clean, plan);
 
-    await run("UPDATE pages SET profile_json = $1, updated_at = $2 WHERE user_id = $3", [JSON.stringify(clean), now, session.userId]);
+    await run("UPDATE pages SET profile_json = $1, updated_at = $2 WHERE id = $3", [JSON.stringify(clean), now, existing.id]);
 
     return NextResponse.json({ ok: true, updatedAt: now, plan, profile: clean });
   } catch (err: unknown) {

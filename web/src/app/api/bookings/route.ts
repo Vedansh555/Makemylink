@@ -19,13 +19,30 @@ export async function GET(req: Request) {
   const u = new URL(req.url);
   const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "");
   if (!found) return NextResponse.json({ slots: [] });
+  const month = u.searchParams.get("month") ?? "";
+  if (/^\d{4}-\d{2}$/.test(month)) {
+    // For the calendar: how many times are free and how many exist on each day of the month.
+    const rows = await all<{ slot_start: number }>(
+      "SELECT slot_start FROM bookings WHERE page_id = $1 AND link_id = $2 AND status <> 'cancelled' AND slot_start > $3 AND slot_start < $4",
+      [found.page.id, found.link.id, Date.now() - 86_400_000, Date.now() + 120 * 86_400_000],
+    );
+    const taken = rows.map((r) => r.slot_start);
+    const [y, m] = month.split("-").map(Number) as [number, number];
+    const days: Record<string, { free: number; total: number }> = {};
+    for (let d = 1; d <= new Date(y, m, 0).getDate(); d++) {
+      const k = `${month}-${String(d).padStart(2, "0")}`;
+      const total = slotsForDay(found.cfg, k, []).length;
+      if (total) days[k] = { free: slotsForDay(found.cfg, k, taken).length, total };
+    }
+    return NextResponse.json({ days });
+  }
   const date = u.searchParams.get("date") ?? "";
   // Look at a window around the day so a slot taken near midnight (in another zone) still blocks.
   const rows = await all<{ slot_start: number }>(
     "SELECT slot_start FROM bookings WHERE page_id = $1 AND link_id = $2 AND status <> 'cancelled' AND slot_start > $3 AND slot_start < $4",
     [found.page.id, found.link.id, Date.now() - 86_400_000, Date.now() + 90 * 86_400_000],
   );
-  return NextResponse.json({ slots: slotsForDay(found.cfg, date, rows.map((r) => r.slot_start)), durationMin: found.cfg.durationMin, timeZone: found.cfg.timeZone });
+  return NextResponse.json({ slots: slotsForDay(found.cfg, date, rows.map((r) => r.slot_start)), all: slotsForDay(found.cfg, date, []), durationMin: found.cfg.durationMin, timeZone: found.cfg.timeZone });
 }
 
 // POST /api/bookings {handle, linkId, slot, name, email, note}

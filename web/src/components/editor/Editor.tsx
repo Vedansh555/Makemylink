@@ -205,6 +205,7 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
 
 export function Editor() {
   const params = useSearchParams();
+  const pageQs = params.get("page") ? `?page=${encodeURIComponent(params.get("page")!)}` : "";
   const [p, setP] = useState<Profile | null>(null);
   const [saved, setSaved] = useState<"saved" | "error" | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
@@ -242,7 +243,7 @@ export function Editor() {
       .then((data) => {
         if (data?.user) {
           setUser(data.user);
-          fetch("/api/page")
+          fetch(`/api/page${pageQs}`)
             .then((r) => (r.ok ? r.json() : null))
             .then((pageData) => {
               if (pageData?.profile) {
@@ -257,6 +258,7 @@ export function Editor() {
         }
       })
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load the draft once, on the client, or initialize with selected theme / handle
@@ -301,7 +303,7 @@ export function Editor() {
     setPublishing(true);
     setPublishSuccess(false);
     try {
-      const res = await fetch("/api/page", {
+      const res = await fetch(`/api/page${pageQs}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile: p }),

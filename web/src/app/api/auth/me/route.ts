@@ -20,7 +20,7 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 401 });
   }
 
-  const page = await one<{ handle: string }>("SELECT handle FROM pages WHERE user_id = $1", [session.userId]);
+  const page = await one<{ handle: string }>("SELECT handle FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1", [session.userId]);
 
   return NextResponse.json({
     user: {

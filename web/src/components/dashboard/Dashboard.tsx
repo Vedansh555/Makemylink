@@ -7,9 +7,12 @@ import { useCallback, useEffect, useState } from "react";
 import { detectRegion, formatPrice, plans, type Billing, type Region } from "@/lib/pricing";
 import { Logo } from "../landing/Nav";
 
-type Tab = "overview" | "leads" | "bookings" | "links" | "domain" | "billing" | "account";
+type PageInfo = { id: string; handle: string; name: string; views: number; subs: number; primary: boolean };
+type Tab = "pages" | "overview" | "leads" | "bookings" | "links" | "domain" | "billing" | "account";
 interface Data {
   plan: "free" | "pro";
+  pageId: string;
+  bookingPage?: boolean;
   handle: string;
   days: number;
   daily: { day: string; kind: string; n: number }[];
@@ -31,8 +34,10 @@ const card = "rounded-2xl border border-fg/10 bg-fg/[0.03] p-5";
 export function Dashboard() {
   const router = useRouter();
   const params = useSearchParams();
-  const [tab, setTab] = useState<Tab>((params.get("tab") as Tab) || "overview");
+  const [tab, setTab] = useState<Tab>((params.get("tab") as Tab) || "pages");
   const [data, setData] = useState<Data | null>(null);
+  const [pageId, setPageId] = useState<string>(params.get("page") ?? "");
+  const [pages, setPages] = useState<{ pages: PageInfo[]; limit: number; plan: "free" | "pro" } | null>(null);
   const [email, setEmail] = useState("");
   const [verified, setVerified] = useState(true);
   const [error, setError] = useState("");
@@ -43,22 +48,23 @@ export function Dashboard() {
     const u = (await me.json()).user;
     setEmail(u.email);
     setVerified(u.emailVerified !== false);
-    const r = await fetch("/api/dashboard");
+    const [r, pr] = await Promise.all([fetch(`/api/dashboard${pageId ? `?page=${encodeURIComponent(pageId)}` : ""}`), fetch("/api/pages")]);
+    if (pr.ok) setPages(await pr.json());
     if (r.ok) setData(await r.json());
     else setError("Could not load your dashboard.");
-  }, [router]);
+  }, [router, pageId]);
   useEffect(() => {
     load();
   }, [load]);
 
-  const tabs: [Tab, string][] = [["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["domain", "Domain"], ["billing", "Plan"], ["account", "Account"]];
+  const tabs: [Tab, string][] = [["pages", "My pages"], ["overview", "Overview"], ["leads", "Emails"], ["bookings", "Bookings"], ["links", "Link health"], ["domain", "Domain"], ["billing", "Plan"], ["account", "Account"]];
 
   return (
     <main className="min-h-screen bg-bg text-fg">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
         <Logo />
         <div className="flex items-center gap-3 text-[13px]">
-          <Link href="/create" className="rounded-lg border border-fg/15 px-3.5 py-2 hover:border-fg/40">Edit page</Link>
+          <Link href={data ? `/create?page=${data.pageId}` : "/create"} className="rounded-lg border border-fg/15 px-3.5 py-2 hover:border-fg/40">Edit page</Link>
           {data && <Link href={`/${data.handle}`} className="hidden text-fg/55 hover:text-fg sm:block">/{data.handle}</Link>}
         </div>
       </header>
@@ -72,11 +78,20 @@ export function Dashboard() {
             </button>
           ))}
         </nav>
+        {pages && pages.pages.length > 1 && tab !== "pages" && tab !== "billing" && tab !== "account" && (
+          <label className="mt-4 flex items-center gap-2 text-[13px] text-fg/60">
+            Showing
+            <select value={data?.pageId ?? ""} onChange={(e) => { setData(null); setPageId(e.target.value); }} className="rounded-lg border border-fg/15 bg-bg px-3 py-1.5 text-fg">
+              {pages.pages.map((pg) => <option key={pg.id} value={pg.id}>@{pg.handle}</option>)}
+            </select>
+          </label>
+        )}
         {!verified && <VerifyBanner />}
         {error && <p className="mt-6 text-[14px] text-red-400">{error}</p>}
         {!data && !error && <p className="mt-8 text-fg/50">Loading…</p>}
         {data && (
           <div className="mt-6">
+            {tab === "pages" && <PagesTab info={pages} current={data.pageId} choose={(id, t) => { setData(null); setPageId(id); setTab(t); }} reload={load} goBilling={() => setTab("billing")} />}
             {tab === "overview" && <Overview d={data} goBilling={() => setTab("billing")} />}
             {tab === "leads" && <Leads d={data} />}
             {tab === "bookings" && <Bookings d={data} reload={load} />}
@@ -88,6 +103,72 @@ export function Dashboard() {
         )}
       </div>
     </main>
+  );
+}
+
+function PagesTab({ info, current, choose, reload, goBilling }: { info: { pages: PageInfo[]; limit: number; plan: "free" | "pro" } | null; current: string; choose: (id: string, tab: Tab) => void; reload: () => void; goBilling: () => void }) {
+  const [handle, setHandle] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  if (!info) return <p className="text-fg/50">Loading…</p>;
+  const full = info.pages.length >= info.limit;
+  async function add(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMsg("");
+    const res = await fetch("/api/pages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle }) });
+    const d = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (!res.ok) return setMsg(d.error ?? "Something went wrong");
+    window.location.href = `/create?page=${d.id}`;
+  }
+  async function remove(pg: PageInfo) {
+    if (!window.confirm(`Delete @${pg.handle}, its emails, bookings and stats? This cannot be undone.`)) return;
+    const res = await fetch(`/api/pages?id=${pg.id}`, { method: "DELETE" });
+    if (!res.ok) return setMsg((await res.json().catch(() => ({}))).error ?? "Could not delete");
+    reload();
+  }
+  return (
+    <div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {info.pages.map((pg) => (
+          <div key={pg.id} className={`${card} ${pg.id === current ? "border-[#ff5b37]/50" : ""}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-[17px] font-semibold">{pg.name}</p>
+                <Link href={`/${pg.handle}`} className="text-[13px] text-fg/50 hover:text-fg">showz.me/{pg.handle}</Link>
+              </div>
+              {pg.primary && <span className="shrink-0 rounded-full bg-fg/10 px-2.5 py-1 text-[10px] uppercase tracking-wider text-fg/60">Main</span>}
+            </div>
+            <p className="mt-3 text-[13px] text-fg/55">{pg.views} views (30 days) · {pg.subs} emails</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[13px]">
+              <Link href={`/create?page=${pg.id}`} className="rounded-lg bg-fg px-3.5 py-2 font-semibold text-bg">Edit</Link>
+              <button onClick={() => choose(pg.id, "overview")} className="rounded-lg border border-fg/15 px-3.5 py-2 hover:border-fg/40">Stats</button>
+              <button onClick={() => choose(pg.id, "leads")} className="rounded-lg border border-fg/15 px-3.5 py-2 hover:border-fg/40">Emails</button>
+              {!pg.primary && <button onClick={() => remove(pg)} className="rounded-lg px-3 py-2 text-fg/45 hover:text-red-400">Delete</button>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={`${card} mt-4`}>
+        <p className="text-[15px] font-semibold">Add another page</p>
+        <p className="mt-1 text-[13px] text-fg/55">{info.pages.length} of {info.limit} pages used. {info.plan === "free" ? "Free accounts get 1 page. Pro gives you up to 5, for example one per business, client or campaign." : "Each page has its own link, theme, emails and bookings."}</p>
+        {full && info.plan === "free" ? (
+          <button onClick={goBilling} className="mt-4 rounded-xl bg-[#ff5b37] px-5 py-2.5 text-[14px] font-semibold text-[#111]">Go Pro for more pages</button>
+        ) : full ? (
+          <p className="mt-3 text-[13px] text-fg/50">You have used all {info.limit} pages.</p>
+        ) : (
+          <form onSubmit={add} className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-1 items-center rounded-xl border border-fg/15 bg-bg px-3.5 text-[14px]">
+              <span className="text-fg/40">showz.me/</span>
+              <input value={handle} onChange={(e) => setHandle(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ""))} placeholder="newpage" maxLength={30} required className="min-w-0 flex-1 bg-transparent py-2.5 pl-1 outline-none" />
+            </div>
+            <button disabled={busy || handle.length < 2} className="rounded-xl bg-fg px-5 py-2.5 text-[14px] font-semibold text-bg disabled:opacity-40">{busy ? "Creating…" : "Create page"}</button>
+          </form>
+        )}
+        {msg && <p className="mt-3 text-[13px] text-red-400">{msg}</p>}
+      </div>
+    </div>
   );
 }
 
@@ -189,7 +270,7 @@ function Leads({ d }: { d: Data }) {
           <b>{d.subscribers.total}</b> {d.subscribers.limit ? `of ${d.subscribers.limit} ` : ""}emails
         </p>
         {d.plan === "pro" ? (
-          <a href="/api/subscribers/export" download className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg">Download CSV</a>
+          <a href={`/api/subscribers/export?page=${d.pageId}`} download className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg">Download CSV</a>
         ) : (
           <span className="text-[12px] text-fg/50">CSV export is on Pro</span>
         )}
@@ -210,7 +291,20 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
     reload();
   }
   if (d.plan !== "pro") return <Locked>Paid 1:1 bookings are a Pro feature. Upgrade on the Plan tab.</Locked>;
+  const bookUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${d.handle}/book`;
   return (
+    <div className="space-y-4">
+    {d.bookingPage ? (
+      <div className={card}>
+        <p className="text-[15px] font-semibold">Your booking page</p>
+        <p className="mt-1 text-[13px] text-fg/55">Share this link on its own, in a YouTube description, a WhatsApp status or an email. People see your calendar, the times left and book straight away, without opening your whole profile.</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input readOnly value={bookUrl} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]" />
+          <button onClick={() => navigator.clipboard?.writeText(bookUrl)} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">Copy link</button>
+          <a href={`/${d.handle}/book`} target="_blank" rel="noreferrer" className="rounded-xl border border-fg/15 px-4 py-2.5 text-center text-[13px]">Open</a>
+        </div>
+      </div>
+    ) : null}
     <div className={card}>
       {!d.bookings.length && <p className="text-[14px] text-fg/50">No bookings yet. Add a booking card in the editor.</p>}
       <ul className="divide-y divide-fg/10">
@@ -229,6 +323,7 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
           </li>
         ))}
       </ul>
+    </div>
     </div>
   );
 }

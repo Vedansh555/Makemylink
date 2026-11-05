@@ -33,10 +33,13 @@ export async function pageByHandle(handle: string): Promise<PageRow | null> {
   }
 }
 
-export async function pageForUser(userId: string) {
+/** One of the user's pages: the one asked for, or their first (oldest) page. */
+export async function pageForUser(userId: string, pageId?: string | null) {
   const row = await one<{ id: string; handle: string; profile_json: string; updated_at: number }>(
-    "SELECT id, handle, profile_json, updated_at FROM pages WHERE user_id = $1",
-    [userId],
+    pageId
+      ? "SELECT id, handle, profile_json, updated_at FROM pages WHERE user_id = $1 AND id = $2"
+      : "SELECT id, handle, profile_json, updated_at FROM pages WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1",
+    pageId ? [userId, pageId] : [userId],
   );
   return row ?? null;
 }
