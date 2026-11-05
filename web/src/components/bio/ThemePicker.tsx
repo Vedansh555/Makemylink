@@ -18,7 +18,7 @@ export function ThemePicker({
   maxHeight?: string;
   /** On the free plan only FREE_THEME_IDS can be chosen. */
   plan?: PlanId;
-  onLocked?: () => void;
+  onLocked?: (id: string) => void;
 }) {
   const [filter, setFilter] = useState<Family>(familyOrder[0]!);
   const shown = themeList.filter((t) => t.family === filter);
@@ -41,7 +41,7 @@ export function ThemePicker({
           const locked = plan !== "pro" && !isFreeTheme(t.id);
           return (
             <div key={t.id} className="relative">
-              <ThemeCard id={t.id} active={value === t.id} onClick={() => (locked ? onLocked?.() : onChange(t.id))} />
+              <ThemeCard id={t.id} active={value === t.id} onClick={() => (locked ? onLocked?.(t.id) : onChange(t.id))} />
               {locked && <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-[#ff5b37] px-1.5 py-0.5 text-[9px] font-bold text-[#111]">PRO</span>}
             </div>
           );

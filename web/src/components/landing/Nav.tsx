@@ -43,7 +43,7 @@ export function Nav() {
               Log in
             </Link>
           )}
-          <Link href="/create" className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
+          <Link href="/start" className="rounded-lg bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]">
             Create<span className="hidden sm:inline"> your page</span>
           </Link>
         </div>

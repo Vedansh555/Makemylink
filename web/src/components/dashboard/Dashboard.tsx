@@ -18,6 +18,7 @@ interface Data {
   subscribers: { total: number; recent: { email: string; created_at: number }[]; limit: number | null };
   bookings: { id: string; title: string; buyer_name: string; buyer_email: string; slot_start: number; note: string; amount: number; currency: string; status: string }[];
   health: { link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }[];
+  checklist: { key: string; label: string; done: boolean; href?: string }[];
 }
 declare global {
   interface Window {
@@ -115,8 +116,33 @@ function Overview({ d, goBilling }: { d: Data; goBilling: () => void }) {
     else e.c += x.n;
   });
   const max = Math.max(1, ...[...byDay.values()].map((x) => x.v));
+  const doneCount = d.checklist.filter((c) => c.done).length;
   return (
     <div className="space-y-4">
+      {doneCount < d.checklist.length && (
+        <div className={card}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[15px] font-semibold">Getting started</p>
+            <p className="text-[12px] text-fg/50">{doneCount} of {d.checklist.length} done</p>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-fg/10">
+            <div className="h-full rounded-full bg-[#ff5b37] transition-all" style={{ width: `${(doneCount / d.checklist.length) * 100}%` }} />
+          </div>
+          <ul className="mt-4 divide-y divide-fg/10">
+            {d.checklist.map((c) => (
+              <li key={c.key} className="flex items-center gap-3 py-2.5 text-[14px]">
+                <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] ${c.done ? "bg-[#ff5b37] text-[#111]" : "border border-fg/25 text-transparent"}`}>✓</span>
+                <span className={c.done ? "text-fg/45 line-through" : ""}>{c.label}</span>
+                {!c.done && c.href && (
+                  <Link href={c.href} className="ml-auto text-[12px] font-semibold text-[#c8431f] underline underline-offset-4">
+                    Do it
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-3">
         {[[`Views (${d.days}d)`, views], [`Clicks (${d.days}d)`, clicks], ["Emails collected", d.subscribers.total]].map(([l, v]) => (
           <div key={l as string} className={card}>
@@ -289,7 +315,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
       {d.plan === "pro" ? (
         <p className="mt-3 text-[14px] text-fg/60">Pro is active. Pay again any time to add more time. It is added to what you have left.</p>
       ) : (
-        <p className="mt-3 text-[14px] text-fg/60">Bookings, the Bento grid, all themes, CSV export, 30-day analytics and link checks are on Pro.</p>
+        <p className="mt-3 text-[14px] text-fg/60">Bookings, card sizes, all themes, CSV export, 30-day analytics and link checks are on Pro.</p>
       )}
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <div className="flex rounded-full border border-fg/10 bg-fg/5 p-1 text-[13px]">
