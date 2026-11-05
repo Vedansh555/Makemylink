@@ -7,13 +7,12 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Link2 } from "lucide-react";
 import { getDemoProfile } from "@/lib/demo";
+import { portrait } from "@/lib/avatar";
 import { PhoneFrame } from "./PhoneFrame";
 
 const ChromeScene = dynamic(() => import("../three/ChromeScene"), { ssr: false });
 
 const ease = [0.2, 0.7, 0.2, 1] as const;
-
-const uses = ["creators", "mentors", "coaches", "photographers", "stylists", "small shops"];
 
 export function Hero() {
   // Desktop gets the big scene behind the headline; phones get a small one below the text.
@@ -29,7 +28,7 @@ export function Hero() {
   }, []);
   const left = getDemoProfile("kai")!;
   const center = getDemoProfile("bubbles")!;
-  const right = { ...getDemoProfile("aria")!, theme: "violet-mist" };
+  const right = { ...getDemoProfile("aria")!, theme: "violet-mist", avatar: portrait("aria", "f") };
 
   return (
     <section className="relative isolate pt-32 [clip-path:inset(-300px_-300px_0_-300px)] sm:pt-36">
@@ -87,12 +86,9 @@ export function Hero() {
                 <span className="sm:hidden">Import</span>
               </button>
             </form>
-            <p className="mt-3 text-center text-[12.5px] leading-relaxed text-fg/55">We copy your photo, links and shop items in seconds. Works with Linktree, Carrd, Solo.to, Bio.site, Taplink and more.</p>
+            <p className="mt-3 text-center text-[12.5px] text-fg/55">Copies your photo, links and shop items. Works with Linktree, Carrd, Solo.to and more.</p>
           </div>
 
-          <p className="rise mt-8 text-[13px] text-fg/55 [animation-delay:.36s]">
-            Made for {uses.join(", ")}.
-          </p>
         </div>
       </div>
 
