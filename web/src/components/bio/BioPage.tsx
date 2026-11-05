@@ -296,7 +296,7 @@ type Surface = "paper" | "marble" | "brushed" | "concrete" | "grain";
 /** Which real-world surface suits which design family. Families not listed stay clean on purpose. */
 const SURFACE: Partial<Record<string, Surface>> = {
   editorial: "paper", organic: "paper", deco: "paper", frame: "paper", stamp: "paper", badge: "paper", poster: "paper", ribbon: "paper", vinyl: "grain",
-  luxury: "marble", chrome: "brushed", studio: "concrete", brutalist: "concrete",
+  luxury: "grain", chrome: "brushed", studio: "grain", brutalist: "grain",
   gradient: "grain", glass: "grain", duotone: "grain", neon: "grain",
 };
 

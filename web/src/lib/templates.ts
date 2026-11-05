@@ -139,33 +139,6 @@ const EN: Record<Exclude<Goal, "import">, Persona[]> = {
 const mix = <T,>(a: T[], b: T[]): T[] => a.flatMap((x, i) => (b[i] ? [x, b[i]!] : [x])).concat(b.slice(a.length));
 const POOL: Record<Exclude<Goal, "import">, Persona[]> = { booking: mix(PERSONAS.booking, EN.booking), products: mix(PERSONAS.products, EN.products), email: mix(PERSONAS.email, EN.email) };
 
-/**
- * Demo photos, each tagged with its main colour (hue, or null when it is neutral) and tone, so a page can
- * show photos that belong to its own palette instead of clashing with it.
- */
-interface Shot { id: string; hue: number | null; tone: "dark" | "light" | "mid"; title: string; price: string; store: Look["store"]; art: Look["art"]; caption: string }
-const SHOTS: Shot[] = [
-  { id: "1595777457583-95e059d581b8", hue: 5, tone: "mid", title: "Satin slip dress", price: "₹2,499", store: "Myntra", art: "dress", caption: "My favourite dress this season" },
-  { id: "1584917865442-de89df76afd3", hue: 8, tone: "mid", title: "Structured red tote", price: "₹1,899", store: "Amazon", art: "bag", caption: "The bag I carry every day" },
-  { id: "1543163521-1bf539c55dd2", hue: 205, tone: "light", title: "Cobalt block heels", price: "₹2,199", store: "Nykaa", art: "heel", caption: "Heels I can actually walk in" },
-  { id: "1515886657613-9f3515b0c78f", hue: 48, tone: "light", title: "Sunny co-ord set", price: "₹1,999", store: "Myntra", art: "dress", caption: "Today's try-on haul" },
-  { id: "1542291026-7eec264c27ff", hue: 2, tone: "mid", title: "Crimson runners", price: "₹6,999", store: "Own store", art: "sneaker", caption: "This week's drops" },
-  { id: "1491553895911-0055eca6402d", hue: null, tone: "light", title: "Everyday trainers", price: "₹7,499", store: "Amazon", art: "sneaker", caption: "How I keep my whites clean" },
-  { id: "1515955656352-a1fa3ffcd111", hue: 215, tone: "mid", title: "Electric blue pair", price: "₹8,299", store: "Own store", art: "sneaker", caption: "Colour-pop sneakers" },
-  { id: "1560343090-f0409e92791a", hue: 22, tone: "light", title: "Sage suede loafers", price: "₹3,999", store: "Myntra", art: "sneaker", caption: "Loafers for the office" },
-  { id: "1505740420928-5e560c06d30e", hue: 48, tone: "mid", title: "Studio headphones", price: "₹7,990", store: "Amazon", art: "camera", caption: "Headphones, ranked" },
-  { id: "1523275335684-37898b6baf30", hue: null, tone: "light", title: "Minimal smartwatch", price: "₹4,999", store: "Amazon", art: "camera", caption: "The watch I wear daily" },
-  { id: "1586023492125-27b2c045efd7", hue: 46, tone: "light", title: "Mustard accent chair", price: "₹9,999", store: "Amazon", art: "cup", caption: "Tour of my 1BHK" },
-  { id: "1493663284031-b7e3aefcae8e", hue: 185, tone: "light", title: "Teal cushion set", price: "₹1,299", store: "Amazon", art: "cup", caption: "My living room refresh" },
-  { id: "1485955900006-10f4d324d411", hue: 160, tone: "light", title: "Mint pot with succulent", price: "₹599", store: "Own store", art: "cup", caption: "Plants that survive me" },
-  { id: "1495474472287-4d71bcdd2085", hue: 28, tone: "dark", title: "Cold-brew set", price: "₹1,799", store: "Amazon", art: "cup", caption: "My morning coffee setup" },
-  { id: "1556228720-195a672e8a03", hue: 265, tone: "light", title: "Night repair cream", price: "₹1,299", store: "Nykaa", art: "lipstick", caption: "My 5-step routine" },
-  { id: "1534438327276-14e5300c3a48", hue: null, tone: "dark", title: "Adjustable dumbbells", price: "₹6,499", store: "Amazon", art: "camera", caption: "My home gym" },
-  { id: "1571019613454-1cb2f99b2d8b", hue: 20, tone: "light", title: "Yoga mat", price: "₹1,299", store: "Amazon", art: "cup", caption: "My morning workout" },
-  { id: "1498050108023-c5249f4df085", hue: 140, tone: "light", title: "Laptop stand", price: "₹1,499", store: "Own store", art: "camera", caption: "My desk setup" },
-  { id: "1521572163474-6864f9cf17ab", hue: null, tone: "mid", title: "Everyday tee", price: "₹799", store: "Myntra", art: "dress", caption: "Capsule basics" },
-];
-
 const hexRgb = (hex: string) => {
   const h = hex.replace("#", "");
   const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6);
@@ -178,30 +151,20 @@ function hueSat(hex: string): { h: number; sat: number } {
   const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
   return { h: (h * 60 + 360) % 360, sat: d / (1 - Math.abs(max + min - 1)) };
 }
-const brightness = (hex: string) => { const [r, g, b] = hexRgb(hex); return 0.299 * r + 0.587 * g + 0.114 * b; };
 
-/** The photos that sit best on this theme: close in hue to its accent, neutral photos for grey themes, and the right tone for light or dark pages. */
-function matchShots(themeId: string | undefined, n: number): Shot[] {
-  const t = themeId ? themeList.find((x) => x.id === themeId) : undefined;
-  if (!t) return SHOTS.slice(0, n);
-  const { h, sat } = hueSat(t.accent);
-  const neutralTheme = sat < 0.2 || !!t.mono;
-  const dark = brightness(t.bg) < 0.4;
-  const score = (s: Shot) => {
-    let c = 0;
-    if (neutralTheme) c += s.hue === null ? 0 : 0.9;
-    else if (s.hue === null) c += dark ? 0.12 : 0.4;
-    else {
-      const d = Math.abs(s.hue - h);
-      c += (Math.min(d, 360 - d) / 180) * 1.4;
-    }
-    if (dark && s.tone === "dark") c -= 0.1;
-    if (dark && s.tone === "light") c += 0.18;
-    if (!dark && s.tone === "dark") c += 0.12;
-    return c;
-  };
-  return [...SHOTS].sort((a, b) => score(a) - score(b)).slice(0, n);
-}
+/** Graphic products for the demo pages. Each is drawn by the page itself, in the page's colour. */
+const ART_SET: { title: string; inr: string; usd: string; store: Look["store"]; art: Look["art"] }[] = [
+  { title: "Satin slip dress", inr: "₹2,499", usd: "$64", store: "Myntra", art: "dress" },
+  { title: "Structured tote", inr: "₹1,899", usd: "$48", store: "Amazon", art: "bag" },
+  { title: "Block heels", inr: "₹2,199", usd: "$59", store: "Nykaa", art: "heel" },
+  { title: "Round sunglasses", inr: "₹1,299", usd: "$32", store: "Amazon", art: "shades" },
+  { title: "Wrap coat", inr: "₹4,299", usd: "$110", store: "Myntra", art: "jacket" },
+  { title: "Matte lipstick", inr: "₹699", usd: "$18", store: "Nykaa", art: "lipstick" },
+  { title: "Signet ring", inr: "₹1,499", usd: "$38", store: "Own store", art: "ring" },
+  { title: "Everyday trainers", inr: "₹5,999", usd: "$85", store: "Own store", art: "sneaker" },
+  { title: "Ceramic mug", inr: "₹599", usd: "$16", store: "Amazon", art: "cup" },
+  { title: "Mirrorless camera", inr: "₹48,999", usd: "$690", store: "Amazon", art: "camera" },
+];
 
 const seedOf = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 
@@ -211,21 +174,28 @@ export function previewFor(goal: Goal, seed = "", themeId?: string): Profile {
   if (goal === "import") return base;
   const pool = POOL[goal];
   const who = pool[(/^\d+$/.test(seed) ? Number(seed) : seedOf(seed)) % pool.length]!;
-  const shots = goal === "products" ? matchShots(themeId ?? base.theme, 6) : [];
+  // Products are drawn as graphics in the page's own colour (the same art the editor offers), so they can never clash with it.
+  const accent = themeList.find((x) => x.id === (themeId ?? base.theme))?.accent ?? "#ff5b37";
+  const { h: accentHue, sat: accentSat } = hueSat(accent);
+  const tint = accentSat < 0.2 ? 215 : accentHue;
+  const usd = /^(Chloe|Jack|Grace|Ella|Noah)\b/.test(who.name);
+  const art0 = seedOf(themeId ?? seed) % ART_SET.length;
   let imgIdx = 0;
   const links = base.links.map((l, i) => {
     if (l.kind === "booking" && who.call) {
       return { ...l, title: who.call.title, booking: { ...l.booking!, price: who.call.price, currency: who.call.currency ?? "INR", durationMin: who.call.min, description: who.call.text } };
     }
     if (goal === "products") {
-      const sh = shots[i % shots.length]!;
-      return { ...l, title: i === 0 ? sh.caption : "My full shop", image: u(sh.id, 640) };
+      return { ...l, title: i === 0 ? "Today's favourites" : "My full shop", image: undefined };
     }
     const pick = who.links[imgIdx++ % who.links.length]!;
     return { ...l, title: pick[0], image: pick[1] };
   });
   const looks = goal === "products"
-    ? shots.slice(2, 6).map((k, i) => ({ id: `k${i + 1}`, title: k.title, price: k.price, store: k.store, url: "https://", art: k.art, hue: 0, image: u(k.id, 600) }))
+    ? [0, 1, 2, 3].map((i) => {
+        const k = ART_SET[(art0 + i) % ART_SET.length]!;
+        return { id: `k${i + 1}`, title: k.title, price: usd ? k.usd : k.inr, store: k.store, url: "https://", art: k.art, hue: (tint + [0, 16, -14, 28][i]! + 360) % 360 };
+      })
     : base.looks;
   return { ...base, name: who.name, handle: who.handle, avatar: who.avatar, location: who.city, bio: who.bio, socials: { instagram: who.handle, youtube: who.handle }, links, looks };
 }
