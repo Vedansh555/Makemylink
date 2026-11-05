@@ -8,8 +8,7 @@ import { ArrowUpRight, ChevronDown, MapPin, Play, QrCode, X } from "lucide-react
 import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { OPERATOR } from "@/lib/legal";
-import { BookingModal } from "./BookingModal";
-import { BookingTile } from "./BookingTile";
+import { BookingModal, bookingPrice } from "./BookingModal";
 import { WhatsAppModal, WhatsAppIcon } from "./WhatsAppModal";
 import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
@@ -421,7 +420,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
       <motion.main
         initial="hidden"
         animate="show"
-        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-10 px-5 pb-12 pt-14`}
+        className={`relative z-10 mx-auto flex w-full max-w-[480px] flex-col gap-9 px-5 pb-10 pt-12`}
       >
         {/* Cover photo — a real photo behind the header, the one thing every real creator page has that a generated theme can't fake. */}
         {profile.coverImage && (
@@ -432,7 +431,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
         )}
 
         {/* Header */}
-        <motion.header variants={rise} custom={i++} className={`flex flex-col gap-5 ${centered ? "items-center text-center" : ""}`}>
+        <motion.header variants={rise} custom={i++} className={`flex flex-col gap-4 ${centered ? "items-center text-center" : ""}`}>
           {family === "editorial" && (
             <div className={`flex w-full items-center justify-between border-b border-t-fg/80 pb-2 ${t.meta}`}>
               <span>Nº 01</span>
@@ -458,7 +457,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
               </>
             )}
           </div>
-          {profile.bio && <p className={`${t.bio} max-w-[34ch] leading-relaxed [text-wrap:pretty]`}>{profile.bio}</p>}
+          {profile.bio && <p className={`${t.bio} max-w-[36ch]`}>{profile.bio}</p>}
           {socials.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {socials.map(([k, v]) => (
@@ -482,7 +481,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 const arrow = <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />;
                 const thumb = l.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-xl object-cover" : "h-12 w-12 shrink-0 rounded-xl object-cover shadow-[0_8px_18px_-8px_rgba(0,0,0,0.5)] ring-1 ring-black/10"} />
+                  <img src={l.image} alt="" loading="lazy" className={stack ? "aspect-[16/9] w-full rounded-xl object-cover" : "h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5"} />
                 ) : null;
                 const inner = stack ? (
                   <span className="flex w-full flex-col gap-2.5">
@@ -508,9 +507,8 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 if (l.kind === "whatsapp" && l.whatsapp) {
                   return (
                     <div key={l.id} className={`${span} ${tall}`}>
-                      <Tilt max={4} className="rounded-2xl">
-                      <button type="button" onClick={() => setChat(l)} className={`${t.link} w-full cursor-pointer`}>
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-[0_6px_12px_-6px_rgba(0,0,0,0.5)] sm:h-11 sm:w-11">
+                      <button type="button" onClick={() => setChat(l)} className={`${t.featured} w-full cursor-pointer`}>
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#25d366] text-white shadow-sm sm:h-11 sm:w-11">
                           <WhatsAppIcon className="h-5 w-5" />
                         </span>
                         <span className="flex-1 text-left">
@@ -519,7 +517,6 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                         </span>
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </button>
-                      </Tilt>
                     </div>
                   );
                 }
@@ -530,11 +527,11 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                       <Tilt max={5} className="rounded-2xl">
                         <a href={yt} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className={`${t.link} !flex-col !items-stretch !gap-3 !py-3`}>
                           {l.video ? (
-                            <span className="relative block overflow-hidden rounded-xl shadow-[0_18px_36px_-14px_rgba(0,0,0,0.65)] ring-1 ring-black/10">
+                            <span className="relative block overflow-hidden rounded-xl">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`https://i.ytimg.com/vi/${l.video.id}/hqdefault.jpg`} alt="" loading="lazy" className="aspect-video w-full object-cover" />
                               <span className="absolute inset-0 grid place-items-center bg-black/15">
-                                <span className="grid h-14 w-14 place-items-center rounded-full bg-white/95 text-black shadow-[0_14px_34px_-6px_rgba(0,0,0,0.6)] transition group-hover:scale-110"><Play className="h-5 w-5 translate-x-0.5 fill-current" /></span>
+                                <span className="grid h-12 w-12 place-items-center rounded-full bg-white/95 text-black shadow-lg"><Play className="h-5 w-5 translate-x-0.5 fill-current" /></span>
                               </span>
                             </span>
                           ) : null}
@@ -551,32 +548,21 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                   );
                 }
                 if (l.kind === "booking" && l.booking) {
-                  const compactTile = l.size === "1x1";
                   return (
-                    <div key={l.id} className={`${compactTile ? "col-span-1" : "col-span-2"} flex`}>
-                      <Tilt max={4} className="w-full rounded-3xl">
-                        <BookingTile link={l} handle={profile.handle} live={live} compact={compactTile} onOpen={() => setBooking(l)} />
-                      </Tilt>
-                    </div>
-                  );
-                }
-                // A highlighted link with a photo becomes a cover card: the photo fills the card, the title sits on it.
-                if (l.featured && l.image && l.size !== "1x1") {
-                  return (
-                    <div key={l.id} className="col-span-2">
-                      <Tilt max={5} className="rounded-3xl">
-                        <a href={href} onClick={() => track(l.id)} target="_blank" rel="noreferrer" className="group relative block aspect-[16/10] overflow-hidden rounded-3xl shadow-[0_30px_60px_-24px_rgba(0,0,0,0.65)] ring-1 ring-white/15">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={l.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                          <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                          <span className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4 text-white">
-                            <span className="flex-1 text-left text-[18px] font-semibold leading-snug [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">{l.title}</span>
-                            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/95 text-black shadow-lg transition group-hover:scale-110">
-                              <ArrowUpRight className="h-4 w-4" />
-                            </span>
+                    <div key={l.id} className={`${span} ${tall}`}>
+                      <button type="button" onClick={() => setBooking(l)} className={`${t.featured} w-full cursor-pointer`}>
+                        {l.image && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={l.image} alt="" loading="lazy" className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl object-cover shadow-sm ring-1 ring-black/5" />
+                        )}
+                        <span className="flex-1 text-left">
+                          {l.title}
+                          <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">
+                            {l.booking.durationMin} min · {bookingPrice(l)}
                           </span>
-                        </a>
-                      </Tilt>
+                        </span>
+                        <ArrowUpRight className="h-4 w-4 shrink-0" />
+                      </button>
                     </div>
                   );
                 }
@@ -732,7 +718,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
             </Link>
           )}
           {live && (
-            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-75 hover:opacity-100`}>
+            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100`}>
               Report this page
             </a>
           )}

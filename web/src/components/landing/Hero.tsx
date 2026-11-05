@@ -75,41 +75,38 @@ export function Hero() {
         </div>
       )}
 
-      {/* Phones with real pages, on a lit stage */}
-      <div className="relative mx-auto mt-14 max-w-6xl px-4 sm:mt-20">
-        {/* Light behind the trio and a soft floor under it, so the phones sit in a space instead of floating on white */}
-        <div className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 -z-10 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,rgba(255,120,170,0.20),rgba(154,160,173,0.14)_45%,transparent_72%)]" />
-        <div className="pointer-events-none absolute inset-x-[10%] bottom-2 h-24 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.30),transparent_68%)] blur-xl sm:bottom-0" />
-
-        <div className="relative flex items-end justify-center sm:gap-4 [perspective:1800px]">
-          <motion.div
-            initial={{ opacity: 0, y: 80, rotateY: 30 }}
-            animate={{ opacity: 1, y: 0, rotateY: 14 }}
-            transition={{ duration: 1.2, delay: 0.3, ease }}
-            className="-mr-10 translate-y-4 sm:mr-0 sm:translate-y-8"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            <div className="relative [animation:float_7s_ease-in-out_infinite]">
-              <PhoneFrame interactive={false} profile={left} scale={wide ? 0.64 : 0.36} />
-            </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10">
-            <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
-              <PhoneFrame interactive={false} profile={center} scale={wide ? 0.82 : 0.56} />
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 80, rotateY: -30 }}
-            animate={{ opacity: 1, y: 0, rotateY: -14 }}
-            transition={{ duration: 1.2, delay: 0.4, ease }}
-            className="-ml-10 translate-y-4 sm:ml-0 sm:translate-y-8"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
-              <PhoneFrame interactive={false} profile={right} scale={wide ? 0.64 : 0.36} />
-            </div>
-          </motion.div>
-        </div>
+      {/* Phones with real pages */}
+      <div className="relative mx-auto mt-14 flex max-w-6xl items-end justify-center px-4 sm:gap-6 [perspective:1600px] sm:mt-20">
+        <motion.div
+          initial={{ opacity: 0, y: 80, rotateY: 30 }}
+          animate={{ opacity: 1, y: 0, rotateY: 16 }}
+          transition={{ duration: 1.2, delay: 0.3, ease }}
+          className="-mr-12 translate-y-6 sm:mr-0 sm:translate-y-10"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div className="relative [animation:float_7s_ease-in-out_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#9aa0ad" }} />
+            <PhoneFrame interactive={false} profile={left} scale={wide ? 0.56 : 0.34} />
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.2, ease }} className="relative z-10 translate-y-6 sm:translate-y-0">
+          <div className="relative [animation:float_6s_ease-in-out_-2s_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#ff5fb0" }} />
+            <PhoneFrame interactive={false} profile={center} scale={wide ? 0.66 : 0.5} />
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 80, rotateY: -30 }}
+          animate={{ opacity: 1, y: 0, rotateY: -16 }}
+          transition={{ duration: 1.2, delay: 0.4, ease }}
+          className="-ml-12 translate-y-6 sm:ml-0 sm:translate-y-10"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div className="relative [animation:float_7s_ease-in-out_-3.5s_infinite]">
+            <div className="pointer-events-none absolute -inset-x-6 inset-y-10 -z-10 rounded-full opacity-50 blur-3xl" style={{ background: "#b38aff" }} />
+            <PhoneFrame interactive={false} profile={right} scale={wide ? 0.56 : 0.34} />
+          </div>
+        </motion.div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t sm:block from-bg to-transparent" />
     </section>

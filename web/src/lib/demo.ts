@@ -27,6 +27,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://ltk.com",
         art: "jacket",
         hue: 32,
+        image: "https://images.unsplash.com/photo-1539533018447-63fcce667883?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -36,6 +37,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://shopmy.us",
         art: "dress",
         hue: 350,
+        image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -45,6 +47,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://amazon.com",
         art: "bag",
         hue: 20,
+        image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -54,6 +57,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://ltk.com",
         art: "heel",
         hue: 0,
+        image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -74,9 +78,9 @@ const RAW_PROFILES: Profile[] = [
     theme: "chrome",
     socials: { instagram: "kai.rossi", tiktok: "kairossi", youtube: "kairossi", email: "booking@kairossi.com" },
     links: [
-      { id: "l1", title: "Listen to my new EP", url: "#", featured: true },
-      { id: "l2", title: "Tour dates 2026", url: "#" },
-      { id: "l3", title: "Book me for your event", url: "#" },
+      { id: "l1", title: "Listen to my new EP", url: "#", featured: true, image: "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=240&q=80" },
+      { id: "l2", title: "Tour dates 2026", url: "#", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=240&q=80" },
+      { id: "l3", title: "Book me for your event", url: "#", image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "Merch",
     looks: [
@@ -88,6 +92,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "vinyl",
         hue: 210,
+        image: "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -97,6 +102,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "jacket",
         hue: 220,
+        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -106,6 +112,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "shades",
         hue: 190,
+        image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -138,7 +145,7 @@ const RAW_PROFILES: Profile[] = [
       { id: "l1", title: "Book a bridal trial", url: "#", featured: true },
       { id: "l2", title: "Price list", url: "#" },
       { id: "l3", title: "Chat on WhatsApp", url: "#" },
-      { id: "l4", title: "My 5-minute everyday look", url: "#" },
+      { id: "l4", title: "My 5-minute everyday look", url: "#", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "In my kit",
     looks: [
@@ -150,6 +157,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://nykaa.com",
         art: "lipstick",
         hue: 340,
+        image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -159,6 +167,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://myntra.com",
         art: "dress",
         hue: 300,
+        image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -168,6 +177,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://nykaa.com",
         art: "ring",
         hue: 45,
+        image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -177,6 +187,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://myntra.com",
         art: "bag",
         hue: 320,
+        image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -211,6 +222,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "book",
         hue: 0,
+        image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -220,6 +232,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "camera",
         hue: 0,
+        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -229,6 +242,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "vinyl",
         hue: 0,
+        image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -249,9 +263,9 @@ const RAW_PROFILES: Profile[] = [
     theme: "candy",
     socials: { instagram: "miabubbles", tiktok: "miabubbles", youtube: "miabubbles" },
     links: [
-      { id: "l1", title: "$20 thrift haul challenge", url: "#", featured: true },
-      { id: "l2", title: "My Amazon faves", url: "#" },
-      { id: "l3", title: "Join my close friends club", url: "#" },
+      { id: "l1", title: "$20 thrift haul challenge", url: "#", featured: true, image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=240&q=80" },
+      { id: "l2", title: "My Amazon faves", url: "#", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=240&q=80" },
+      { id: "l3", title: "Join my close friends club", url: "#", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "My faves",
     looks: [
@@ -263,6 +277,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "dress",
         hue: 320,
+        image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -272,6 +287,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "sneaker",
         hue: 90,
+        image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -281,6 +297,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "shades",
         hue: 330,
+        image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -290,6 +307,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "bag",
         hue: 280,
+        image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -310,9 +328,9 @@ const RAW_PROFILES: Profile[] = [
     theme: "mint-glass",
     socials: { instagram: "pawsome.duo", tiktok: "pawsomeduo", youtube: "pawsomeduo" },
     links: [
-      { id: "l1", title: "Today's cute video", url: "#", featured: true },
+      { id: "l1", title: "Today's cute video", url: "#", featured: true, image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Book a grooming session", url: "#" },
-      { id: "l3", title: "Our favourite treats", url: "#" },
+      { id: "l3", title: "Our favourite treats", url: "#", image: "https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "Shop their faves",
     looks: [
@@ -324,6 +342,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "dog",
         hue: 150,
+        image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -333,6 +352,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "cat",
         hue: 25,
+        image: "https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -342,6 +362,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "dog",
         hue: 300,
+        image: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -351,6 +372,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "cat",
         hue: 200,
+        image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -371,9 +393,9 @@ const RAW_PROFILES: Profile[] = [
     theme: "ice-chrome",
     socials: { instagram: "atlas.rhee", youtube: "atlasrhee", email: "hello@atlasrhee.com" },
     links: [
-      { id: "l1", title: "This month: Lisbon rooftops", url: "#", featured: true },
-      { id: "l2", title: "Book a shoot on location", url: "#" },
-      { id: "l3", title: "Travel packing guide", url: "#" },
+      { id: "l1", title: "This month: Lisbon rooftops", url: "#", featured: true, image: "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?auto=format&fit=crop&w=240&q=80" },
+      { id: "l2", title: "Book a shoot on location", url: "#", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=240&q=80" },
+      { id: "l3", title: "Travel packing guide", url: "#", image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "Prints & gear",
     looks: [
@@ -385,6 +407,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "building",
         hue: 210,
+        image: "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -394,6 +417,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "plane",
         hue: 30,
+        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -403,6 +427,7 @@ const RAW_PROFILES: Profile[] = [
         url: "#",
         art: "camera",
         hue: 0,
+        image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -423,9 +448,9 @@ const RAW_PROFILES: Profile[] = [
     theme: "bakes-sky",
     socials: { instagram: "bobbybakes", tiktok: "bobbybakes", youtube: "bobbybakes", email: "hello@bobbybakes.com" },
     links: [
-      { id: "l1", title: "Join Basque Cheesecake Masterclass", url: "https://bobbybakes.com/class", featured: true },
-      { id: "l2", title: "NYC Weekend Pop-Up Schedule", url: "https://bobbybakes.com/events" },
-      { id: "l3", title: "Free Vanilla Bean Recipe Guide", url: "https://bobbybakes.com/recipe" },
+      { id: "l1", title: "Join Basque Cheesecake Masterclass", url: "https://bobbybakes.com/class", featured: true, image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=240&q=80" },
+      { id: "l2", title: "NYC Weekend Pop-Up Schedule", url: "https://bobbybakes.com/events", image: "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?auto=format&fit=crop&w=240&q=80" },
+      { id: "l3", title: "Free Vanilla Bean Recipe Guide", url: "https://bobbybakes.com/recipe", image: "https://images.unsplash.com/photo-1556911073-38141963c9e0?auto=format&fit=crop&w=240&q=80" },
     ],
     shopTitle: "Shop courses & gear",
     looks: [
@@ -437,6 +462,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://bobbybakes.com",
         art: "cup",
         hue: 45,
+        image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -446,6 +472,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://amazon.com",
         art: "cup",
         hue: 30,
+        image: "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -455,6 +482,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://bobbybakes.com",
         art: "jacket",
         hue: 220,
+        image: "https://images.unsplash.com/photo-1556911073-38141963c9e0?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k4",
@@ -484,7 +512,7 @@ const RAW_PROFILES: Profile[] = [
     theme: "arch-terracotta",
     socials: { instagram: "caitirosephoto", pinterest: "caitirose", email: "info@caitirose.com" },
     links: [
-      { id: "l1", title: "View 2026/2027 Wedding Portfolio", url: "https://caitirose.com/portfolio", featured: true },
+      { id: "l1", title: "View 2026/2027 Wedding Portfolio", url: "https://caitirose.com/portfolio", featured: true, image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=240&q=80" },
       { id: "l2", title: "Inquire for Dates & Pricing", url: "https://caitirose.com/contact" },
       { id: "l3", title: "Elopement Planning Checklist", url: "https://caitirose.com/guide" },
     ],
@@ -498,6 +526,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://caitirose.com",
         art: "camera",
         hue: 35,
+        image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -507,6 +536,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://caitirose.com",
         art: "book",
         hue: 25,
+        image: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -516,6 +546,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://amazon.com",
         art: "camera",
         hue: 200,
+        image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -550,6 +581,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://keyz.co",
         art: "book",
         hue: 340,
+        image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k2",
@@ -559,6 +591,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://keyz.co",
         art: "vinyl",
         hue: 15,
+        image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80",
       },
       {
         id: "k3",
@@ -568,6 +601,7 @@ const RAW_PROFILES: Profile[] = [
         url: "https://amazon.com",
         art: "cup",
         hue: 210,
+        image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80",
       },
     ],
     mediaKit: {
@@ -612,7 +646,7 @@ const RAW_PROFILES: Profile[] = [
   },
 ];
 
-/** Sample pages. Only the profile picture is a photo (a close-up portrait); products and links are drawn in the page's own colours. */
+/** Profile pictures are close-up portraits, one face per page, going round in order. */
 const faceCount = { m: 0, f: 0 };
 export const demoProfiles: Profile[] = RAW_PROFILES.map((p) => {
   const g = genderOf(p.handle);
