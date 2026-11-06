@@ -257,7 +257,7 @@ export function Features() {
         <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(44px,7vw,96px)] leading-[0.9]">Built to earn, not just to list.</h2>
       </Reveal>
 
-      <div className="mt-14 grid gap-5 md:grid-cols-6">
+      <div className="mt-14 grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-6">
         {/* Sell or recommend products */}
         <Reveal className="md:col-span-4">
           <Card className="h-full">

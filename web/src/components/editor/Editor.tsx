@@ -808,28 +808,28 @@ export function Editor() {
               title="Links and bookings"
               hint="The buttons people tap. Tap the Picture square on a card to show a small image beside its title. Add a booking card to get paid for calls."
               action={
-                <div className="flex flex-wrap justify-end gap-2">
+                <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
                   <button
                     onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) proNote("Paid bookings"); }}
-                    className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
+                    className={`flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full sm:w-auto border px-3.5 py-2 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
                     <Plus className="h-3.5 w-3.5" /> Booking
                   </button>
                   <button
                     onClick={() => set("links", [...p.links, newWhatsApp()])}
-                    className="flex items-center gap-1 whitespace-nowrap rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
+                    className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full sm:w-auto border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
                   >
                     <Plus className="h-3.5 w-3.5" /> WhatsApp
                   </button>
                   <button
                     onClick={() => set("links", [...p.links, newYoutube()])}
-                    className="flex items-center gap-1 whitespace-nowrap rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
+                    className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full sm:w-auto border border-fg/20 px-3.5 py-2 text-[12px] font-semibold"
                   >
                     <Plus className="h-3.5 w-3.5" /> Latest video
                   </button>
                   <button
                     onClick={() => set("links", [...p.links, { id: uid(), title: "New link", url: "https://" }])}
-                    className="flex items-center gap-1 whitespace-nowrap rounded-full bg-fg px-3.5 py-2 text-[12px] font-semibold text-bg"
+                    className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full sm:w-auto bg-fg px-3.5 py-2 text-[12px] font-semibold text-bg"
                   >
                     <Plus className="h-3.5 w-3.5" /> Add link
                   </button>

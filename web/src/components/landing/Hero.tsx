@@ -42,10 +42,11 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6">
         <div>
-          <h1 className="rise font-display text-[clamp(56px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
-            Your whole business,
-            <br />
-            in one <span className="chrome-text [text-shadow:none]">link.</span>
+          <h1 className="rise font-display text-[clamp(40px,10vw,150px)] leading-[0.88] tracking-[-0.02em] text-fg [text-shadow:var(--hero-shadow)]">
+            <span className="block whitespace-nowrap">Your whole business</span>
+            <span className="block whitespace-nowrap">
+              in one <span className="chrome-text [text-shadow:none]">link.</span>
+            </span>
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
