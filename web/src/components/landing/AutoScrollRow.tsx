@@ -21,13 +21,25 @@ export function AutoScrollRow({ children, className = "" }: { children: React.Re
     if (reduceMotion) return;
 
     let raf: number;
-    const tick = () => {
+    // iPhones round scrollLeft to whole pixels, so adding a fraction to it each frame never moves anything.
+    // We keep the exact position ourselves and write it out, which works the same on every device.
+    let pos = el.scrollLeft;
+    let last = performance.now();
+    const SPEED = 0.04; // pixels per millisecond, about 40 a second
+    const tick = (now: number) => {
+      const dt = Math.min(now - last, 50);
+      last = now;
       if (!paused.current) {
         // The list is the real content twice over, so wrapping at the halfway point loops seamlessly.
         // Recomputed every frame and wrapped with modulo so a width that shifts (images, fonts loading)
         // can never push it past the real end and strand it there.
         const half = el.scrollWidth / 2;
-        if (half > 0) el.scrollLeft = (el.scrollLeft + 0.6) % half;
+        if (half > 0) {
+          pos = (pos + SPEED * dt) % half;
+          el.scrollLeft = pos;
+        }
+      } else {
+        pos = el.scrollLeft; // follow the visitor while they drag or swipe
       }
       raf = requestAnimationFrame(tick);
     };
@@ -81,6 +93,11 @@ export function AutoScrollRow({ children, className = "" }: { children: React.Re
         paused.current = true;
         resumeSoon();
       }}
+      onTouchStart={() => {
+        paused.current = true;
+      }}
+      onTouchEnd={resumeSoon}
+      onTouchCancel={resumeSoon}
       className={`no-scrollbar cursor-grab select-none overflow-x-auto overscroll-x-contain active:cursor-grabbing ${className}`}
     >
       {children}
