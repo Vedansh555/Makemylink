@@ -47,7 +47,7 @@ export function GoalCards({ handle }: { handle?: string }) {
               </span>
             </div>
 
-            <div className="pointer-events-none relative mt-6 flex h-[230px] justify-center overflow-hidden sm:absolute sm:-bottom-24 sm:right-7 sm:mt-0 sm:block sm:h-auto sm:overflow-visible">
+            <div className="pointer-events-none relative mt-4 flex h-[262px] items-start justify-center overflow-hidden pt-7 sm:pt-0 sm:absolute sm:-bottom-24 sm:right-7 sm:mt-0 sm:block sm:h-auto sm:overflow-visible">
               <div className="absolute -inset-x-8 inset-y-12 -z-10 hidden rounded-full opacity-45 blur-3xl sm:block" style={{ background: GLOW[g.id] }} />
               <div className="origin-bottom transition-transform duration-500 group-active:-translate-y-2 sm:-rotate-3 sm:group-hover:-translate-y-2 sm:group-hover:rotate-0">
                 <div className="max-sm:[animation:phonedrift_5s_ease-in-out_infinite] motion-reduce:[animation:none]">
