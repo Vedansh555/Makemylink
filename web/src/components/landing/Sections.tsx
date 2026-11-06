@@ -112,8 +112,9 @@ export function ThemeGallery() {
         </Reveal>
       </div>
       <Reveal>
-        <div className="relative mt-14">
-          <AutoScrollRow className="flex w-full gap-8 px-4">
+        <div className="relative">
+          {/* Room above and below the phones, so their soft shadows fade out fully instead of being cut into a grey band by the row's edge. */}
+          <AutoScrollRow className="flex w-full gap-8 px-4 pb-16 pt-14">
             {[...demoProfiles, ...demoProfiles].map((p, i) => {
               const def = getTheme(p.theme).def;
               return (
