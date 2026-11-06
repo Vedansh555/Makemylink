@@ -51,7 +51,7 @@ export function GoalCards({ handle }: { handle?: string }) {
               <div className="absolute -inset-x-8 inset-y-12 -z-10 hidden rounded-full opacity-45 blur-3xl sm:block" style={{ background: GLOW[g.id] }} />
               <div className="origin-bottom transition-transform duration-500 group-active:-translate-y-2 sm:-rotate-3 sm:group-hover:-translate-y-2 sm:group-hover:rotate-0">
                 <div className="max-sm:[animation:phonedrift_5s_ease-in-out_infinite] motion-reduce:[animation:none]">
-                  <PhoneFrame interactive={false} profile={preview} scale={0.46} />
+                  <PhoneFrame interactive={false} profile={preview} scale={0.46} compactShadow />
                 </div>
               </div>
             </div>
