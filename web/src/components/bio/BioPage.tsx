@@ -9,6 +9,7 @@ import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { OPERATOR } from "@/lib/legal";
 import { BookingModal, bookingPrice } from "./BookingModal";
+import { BookingTile } from "./BookingTile";
 import { WhatsAppModal, WhatsAppIcon } from "./WhatsAppModal";
 import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
@@ -161,6 +162,22 @@ function FamilyBackground({ theme }: { theme: ResolvedTheme }) {
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-t-accent/10 to-transparent" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_color-mix(in_srgb,var(--t-accent)_8%,transparent)_0%,_transparent_60%)]" />
+        </div>
+      );
+    case "glasshouse":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="gh-orb absolute -left-24 top-24 h-72 w-72 rounded-full bg-t-accent2 opacity-70 blur-[56px]" />
+          <div className="gh-orb absolute -right-28 top-[42%] h-72 w-72 rounded-full bg-t-accent opacity-40 blur-[60px] [animation-delay:-8s]" />
+          <div className="gh-orb absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-[color-mix(in_srgb,var(--t-accent2)_45%,#fff6a8)] opacity-70 blur-[56px] [animation-delay:-15s]" />
+        </div>
+      );
+    case "mochi":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-24 -top-16 h-72 w-72 rounded-full bg-t-accent2/50 blur-[56px]" />
+          <div className="absolute -right-28 top-[38%] h-72 w-72 rounded-full bg-t-accent/25 blur-[60px]" />
+          <div className="absolute -left-24 bottom-20 h-72 w-72 rounded-full bg-t-accent2/40 blur-[56px]" />
         </div>
       );
     case "editorial":
@@ -324,7 +341,7 @@ function surfaceStyle(kind: Surface, light: boolean): React.CSSProperties {
 
 /** The page background: the family's own backdrop, plus a real surface texture only where it suits the design. */
 // Graphic, flat families stay flat on purpose. Every other family gets a soft key light from above and a vignette below.
-const FLAT = new Set(["mono", "brutalist", "terminal", "catalog", "zine", "stamp", "ticket", "minimal", "pop", "sticker"]);
+const FLAT = new Set(["glasshouse", "mochi", "mono", "brutalist", "terminal", "catalog", "zine", "stamp", "ticket", "minimal", "pop", "sticker"]);
 
 export function Background({ theme }: { theme: ResolvedTheme }) {
   const kind = SURFACE[theme.def.family];
@@ -405,6 +422,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
   const nameFont = profile.fontOverride ? fontClass[profile.fontOverride as keyof typeof fontClass] ?? theme.nameFont : theme.nameFont;
   const socials = (Object.entries(profile.socials) as [SocialKey, string | undefined][]).filter(([, v]) => v);
   const { centered, numbered } = theme.family;
+  const soft = family === "glasshouse" || family === "mochi";
   let i = 0;
 
   return (
@@ -439,24 +457,38 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
               <span>{new Date().getFullYear()}</span>
             </div>
           )}
-          <div className={`flex gap-5 ${centered ? "flex-col items-center" : "items-end"}`}>
-            <Avatar profile={profile} t={t} font={nameFont} />
-            {!centered && profile.location && (
-              <span className={`${t.meta} mb-1 flex items-center gap-1`}>
-                <MapPin className="h-3 w-3" /> {profile.location}
-              </span>
-            )}
-          </div>
-          <h1 className={`${t.name} ${nameFont}`}>{profile.name}</h1>
-          <div className={`${t.meta} flex items-center gap-2`}>
-            <span>@{profile.handle}</span>
-            {centered && profile.location && (
-              <>
-                <span>·</span>
-                <span>{profile.location}</span>
-              </>
-            )}
-          </div>
+          {family === "glasshouse" && profile.avatar ? (
+            // A big front-facing portrait with the name on a pane of glass across it.
+            <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-[32px] shadow-[0_30px_50px_-26px_var(--t-accent)] ring-1 ring-white/50">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={profile.avatar} alt={profile.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 28%" }} />
+              <div className="absolute inset-x-3 bottom-3 rounded-[22px] border border-white/40 bg-t-bg/60 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl">
+                <h1 className={`${t.name} ${nameFont}`}>{profile.name}</h1>
+                <p className={`${t.meta} mt-1.5`}>@{profile.handle}{profile.location ? ` in ${profile.location}` : ""}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className={`flex gap-5 ${centered ? "flex-col items-center" : "items-end"}`}>
+                <Avatar profile={profile} t={t} font={nameFont} />
+                {!centered && profile.location && (
+                  <span className={`${t.meta} mb-1 flex items-center gap-1`}>
+                    <MapPin className="h-3 w-3" /> {profile.location}
+                  </span>
+                )}
+              </div>
+              <h1 className={`${t.name} ${nameFont}`}>{profile.name}</h1>
+              <div className={`${t.meta} flex items-center gap-2`}>
+                <span>@{profile.handle}</span>
+                {centered && profile.location && (
+                  <>
+                    <span>·</span>
+                    <span>{profile.location}</span>
+                  </>
+                )}
+              </div>
+            </>
+          )}
           {profile.bio && <p className={`${t.bio} max-w-[36ch]`}>{profile.bio}</p>}
           {socials.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -532,13 +564,24 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                           ) : null}
                           <span className="flex items-center gap-2">
                             <span className="flex-1 text-left">
-                              <span className="block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">{l.video ? "Latest video" : "YouTube"}</span>
+                              <span className={soft ? "block text-[13px] font-semibold opacity-65" : "block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60"}>{l.video ? "Latest video" : "YouTube"}</span>
                               {l.video?.title ?? l.title}
                             </span>
                             {arrow}
                           </span>
                         </a>
                       </Tilt>
+                    </div>
+                  );
+                }
+                if (l.kind === "booking" && l.booking && soft) {
+                  // Glasshouse and Mochi show a booking as a bento tile with the next free times.
+                  const compactTile = l.size === "1x1";
+                  return (
+                    <div key={l.id} className={`${compactTile ? "col-span-1" : "col-span-2"} flex`}>
+                      <div className="w-full">
+                        <BookingTile link={l} handle={profile.handle} live={live} compact={compactTile} onOpen={() => setBooking(l)} />
+                      </div>
                     </div>
                   );
                 }

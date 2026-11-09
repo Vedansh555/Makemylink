@@ -26,6 +26,8 @@ export const FREE_THEME_IDS: string[] = (() => {
     }
     if (ids.length >= 10) break;
   }
+  // Two showcase looks are free on every plan.
+  ids.push("glasshouse", "mochi-peach");
   return ids;
 })();
 

@@ -39,8 +39,10 @@ export type Family =
   | "arch"
   | "clay"
   | "bakes"
-  | "lavender";
-export type FontKey = "bodoni" | "display" | "syne" | "unbounded" | "grotesk" | "sans";
+  | "lavender"
+  | "glasshouse"
+  | "mochi";
+export type FontKey = "bodoni" | "display" | "syne" | "unbounded" | "grotesk" | "sans" | "bricolage" | "fredoka";
 
 export interface ThemeTokens {
   root: string;
@@ -97,6 +99,8 @@ export const fontClass: Record<FontKey, string> = {
   unbounded: "font-unbounded",
   grotesk: "font-grotesk",
   sans: "font-sans",
+  bricolage: "font-bricolage",
+  fredoka: "font-fredoka",
 };
 
 export const families: Record<Family, FamilyDef> = {
@@ -998,6 +1002,62 @@ export const families: Record<Family, FamilyDef> = {
       badge: "italic text-t-fg/40",
     },
   },
+  glasshouse: {
+    label: "Glasshouse",
+    font: "bricolage",
+    centered: false,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[40px] font-extrabold leading-[1] tracking-[-0.035em]",
+      bio: "text-[16px] font-medium leading-relaxed text-t-fg",
+      meta: "text-[13.5px] font-semibold text-t-fg/70",
+      section: "font-bricolage text-[20px] font-bold tracking-tight",
+      link: "group flex items-center gap-4 rounded-[26px] bg-t-bg/45 backdrop-blur-xl backdrop-saturate-150 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_24px_38px_-22px_var(--t-accent)] px-5 py-4 text-[15px] font-semibold transition duration-300 hover:-translate-y-0.5",
+      featured: "group flex items-center gap-4 rounded-[26px] border border-white/40 bg-gradient-to-br from-t-accent2/70 to-t-bg/50 px-5 py-5 text-[16px] font-bold backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_24px_38px_-20px_var(--t-accent)]",
+      lookCard: "overflow-hidden rounded-[28px] bg-t-bg/45 backdrop-blur-xl backdrop-saturate-150 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_24px_38px_-22px_var(--t-accent)]",
+      lookTitle: "font-bricolage text-[16px] font-bold leading-snug tracking-tight whitespace-normal! overflow-visible!",
+      lookMeta: "text-[13.5px] font-semibold text-t-fg/70",
+      tag: "rounded-full bg-t-bg/80 px-2.5 py-1 text-[11px] font-bold backdrop-blur",
+      stat: "rounded-[24px] bg-t-bg/45 backdrop-blur-xl backdrop-saturate-150 border border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_24px_38px_-22px_var(--t-accent)] p-3 text-center",
+      statValue: "font-bricolage text-[24px] font-extrabold leading-none",
+      chip: "rounded-full border border-white/50 bg-t-bg/55 px-3 py-1 text-[12px] font-semibold backdrop-blur",
+      input: "w-full rounded-2xl border-0 bg-t-bg/80 px-4 py-3 text-[15px] font-medium outline-none shadow-[inset_0_2px_0_rgba(0,0,0,0.07)] placeholder:text-t-fg/50 focus:ring-2 focus:ring-t-accent",
+      button: "rounded-2xl bg-t-fg px-5 py-3 text-[15px] font-bold text-t-bg",
+      social: "grid h-11 w-11 place-items-center rounded-full border border-white/50 bg-t-bg/60 backdrop-blur transition hover:-translate-y-0.5",
+      avatar: "h-24 w-24 rounded-full ring-4 ring-t-bg/70 shadow-[0_16px_30px_-14px_var(--t-accent)]",
+      monogram: "bg-t-accent font-bricolage font-extrabold text-t-on-accent",
+      badge: "font-semibold text-t-fg/70",
+    },
+  },
+  mochi: {
+    label: "Mochi",
+    font: "fredoka",
+    centered: true,
+    numbered: false,
+    tokens: {
+      root: "bg-t-bg text-t-fg font-sans",
+      name: "text-[38px] font-semibold leading-[1.05] tracking-[-0.01em]",
+      bio: "text-[16px] font-semibold leading-relaxed text-t-fg",
+      meta: "text-[13.5px] font-bold text-t-fg/80",
+      section: "font-fredoka text-[22px] font-semibold",
+      link: "group flex items-center gap-4 rounded-[28px] bg-white px-5 py-4 text-[16px] font-bold text-t-fg shadow-[inset_0_5px_0_rgba(255,255,255,0.85),inset_0_-7px_0_rgba(0,0,0,0.06),0_20px_28px_-16px_var(--t-accent)] transition duration-300 hover:-translate-y-0.5",
+      featured: "group flex items-center gap-4 rounded-[28px] bg-[linear-gradient(160deg,color-mix(in_srgb,var(--t-accent2)_55%,white),var(--t-accent2))] px-5 py-5 text-[17px] font-bold text-t-fg shadow-[inset_0_5px_0_rgba(255,255,255,0.85),inset_0_-7px_0_rgba(0,0,0,0.06),0_20px_28px_-16px_var(--t-accent)]",
+      lookCard: "overflow-hidden rounded-[28px] bg-white shadow-[inset_0_5px_0_rgba(255,255,255,0.85),inset_0_-7px_0_rgba(0,0,0,0.06),0_20px_28px_-16px_var(--t-accent)]",
+      lookTitle: "font-fredoka text-[16px] font-medium leading-snug whitespace-normal! overflow-visible!",
+      lookMeta: "text-[14px] font-bold text-t-fg/80",
+      tag: "rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-t-fg shadow-sm",
+      stat: "rounded-[26px] bg-white p-3 text-center shadow-[inset_0_5px_0_rgba(255,255,255,0.85),inset_0_-7px_0_rgba(0,0,0,0.06),0_20px_28px_-16px_var(--t-accent)]",
+      statValue: "font-fredoka text-[24px] font-semibold leading-none",
+      chip: "rounded-full bg-white px-3 py-1 text-[12px] font-bold shadow-[inset_0_3px_0_rgba(255,255,255,0.9)]",
+      input: "w-full rounded-2xl bg-white px-4 py-3 text-[15px] font-semibold outline-none shadow-[inset_0_3px_0_rgba(0,0,0,0.07)] placeholder:text-t-fg/50 focus:ring-2 focus:ring-t-accent",
+      button: "rounded-2xl bg-t-accent px-5 py-3 text-[15px] font-semibold text-t-on-accent shadow-[inset_0_3px_0_rgba(255,255,255,0.35),0_14px_20px_-12px_var(--t-accent)]",
+      social: "grid h-11 w-11 place-items-center rounded-2xl bg-white text-t-fg transition hover:-translate-y-0.5 shadow-[inset_0_3px_0_rgba(255,255,255,0.9),0_12px_18px_-12px_var(--t-accent)]",
+      avatar: "h-28 w-28 rounded-full border-[5px] border-white ring-[10px] ring-t-accent2/45 shadow-[0_16px_26px_-12px_var(--t-accent)]",
+      monogram: "bg-t-accent font-fredoka font-semibold text-t-on-accent",
+      badge: "font-bold text-t-fg/80",
+    },
+  },
 };
 
 const T = (
@@ -1229,6 +1289,20 @@ export const themeList: ThemeDef[] = [
   T("lavender-bloom", "Lavender Farm", "lavender", ["#f9f7fc", "#1b1933", "#232b5d", "#d8d3e8", "#ffffff"]),
   T("lavender-sage", "Lavender Sage", "lavender", ["#f5f8f5", "#142318", "#2c4835", "#cee2d2", "#ffffff"]),
   T("lavender-dusk", "Lavender Dusk", "lavender", ["#131422", "#f1f0f8", "#786eb8", "#333552", "#ffffff"]),
+
+  // Glasshouse: frosted glass bento over slow colour, with a big portrait tile
+  T("glasshouse", "Glasshouse", "glasshouse", ["#eef0ff", "#1b1840", "#6f60ff", "#ffb6d0", "#ffffff"]),
+  T("glasshouse-mint", "Glasshouse Mint", "glasshouse", ["#eafaf3", "#0f3a2c", "#1fae7a", "#a9e7ff", "#ffffff"]),
+  T("glasshouse-peach", "Glasshouse Peach", "glasshouse", ["#fff1ea", "#4a2214", "#ff7a4d", "#ffd37a", "#ffffff"]),
+  T("glasshouse-lilac", "Glasshouse Lilac", "glasshouse", ["#f3eaff", "#2a1747", "#9b5cff", "#ff9fd0", "#ffffff"]),
+  T("glasshouse-night", "Glasshouse Night", "glasshouse", ["#0d0f24", "#eef0ff", "#8fa2ff", "#ff8fcf", "#0d0f24"]),
+
+  // Mochi: soft pillowy tiles in pastels
+  T("mochi-peach", "Mochi Peach", "mochi", ["#fff1e4", "#43304a", "#ff7a66", "#ffd86e", "#ffffff"]),
+  T("mochi-mint", "Mochi Mint", "mochi", ["#eafaf1", "#12392d", "#2fbf8f", "#ffe28a", "#ffffff"]),
+  T("mochi-berry", "Mochi Berry", "mochi", ["#fff0f5", "#4a1230", "#ff5c93", "#c9b6ff", "#ffffff"]),
+  T("mochi-sky", "Mochi Sky", "mochi", ["#eaf4ff", "#10294d", "#3d8bff", "#ffd0e0", "#ffffff"]),
+  T("mochi-butter", "Mochi Butter", "mochi", ["#fff9dc", "#3d3000", "#f2a900", "#ffa3c0", "#ffffff"]),
 ];
 
 export const familyOrder: Family[] = [
@@ -1264,6 +1338,8 @@ export const familyOrder: Family[] = [
   "clay",
   "bakes",
   "lavender",
+  "glasshouse",
+  "mochi",
 ];
 
 const byId = new Map(themeList.map((t) => [t.id, t]));

@@ -187,9 +187,9 @@ export function previewFor(goal: Goal, seed = "", themeId?: string): Profile {
 
 /** Design families that suit each goal. The first theme of each family is free on every plan. */
 const LOOK_FAMILIES: Record<Exclude<Goal, "import">, string[]> = {
-  booking: ["luxury", "editorial", "minimal", "glass", "mono", "brutalist"],
-  products: ["pop", "gradient", "glass", "editorial", "neon", "chrome"],
-  email: ["minimal", "editorial", "luxury", "mono", "gradient", "brutalist"],
+  booking: ["glasshouse", "mochi", "luxury", "editorial", "minimal", "glass"],
+  products: ["glasshouse", "mochi", "pop", "gradient", "editorial", "chrome"],
+  email: ["glasshouse", "mochi", "minimal", "editorial", "luxury", "gradient"],
 };
 
 /** Six theme ids to offer for a goal, each the first (free) theme of its family. */
