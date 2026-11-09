@@ -678,7 +678,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                     </div>
                     <div className="flex items-end justify-between gap-2 p-3">
                       <div className="min-w-0">
-                        <p className={`${t.lookTitle} truncate`}>{look.title}</p>
+                        <p className={`${t.lookTitle} [overflow-wrap:anywhere]`}>{look.title}</p>
                         <p className={t.lookMeta}>{look.price}</p>
                       </div>
                       <ArrowUpRight className="h-4 w-4 shrink-0 opacity-60" />
@@ -700,9 +700,10 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 ["Engagement", profile.mediaKit.engagement],
                 ["Avg views", profile.mediaKit.avgViews],
               ].map(([label, value]) => (
-                <div key={label} className={t.stat}>
-                  <div className={t.statValue}>{value}</div>
-                  <div className={`${t.meta} mt-2 !tracking-[0.15em]`}>{label}</div>
+                <div key={label} className={`${t.stat} min-w-0`}>
+                  <div className={`${t.statValue} [overflow-wrap:anywhere]`}>{value}</div>
+                  {/* Kept small and tight so the longest word ("Engagement") always fits inside its box on a phone. */}
+                  <div className={`${t.meta} mt-2 !text-[10px] !leading-tight !tracking-[0.03em] [overflow-wrap:anywhere]`}>{label}</div>
                 </div>
               ))}
             </div>
