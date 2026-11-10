@@ -24,6 +24,7 @@ export const plans: Plan[] = [
       `Up to ${FREE_LIMITS.links} links and ${FREE_LIMITS.looks} products`,
       `Collect up to ${FREE_LIMITS.subscribers} emails`,
       `${FREE_LIMITS.analyticsDays}-day visits and clicks`,
+      "WhatsApp chat card and latest-YouTube card",
       "QR code for your page",
       "Showz badge on your page",
     ],
@@ -37,6 +38,7 @@ export const plans: Plan[] = [
     features: [
       `All ${themeList.length} themes, including 3D chrome`,
       "Paid 1:1 bookings, 0% commission",
+      "Your own domain, like links.yourname.com",
       "Card sizes: half, full or tall",
       "Unlimited links and products",
       "Unlimited emails, with CSV export",

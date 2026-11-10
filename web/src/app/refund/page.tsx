@@ -18,7 +18,7 @@ export default function Refund() {
       <h2>How to ask</h2>
       <p>Email <a href={`mailto:${OPERATOR.supportEmail}`} className="underline">{OPERATOR.supportEmail}</a> from your account email with your payment reference. We reply within 2 working days.</p>
       <h2>How refunds are paid</h2>
-      <p>Approved refunds go back to the original payment method (UPI, card or bank) through Razorpay or Stripe. Banks usually take 5 to 10 working days to show it.</p>
+      <p>Approved refunds go back to the original payment method (UPI, card or bank) through Razorpay or PayPal. Banks usually take 5 to 10 working days to show it.</p>
       <h2>Bookings and products sold by creators</h2>
       <p>If you bought a session or product from a creator through their page, the payment went to that creator, not to us. Please ask the creator for a refund. We can help you reach them but cannot refund their sales.</p>
       <h2>Contact</h2>

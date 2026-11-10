@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import type { BioLink } from "@/lib/types";
+import { ConsentCheck } from "./ConsentCheck";
 
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -16,6 +17,7 @@ export function WhatsAppIcon({ className }: { className?: string }) {
 export function WhatsAppModal({ link, handle, live, onClose }: { link: BioLink; handle: string; live: boolean; onClose: () => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const field = "w-full rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 text-[14px] text-white outline-none placeholder:text-white/30 focus:border-white/40";
@@ -28,7 +30,7 @@ export function WhatsAppModal({ link, handle, live, onClose }: { link: BioLink; 
     }
     setBusy(true);
     setErr("");
-    const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, linkId: link.id, name, email }) });
+    const res = await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, linkId: link.id, name, email, consent: agree }) });
     const d = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok || !d.url) return setErr(d.error ?? "Something went wrong");
@@ -49,6 +51,7 @@ export function WhatsAppModal({ link, handle, live, onClose }: { link: BioLink; 
         <form onSubmit={submit} className="mt-5 space-y-3">
           <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} />
           <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} />
+          <ConsentCheck checked={agree} onChange={setAgree} className="text-white" />
           {err && <p className="text-[13px] text-red-300">{err}</p>}
           <button disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25d366] py-3 text-[14px] font-bold text-[#06371b] shadow-[0_16px_34px_-10px_#25d366,0_1px_0_rgba(255,255,255,0.4)_inset] transition hover:-translate-y-0.5 disabled:opacity-50">
             <WhatsAppIcon className="h-4 w-4" />

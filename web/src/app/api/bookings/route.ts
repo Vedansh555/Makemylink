@@ -49,7 +49,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const blocked = sameOriginOnly(req) ?? rateLimit(`book:${clientIp(req)}`, 10, 60 * 60 * 1000);
   if (blocked) return blocked;
-  const b = (await req.json().catch(() => ({}))) as { handle?: string; linkId?: string; slot?: number; name?: string; email?: string; note?: string };
+  const b = (await req.json().catch(() => ({}))) as { handle?: string; linkId?: string; slot?: number; name?: string; email?: string; note?: string; consent?: boolean };
+  if (b.consent !== true) return NextResponse.json({ error: "Please tick the box to agree to share your details" }, { status: 400 });
   const email = String(b.email ?? "").toLowerCase().trim();
   const name = String(b.name ?? "").trim().slice(0, 80);
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || typeof b.slot !== "number") {
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
 
   const id = crypto.randomUUID();
   const free = cfg.price === 0;
-  await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)", [
+  await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at, consented_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)", [
     id, page.id, link.id, name, email, b.slot, String(b.note ?? "").slice(0, 500), cfg.price, cfg.currency, free ? "confirmed" : "awaiting_payment", Date.now(),
   ]);
 

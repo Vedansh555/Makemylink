@@ -48,6 +48,10 @@ export async function POST(req: Request) {
     const now = Date.now();
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Which creator's badge brought this person here (cookie set by middleware). Only kept if that page exists.
+    const refCookie = /(?:^|;\s*)mml_ref=([a-zA-Z0-9_-]{2,30})/.exec(req.headers.get("cookie") ?? "")?.[1]?.toLowerCase();
+    const referredBy = refCookie && refCookie !== cleanHandle && (await one("SELECT id FROM pages WHERE handle = $1", [refCookie])) ? refCookie : null;
+
     const initialProfile = {
       ...blankProfile,
       handle: cleanHandle,
@@ -55,7 +59,7 @@ export async function POST(req: Request) {
     };
 
     await transaction(async (tx) => {
-      await tx.query("INSERT INTO users (id, email, password_hash, created_at) VALUES ($1, $2, $3, $4)", [userId, cleanEmail, passwordHash, now]);
+      await tx.query("INSERT INTO users (id, email, password_hash, created_at, referred_by) VALUES ($1, $2, $3, $4, $5)", [userId, cleanEmail, passwordHash, now, referredBy]);
       await tx.query("INSERT INTO pages (id, user_id, handle, profile_json, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)", [
         pageId,
         userId,

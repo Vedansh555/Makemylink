@@ -17,6 +17,7 @@ import { safeHref } from "@/lib/security";
 import { SocialIcon, socialUrl, type SocialKey } from "./SocialIcon";
 import { Tilt } from "../ui/Tilt";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
+import { ConsentCheck } from "./ConsentCheck";
 
 const rise = {
   hidden: { opacity: 0, y: 18 },
@@ -378,6 +379,7 @@ function Avatar({ profile, t, font }: { profile: Profile; t: ThemeTokens; font: 
 function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: boolean }) {
   const [done, setDone] = useState(false);
   const [err, setErr] = useState("");
+  const [agree, setAgree] = useState(false);
   if (done) return <p className={t.bio}>You&apos;re on the list ✓</p>;
   return (
     <form
@@ -386,7 +388,7 @@ function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: 
         e.preventDefault();
         const email = new FormData(e.currentTarget).get("email") as string;
         if (!live) return setDone(true); // editor preview: nothing is stored
-        const res = await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, email }) });
+        const res = await fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, email, consent: agree }) });
         if (res.ok) setDone(true);
         else setErr((await res.json().catch(() => ({}))).error ?? "Something went wrong");
       }}
@@ -395,6 +397,7 @@ function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: 
         <input name="email" type="email" required placeholder="your@email.com" className={t.input} aria-label="Email address" />
         <button className={`${t.button} shrink-0`}>Join</button>
       </div>
+      <ConsentCheck checked={agree} onChange={setAgree} className={t.bio} />
       {err && <p className={t.bio}>{err}</p>}
     </form>
   );

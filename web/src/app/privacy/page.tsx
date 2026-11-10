@@ -21,7 +21,7 @@ export default function Privacy() {
       <h2>How we use it</h2>
       <p>To run your account, publish your page, send account and booking emails, show your analytics, prevent abuse, and keep the service secure. We do not sell your personal data.</p>
       <h2>Who we share it with</h2>
-      <p>Only the services that help us run Showz: our hosting provider (Render), database provider (Neon), image storage (Cloudflare), email provider (Resend), and payment providers (Razorpay in India, Stripe elsewhere). They process data on our behalf. We may also disclose information if the law requires it.</p>
+      <p>Only the services that help us run Showz: our hosting provider (Render), database provider (Neon), image storage (Cloudflare), email provider (Resend), and payment providers (Razorpay in India, PayPal elsewhere). They process data on our behalf. We may also disclose information if the law requires it.</p>
       <h2>Cookies</h2>
       <p>We use a login cookie to keep you signed in and a small cookie that remembers your pricing region (₹ or $). We do not use advertising cookies.</p>
       <h2>Your page is public</h2>

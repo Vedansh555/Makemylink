@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { BioLink } from "@/lib/types";
 import Link from "next/link";
 import { slotsForDay } from "@/lib/booking";
+import { ConsentCheck } from "./ConsentCheck";
 
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
@@ -30,6 +31,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
+  const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Result | null>(null);
@@ -60,7 +62,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
     }
     setBusy(true);
     setErr("");
-    const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, linkId: link.id, slot, name, email, note }) });
+    const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle, linkId: link.id, slot, name, email, note, consent: agree }) });
     const d = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(d.error ?? "Something went wrong");
@@ -158,6 +160,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
             <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} />
             <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} />
             <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="What do you want to talk about? (optional)" maxLength={500} rows={2} className={field} />
+            <ConsentCheck checked={agree} onChange={setAgree} className="text-white" />
             {err && <p className="text-[13px] text-red-300">{err}</p>}
             <button disabled={!slot || busy} className="w-full rounded-xl bg-white py-3 text-[14px] font-bold text-black disabled:opacity-40">
               {busy ? "Booking…" : cfg.price === 0 ? "Confirm booking" : `Continue · ${money(cfg.price, cfg.currency)}`}

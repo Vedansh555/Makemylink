@@ -45,6 +45,11 @@ export async function middleware(req: NextRequest) {
       res.cookies.set("mml_region", region, { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
     }
   }
+  // A "Made with Showz" badge links to /?ref=handle. Remember it for 30 days so signup can credit that creator.
+  const ref = req.nextUrl.searchParams.get("ref");
+  if (ref && /^[a-zA-Z0-9_-]{2,30}$/.test(ref)) {
+    res.cookies.set("mml_ref", ref.toLowerCase(), { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
+  }
   return res;
 }
 

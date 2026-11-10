@@ -23,7 +23,7 @@ export default function Cookies() {
       <h2>Stored in your browser</h2>
       <p>The editor saves your unfinished page draft in your browser&apos;s local storage so you don&apos;t lose it, and we remember that you dismissed the cookie notice. This stays on your device.</p>
       <h2>Payments</h2>
-      <p>When you pay, Razorpay or Stripe may set their own cookies on their payment window to prevent fraud. Their policies apply there.</p>
+      <p>When you pay, Razorpay or PayPal may set their own cookies on their payment window to prevent fraud. Their policies apply there.</p>
       <h2>Controlling cookies</h2>
       <p>You can delete or block cookies in your browser settings. If you block the login cookie you won&apos;t be able to stay signed in.</p>
       <p>More about how we handle your data is in our <Link href="/privacy" className="underline">Privacy Policy</Link>.</p>

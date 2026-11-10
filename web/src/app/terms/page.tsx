@@ -24,7 +24,7 @@ export default function Terms() {
       <p>We may remove content or suspend accounts that break these rules, with or without notice.</p>
       <h2>Plans and payments</h2>
       <p>
-        Showz has a Free plan and a paid Pro plan. Pro is sold as a prepaid period (one month or one year) and does <b>not</b> renew automatically. When the period ends, your page stays online with Free plan limits until you pay again. Prices are shown in rupees (₹) in India, paid through Razorpay, and in US dollars elsewhere, paid through Stripe. Payment providers may charge their own fees. We take no commission on your bookings or sales.
+        Showz has a Free plan and a paid Pro plan. Pro is sold as a prepaid period (one month or one year) and does <b>not</b> renew automatically. When the period ends, your page stays online with Free plan limits until you pay again. Prices are shown in rupees (₹) in India, paid through Razorpay, and in US dollars elsewhere, paid through PayPal. Payment providers may charge their own fees. We take no commission on your bookings or sales.
       </p>
       <p>Refunds are covered in our <Link href="/refund" className="underline">Refund and Cancellation Policy</Link>.</p>
       <h2>Bookings and sales between you and your visitors</h2>

@@ -10,7 +10,8 @@ import type { Profile } from "@/lib/types";
 export async function POST(req: Request) {
   const blocked = sameOriginOnly(req) ?? rateLimit(`lead:${clientIp(req)}`, 20, 60 * 60 * 1000);
   if (blocked) return blocked;
-  const b = (await req.json().catch(() => ({}))) as { handle?: string; linkId?: string; name?: string; email?: string };
+  const b = (await req.json().catch(() => ({}))) as { handle?: string; linkId?: string; name?: string; email?: string; consent?: boolean };
+  if (b.consent !== true) return NextResponse.json({ error: "Please tick the box to agree to share your details" }, { status: 400 });
   const email = String(b.email ?? "").toLowerCase().trim();
   const name = String(b.name ?? "").trim().slice(0, 80);
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return NextResponse.json({ error: "Enter your name and a valid email" }, { status: 400 });
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     // The visitor can still chat when the free list is full; we just don't store them.
     if ((c?.n ?? 0) >= FREE_LIMITS.subscribers) return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
   }
-  await run("INSERT INTO subscribers (id, page_id, email, name, source, created_at) VALUES ($1,$2,$3,$4,'whatsapp',$5) ON CONFLICT (page_id, email) DO UPDATE SET name = EXCLUDED.name", [crypto.randomUUID(), page.id, email, name, Date.now()]);
+  await run("INSERT INTO subscribers (id, page_id, email, name, source, created_at, consented_at) VALUES ($1,$2,$3,$4,'whatsapp',$5,$5) ON CONFLICT (page_id, email) DO UPDATE SET name = EXCLUDED.name, consented_at = EXCLUDED.consented_at", [crypto.randomUUID(), page.id, email, name, Date.now()]);
   return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
 }
 

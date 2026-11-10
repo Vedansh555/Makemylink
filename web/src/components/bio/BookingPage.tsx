@@ -8,6 +8,7 @@ import type { BioLink, Profile } from "@/lib/types";
 import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
 import { bookingPrice } from "./BookingModal";
+import { ConsentCheck } from "./ConsentCheck";
 import { Background } from "./BioPage";
 import { Tilt } from "../ui/Tilt";
 
@@ -42,6 +43,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [slotData, setSlotData] = useState<{ free: number[]; all: number[] } | null>(null);
   const [slot, setSlot] = useState<number | null>(null);
   const [name, setName] = useState("");
+  const [agree, setAgree] = useState(false);
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -127,7 +129,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     if (!live) return setDone({ status: "demo", pays: [] });
     setBusy(true);
     setErr("");
-    const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: profile.handle, linkId: link.id, slot, name, email, note }) });
+    const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: profile.handle, linkId: link.id, slot, name, email, note, consent: agree }) });
     const d = await res.json().catch(() => ({}));
     setBusy(false);
     if (res.status === 409) {
@@ -391,6 +393,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                 <input required disabled={!slot} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} autoComplete="name" />
                 <input required disabled={!slot} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} autoComplete="email" />
                 <textarea disabled={!slot} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What would you like to talk about? (optional)" maxLength={500} rows={3} className={`${field} sm:col-span-2`} />
+                <ConsentCheck checked={agree} onChange={setAgree} className="sm:col-span-2" />
                 {err && <p className="text-[13px] text-red-500 sm:col-span-2">{err}</p>}
                 <button disabled={!slot || busy} className={`${cta} hidden w-full disabled:opacity-40 disabled:shadow-none sm:col-span-2 lg:block`}>
                   {busy ? "Booking…" : free ? "Confirm booking" : `Continue · ${price}`}
