@@ -11,7 +11,7 @@ import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
 
-type Pay = RazorpayPay | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
+type Pay = RazorpayPay | { kind: "paypal"; url: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
 type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
 
 export function BookingModal({ link, handle, live, onClose }: { link: BioLink; handle: string; live: boolean; onClose: () => void }) {
@@ -68,6 +68,11 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
     const d = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(d.error ?? "Something went wrong");
+    const pp = (d.pays as Pay[] | undefined)?.find((p): p is { kind: "paypal"; url: string } => p.kind === "paypal");
+    if (d.status === "awaiting_payment" && pp) {
+      window.location.href = pp.url;
+      return;
+    }
     const online = (d.pays as Pay[] | undefined)?.find((p): p is RazorpayPay => p.kind === "razorpay");
     if (d.status === "awaiting_payment" && online) {
       void payOnline(online, d);
@@ -123,10 +128,14 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
             ) : (
               <>
                 <p className="text-[16px] font-semibold">Slot held. One step left.</p>
-                <p className="text-white/70">{done.pays.some((p) => p.kind === "razorpay") ? `Pay ${money(cfg.price, cfg.currency)} to hold your time. Your meeting link appears the moment the payment goes through.` : `Pay ${money(cfg.price, cfg.currency)} directly to the creator. Your meeting link is emailed as soon as they confirm payment.`}</p>
+                <p className="text-white/70">{done.pays.some((p) => p.kind === "razorpay" || p.kind === "paypal") ? `Pay ${money(cfg.price, cfg.currency)} to hold your time. Your meeting link appears the moment the payment goes through.` : `Pay ${money(cfg.price, cfg.currency)} directly to the creator. Your meeting link is emailed as soon as they confirm payment.`}</p>
                 {payErr && <p className="text-[13px] text-red-300">{payErr}</p>}
                 {done.pays.map((p) =>
-                  p.kind === "razorpay" ? (
+                  p.kind === "paypal" ? (
+                    <a key="pp" href={p.url} className="block w-full rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
+                      Pay {money(cfg.price, cfg.currency)} with PayPal
+                    </a>
+                  ) : p.kind === "razorpay" ? (
                     <button key="rzp" type="button" onClick={() => payOnline(p)} className="block w-full rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
                       Pay {money(cfg.price, cfg.currency)} now
                     </button>

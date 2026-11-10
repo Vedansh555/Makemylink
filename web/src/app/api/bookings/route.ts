@@ -6,10 +6,11 @@ import { slotsForDay } from "@/lib/booking";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { esc, sendMail } from "@/lib/mail";
 import { getSession } from "@/lib/session";
-import { HOLD_MS, createOrder, credsForUser } from "@/lib/gateway";
+import { HOLD_MS, createOrder, credsForUser, paypalCreate, paypalCredsForUser } from "@/lib/gateway";
+import { SITE_URL } from "@/lib/site";
 
 /** An online checkout nobody finished lets go of its time slot after a while. */
-const releaseOldHolds = (pageId: string) => run("UPDATE bookings SET status = 'cancelled' WHERE page_id = $1 AND provider = 'razorpay' AND status = 'awaiting_payment' AND created_at < $2", [pageId, Date.now() - HOLD_MS]);
+const releaseOldHolds = (pageId: string) => run("UPDATE bookings SET status = 'cancelled' WHERE page_id = $1 AND provider IN ('razorpay','paypal') AND status = 'awaiting_payment' AND created_at < $2", [pageId, Date.now() - HOLD_MS]);
 
 async function findConfig(handle: string, linkId: string) {
   const page = await pageByHandle(handle);
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
   if (free) await sendMail(email, `Confirmed: ${link.title}`, `<p>You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
 
   // Offer every way the creator set up: UPI for Indian buyers, a payment link (cards) for everyone else.
-  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
+  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
   if (!free) {
     // If the creator connected their own Razorpay, the buyer can pay on the spot and the booking confirms itself.
     const creds = cfg.currency === "INR" ? await credsForUser(page.user_id) : null;
@@ -96,6 +97,17 @@ export async function POST(req: Request) {
         pays.push({ kind: "razorpay", keyId: creds.keyId, orderId: order.id, amount: order.amount, bookingId: id });
       } catch (e) {
         console.error("creator razorpay order", e);
+      }
+    }
+    // Same for a creator's own PayPal and a price in US dollars: the buyer approves on PayPal, comes back, and it confirms itself.
+    const pp = cfg.currency === "USD" ? await paypalCredsForUser(page.user_id) : null;
+    if (pp) {
+      try {
+        const order = await paypalCreate(pp, cfg.price, id, `${link.title} with ${page.profile.name}`, `${SITE_URL}/api/bookings/paypal-return?bid=${id}`, `${SITE_URL}/${page.handle}/${link.id}?pay=cancelled`, page.profile.name);
+        await run("UPDATE bookings SET provider = 'paypal', provider_ref = $1 WHERE id = $2", [order.id, id]);
+        pays.push({ kind: "paypal", url: order.url });
+      } catch (e) {
+        console.error("creator paypal order", e);
       }
     }
     if (cfg.upiId && cfg.currency === "INR") pays.push({ kind: "upi", upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` });

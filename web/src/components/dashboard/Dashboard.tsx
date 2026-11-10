@@ -329,14 +329,10 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
   );
 }
 
-/** Lets a creator connect their own Razorpay so paid bookings confirm by themselves. The money goes straight to them. */
+/** Lets a creator connect their own Razorpay (rupees) and PayPal (dollars) so paid bookings confirm by themselves. The money goes straight to them. */
+type GwStatus = { connected: boolean; keyId: string | null; mode: "test" | "live" };
 function GatewayCard() {
-  const [info, setInfo] = useState<{ connected: boolean; keyId: string | null; mode: "test" | "live" } | null>(null);
-  const [keyId, setKeyId] = useState("");
-  const [secret, setSecret] = useState("");
-  const [msg, setMsg] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [info, setInfo] = useState<{ razorpay: GwStatus; paypal: GwStatus } | null>(null);
   const load = useCallback(async () => {
     const r = await fetch("/api/gateway");
     if (r.ok) setInfo(await r.json());
@@ -345,62 +341,103 @@ function GatewayCard() {
     load();
   }, [load]);
 
+  return (
+    <div className={card}>
+      <p className="text-[15px] font-semibold">Get paid automatically</p>
+      <p className="mt-1 text-[13px] text-fg/55">Connect your own account so bookings are paid on the page and confirm by themselves, with no clicking &ldquo;Mark paid&rdquo;. The money goes straight to your account, never through Showz. Until you connect, buyers pay your UPI ID or payment link.</p>
+      <div className="mt-4 divide-y divide-fg/10">
+        <GatewayRow
+          title="Razorpay"
+          sub="For bookings priced in rupees (₹)."
+          status={info?.razorpay}
+          reload={load}
+          provider="razorpay"
+          steps={["Open your Razorpay dashboard, then Account & Settings, then API Keys.", "Click Generate Key. Copy the Key ID and the Key Secret (Razorpay shows the secret only once).", "Paste both below. Keys starting rzp_test_ are safe for trying it out."]}
+          fields={[{ name: "keyId", label: "Key ID (rzp_live_… or rzp_test_…)" }, { name: "keySecret", label: "Key Secret", secret: true }]}
+        />
+        <GatewayRow
+          title="PayPal"
+          sub="For bookings priced in dollars ($)."
+          status={info?.paypal}
+          reload={load}
+          provider="paypal"
+          steps={["Go to developer.paypal.com and log in with your PayPal Business account.", "Open Apps & Credentials, then Create App. Pick Live (or Sandbox to practise).", "Copy the Client ID and the Secret and paste them below."]}
+          fields={[{ name: "clientId", label: "Client ID" }, { name: "clientSecret", label: "Secret", secret: true }]}
+          sandboxOption
+        />
+      </div>
+    </div>
+  );
+}
+
+function GatewayRow({ title, sub, status, reload, provider, steps, fields, sandboxOption }: { title: string; sub: string; status?: GwStatus; reload: () => void; provider: "razorpay" | "paypal"; steps: string[]; fields: { name: string; label: string; secret?: boolean }[]; sandboxOption?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [vals, setVals] = useState<Record<string, string>>({});
+  const [sandbox, setSandbox] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const field = "min-w-0 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]";
+
   async function connect(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setMsg("");
-    const r = await fetch("/api/gateway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keyId, keySecret: secret }) });
+    const r = await fetch("/api/gateway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider, ...vals, sandbox }) });
     const o = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) return setMsg(o.error ?? "Something went wrong");
-    setKeyId("");
-    setSecret("");
+    setVals({});
     setOpen(false);
-    await load();
+    reload();
   }
   async function disconnect() {
-    if (!confirm("Disconnect Razorpay? New bookings go back to manual payment (UPI or your payment link).")) return;
-    await fetch("/api/gateway", { method: "DELETE" });
-    await load();
+    if (!confirm(`Disconnect ${title}? New bookings go back to manual payment (your UPI ID or payment link).`)) return;
+    await fetch(`/api/gateway?provider=${provider}`, { method: "DELETE" });
+    reload();
   }
-  const field = "min-w-0 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]";
 
   return (
-    <div className={card}>
-      <p className="text-[15px] font-semibold">Get paid automatically</p>
-      {info?.connected ? (
-        <>
-          <p className="mt-1 text-[13px] text-fg/55">
-            Razorpay is connected <span className={`font-semibold ${info.mode === "live" ? "text-emerald-500" : "text-amber-500"}`}>({info.mode === "live" ? "live" : "test mode: no real money"})</span>. Buyers pay in rupees on your booking card and the booking confirms by itself. The money goes straight to your Razorpay account.
+    <div className="py-4 first:pt-0 last:pb-0">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-[14px] font-semibold">
+            {title}
+            {status?.connected && <span className={`ml-2 text-[12px] font-semibold ${status.mode === "live" ? "text-emerald-500" : "text-amber-500"}`}>{status.mode === "live" ? "Connected" : "Connected (test mode, no real money)"}</span>}
           </p>
-          <p className="mt-2 font-mono text-[13px] text-fg/70">{info.keyId}</p>
-          <button onClick={disconnect} className="mt-3 rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Disconnect</button>
-        </>
-      ) : (
-        <>
-          <p className="mt-1 text-[13px] text-fg/55">Connect your own Razorpay so rupee bookings are paid on the page and confirm by themselves, with no clicking &ldquo;Mark paid&rdquo;. The money goes straight to your Razorpay account, never through Showz. Until then, buyers pay your UPI ID or payment link.</p>
-          {!open ? (
-            <button onClick={() => setOpen(true)} className="mt-3 rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">Connect Razorpay</button>
-          ) : (
-            <form onSubmit={connect} className="mt-4 space-y-3">
-              <ol className="list-decimal space-y-1 pl-5 text-[13px] text-fg/65">
-                <li>Open your Razorpay dashboard, then Account &amp; Settings, then API Keys.</li>
-                <li>Click Generate Key. Copy the Key ID and the Key Secret (Razorpay shows the secret only once).</li>
-                <li>Paste both below. Keys starting <span className="font-mono">rzp_test_</span> are safe for trying it out.</li>
-              </ol>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <input required value={keyId} onChange={(e) => setKeyId(e.target.value)} placeholder="Key ID (rzp_live_… or rzp_test_…)" autoComplete="off" spellCheck={false} className={`${field} flex-1`} />
-                <input required type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Key Secret" autoComplete="new-password" className={`${field} flex-1`} />
-              </div>
-              <p className="text-[12px] text-fg/45">We check the keys with Razorpay, then store the secret locked, and never show it again. You can disconnect at any time, and you can delete the key in Razorpay too.</p>
-              {msg && <p className="text-[13px] text-red-500">{msg}</p>}
-              <div className="flex gap-2">
-                <button disabled={busy} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">{busy ? "Checking…" : "Connect"}</button>
-                <button type="button" onClick={() => setOpen(false)} className="rounded-xl border border-fg/20 px-4 py-2.5 text-[13px]">Cancel</button>
-              </div>
-            </form>
+          <p className="text-[13px] text-fg/55">{sub}</p>
+        </div>
+        {status?.connected ? (
+          <button onClick={disconnect} className="rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Disconnect</button>
+        ) : !open ? (
+          <button onClick={() => setOpen(true)} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">Connect {title}</button>
+        ) : null}
+      </div>
+      {status?.connected && <p className="mt-2 break-all font-mono text-[12px] text-fg/55">{status.keyId}</p>}
+      {open && !status?.connected && (
+        <form onSubmit={connect} className="mt-4 space-y-3">
+          <ol className="list-decimal space-y-1 pl-5 text-[13px] text-fg/65">
+            {steps.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ol>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {fields.map((f) => (
+              <input key={f.name} required type={f.secret ? "password" : "text"} value={vals[f.name] ?? ""} onChange={(e) => setVals((v) => ({ ...v, [f.name]: e.target.value }))} placeholder={f.label} autoComplete={f.secret ? "new-password" : "off"} spellCheck={false} className={`${field} flex-1`} />
+            ))}
+          </div>
+          {sandboxOption && (
+            <label className="flex items-center gap-2 text-[13px] text-fg/65">
+              <input type="checkbox" checked={sandbox} onChange={(e) => setSandbox(e.target.checked)} className="h-4 w-4" />
+              These are Sandbox (test) keys
+            </label>
           )}
-        </>
+          <p className="text-[12px] text-fg/45">We check the keys with {title}, then store the secret locked, and never show it again. You can disconnect at any time, and you can delete the key at {title} too.</p>
+          {msg && <p className="text-[13px] text-red-500">{msg}</p>}
+          <div className="flex gap-2">
+            <button disabled={busy} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">{busy ? "Checking…" : "Connect"}</button>
+            <button type="button" onClick={() => setOpen(false)} className="rounded-xl border border-fg/20 px-4 py-2.5 text-[13px]">Cancel</button>
+          </div>
+        </form>
       )}
     </div>
   );
