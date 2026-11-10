@@ -9,10 +9,11 @@ import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
 import { bookingPrice } from "./BookingModal";
 import { ConsentCheck } from "./ConsentCheck";
+import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 import { Background } from "./BioPage";
 import { Tilt } from "../ui/Tilt";
 
-type Pay = { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
+type Pay = RazorpayPay | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
 type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
 type DayInfo = { free: number; total: number };
 
@@ -44,6 +45,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [slot, setSlot] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [agree, setAgree] = useState(false);
+  const [payErr, setPayErr] = useState("");
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -140,7 +142,25 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       fetch(`/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}`).then((r) => r.json()).then((x) => setSlotData({ free: x.slots ?? [], all: x.all ?? x.slots ?? [] }));
     }
     if (!res.ok) return setErr(d.error ?? "Something went wrong");
+    const online = (d.pays as Pay[] | undefined)?.find((p): p is RazorpayPay => p.kind === "razorpay");
+    if (d.status === "awaiting_payment" && online) {
+      void payOnline(online, d);
+      return;
+    }
     setDone(d);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Opens Razorpay for a held booking; on success the booking confirms by itself.
+  async function payOnline(p: RazorpayPay, held?: Result) {
+    setPayErr("");
+    const r = await payWithRazorpay(p, { name, email, title: link.title, creator: profile.name });
+    if (r.ok) {
+      setDone({ status: "confirmed", meetingUrl: r.meetingUrl, pays: [] });
+    } else {
+      if (held) setDone(held);
+      if (!r.cancelled) setPayErr(r.error ?? "");
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -180,9 +200,12 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                     </div>
                   ) : (
                     <div className="mt-6 space-y-3 text-[14px]">
-                      <p className="opacity-70">One step left: pay {price} to {profile.name}. Your meeting link is emailed as soon as they confirm the payment.</p>
+                      <p className="opacity-70">{done.pays.some((p) => p.kind === "razorpay") ? `One step left: pay ${price} to hold your time. Your meeting link appears the moment the payment goes through.` : `One step left: pay ${price} to ${profile.name}. Your meeting link is emailed as soon as they confirm the payment.`}</p>
+                      {payErr && <p className="text-[13px] text-red-500">{payErr}</p>}
                       {done.pays.map((p) =>
-                        p.kind === "upi" ? (
+                        p.kind === "razorpay" ? (
+                          <button key="rzp" type="button" onClick={() => payOnline(p)} className={`${cta} block w-full`}>Pay {price} now</button>
+                        ) : p.kind === "upi" ? (
                           <div key="upi">
                             <a href={p.link} className={`${cta} block`}>Pay with UPI</a>
                             <p className="mt-2 text-[13px] opacity-60">or UPI ID: <span className="select-all font-mono">{p.upiId}</span></p>

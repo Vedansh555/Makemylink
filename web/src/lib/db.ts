@@ -101,6 +101,14 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAU
 ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS consented_at BIGINT;
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS consented_at BIGINT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by TEXT;
+CREATE TABLE IF NOT EXISTS creator_gateways (
+  user_id TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  key_id TEXT NOT NULL,
+  secret_enc TEXT NOT NULL,
+  created_at DOUBLE PRECISION NOT NULL,
+  PRIMARY KEY (user_id, provider)
+);
 `;
 
 interface Ctx {

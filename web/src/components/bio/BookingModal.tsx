@@ -6,11 +6,12 @@ import type { BioLink } from "@/lib/types";
 import Link from "next/link";
 import { slotsForDay } from "@/lib/booking";
 import { ConsentCheck } from "./ConsentCheck";
+import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
 
-type Pay = { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
+type Pay = RazorpayPay | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string };
 type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
 
 export function BookingModal({ link, handle, live, onClose }: { link: BioLink; handle: string; live: boolean; onClose: () => void }) {
@@ -32,6 +33,7 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [agree, setAgree] = useState(false);
+  const [payErr, setPayErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Result | null>(null);
@@ -66,7 +68,23 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
     const d = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(d.error ?? "Something went wrong");
+    const online = (d.pays as Pay[] | undefined)?.find((p): p is RazorpayPay => p.kind === "razorpay");
+    if (d.status === "awaiting_payment" && online) {
+      void payOnline(online, d);
+      return;
+    }
     setDone(d);
+  }
+
+  // Opens Razorpay for a held booking; on success the booking confirms by itself.
+  async function payOnline(p: RazorpayPay, held?: Result) {
+    setPayErr("");
+    const r = await payWithRazorpay(p, { name, email, title: link.title, creator: link.title });
+    if (r.ok) setDone({ status: "confirmed", meetingUrl: r.meetingUrl, pays: [] });
+    else {
+      if (held) setDone(held);
+      if (!r.cancelled) setPayErr(r.error ?? "");
+    }
   }
 
   const fmtTime = (ms: number) => new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", timeZone: cfg.timeZone }).format(new Date(ms));
@@ -105,9 +123,14 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
             ) : (
               <>
                 <p className="text-[16px] font-semibold">Slot held. One step left.</p>
-                <p className="text-white/70">Pay {money(cfg.price, cfg.currency)} directly to {link.title.length ? "the creator" : ""}. Your meeting link is emailed as soon as they confirm payment.</p>
+                <p className="text-white/70">{done.pays.some((p) => p.kind === "razorpay") ? `Pay ${money(cfg.price, cfg.currency)} to hold your time. Your meeting link appears the moment the payment goes through.` : `Pay ${money(cfg.price, cfg.currency)} directly to the creator. Your meeting link is emailed as soon as they confirm payment.`}</p>
+                {payErr && <p className="text-[13px] text-red-300">{payErr}</p>}
                 {done.pays.map((p) =>
-                  p.kind === "upi" ? (
+                  p.kind === "razorpay" ? (
+                    <button key="rzp" type="button" onClick={() => payOnline(p)} className="block w-full rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
+                      Pay {money(cfg.price, cfg.currency)} now
+                    </button>
+                  ) : p.kind === "upi" ? (
                     <div key="upi">
                       <a href={p.link} className="block rounded-xl bg-white px-4 py-3 text-center font-semibold text-black">
                         Pay with UPI (India)

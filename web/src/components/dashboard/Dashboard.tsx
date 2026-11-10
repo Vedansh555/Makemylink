@@ -294,6 +294,7 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
   const bookUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${d.handle}/book`;
   return (
     <div className="space-y-4">
+    <GatewayCard />
     {d.bookingPage ? (
       <div className={card}>
         <p className="text-[15px] font-semibold">Your booking page</p>
@@ -324,6 +325,83 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
         ))}
       </ul>
     </div>
+    </div>
+  );
+}
+
+/** Lets a creator connect their own Razorpay so paid bookings confirm by themselves. The money goes straight to them. */
+function GatewayCard() {
+  const [info, setInfo] = useState<{ connected: boolean; keyId: string | null; mode: "test" | "live" } | null>(null);
+  const [keyId, setKeyId] = useState("");
+  const [secret, setSecret] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
+  const load = useCallback(async () => {
+    const r = await fetch("/api/gateway");
+    if (r.ok) setInfo(await r.json());
+  }, []);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function connect(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMsg("");
+    const r = await fetch("/api/gateway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keyId, keySecret: secret }) });
+    const o = await r.json().catch(() => ({}));
+    setBusy(false);
+    if (!r.ok) return setMsg(o.error ?? "Something went wrong");
+    setKeyId("");
+    setSecret("");
+    setOpen(false);
+    await load();
+  }
+  async function disconnect() {
+    if (!confirm("Disconnect Razorpay? New bookings go back to manual payment (UPI or your payment link).")) return;
+    await fetch("/api/gateway", { method: "DELETE" });
+    await load();
+  }
+  const field = "min-w-0 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]";
+
+  return (
+    <div className={card}>
+      <p className="text-[15px] font-semibold">Get paid automatically</p>
+      {info?.connected ? (
+        <>
+          <p className="mt-1 text-[13px] text-fg/55">
+            Razorpay is connected <span className={`font-semibold ${info.mode === "live" ? "text-emerald-500" : "text-amber-500"}`}>({info.mode === "live" ? "live" : "test mode: no real money"})</span>. Buyers pay in rupees on your booking card and the booking confirms by itself. The money goes straight to your Razorpay account.
+          </p>
+          <p className="mt-2 font-mono text-[13px] text-fg/70">{info.keyId}</p>
+          <button onClick={disconnect} className="mt-3 rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Disconnect</button>
+        </>
+      ) : (
+        <>
+          <p className="mt-1 text-[13px] text-fg/55">Connect your own Razorpay so rupee bookings are paid on the page and confirm by themselves, with no clicking &ldquo;Mark paid&rdquo;. The money goes straight to your Razorpay account, never through Showz. Until then, buyers pay your UPI ID or payment link.</p>
+          {!open ? (
+            <button onClick={() => setOpen(true)} className="mt-3 rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">Connect Razorpay</button>
+          ) : (
+            <form onSubmit={connect} className="mt-4 space-y-3">
+              <ol className="list-decimal space-y-1 pl-5 text-[13px] text-fg/65">
+                <li>Open your Razorpay dashboard, then Account &amp; Settings, then API Keys.</li>
+                <li>Click Generate Key. Copy the Key ID and the Key Secret (Razorpay shows the secret only once).</li>
+                <li>Paste both below. Keys starting <span className="font-mono">rzp_test_</span> are safe for trying it out.</li>
+              </ol>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input required value={keyId} onChange={(e) => setKeyId(e.target.value)} placeholder="Key ID (rzp_live_… or rzp_test_…)" autoComplete="off" spellCheck={false} className={`${field} flex-1`} />
+                <input required type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Key Secret" autoComplete="new-password" className={`${field} flex-1`} />
+              </div>
+              <p className="text-[12px] text-fg/45">We check the keys with Razorpay, then store the secret locked, and never show it again. You can disconnect at any time, and you can delete the key in Razorpay too.</p>
+              {msg && <p className="text-[13px] text-red-500">{msg}</p>}
+              <div className="flex gap-2">
+                <button disabled={busy} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">{busy ? "Checking…" : "Connect"}</button>
+                <button type="button" onClick={() => setOpen(false)} className="rounded-xl border border-fg/20 px-4 py-2.5 text-[13px]">Cancel</button>
+              </div>
+            </form>
+          )}
+        </>
+      )}
     </div>
   );
 }

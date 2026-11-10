@@ -6,6 +6,10 @@ import { slotsForDay } from "@/lib/booking";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { esc, sendMail } from "@/lib/mail";
 import { getSession } from "@/lib/session";
+import { HOLD_MS, createOrder, credsForUser } from "@/lib/gateway";
+
+/** An online checkout nobody finished lets go of its time slot after a while. */
+const releaseOldHolds = (pageId: string) => run("UPDATE bookings SET status = 'cancelled' WHERE page_id = $1 AND provider = 'razorpay' AND status = 'awaiting_payment' AND created_at < $2", [pageId, Date.now() - HOLD_MS]);
 
 async function findConfig(handle: string, linkId: string) {
   const page = await pageByHandle(handle);
@@ -19,6 +23,7 @@ export async function GET(req: Request) {
   const u = new URL(req.url);
   const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "");
   if (!found) return NextResponse.json({ slots: [] });
+  await releaseOldHolds(found.page.id);
   const month = u.searchParams.get("month") ?? "";
   if (/^\d{4}-\d{2}$/.test(month)) {
     // For the calendar: how many times are free and how many exist on each day of the month.
@@ -59,6 +64,7 @@ export async function POST(req: Request) {
   const found = await findConfig(b.handle ?? "", b.linkId ?? "");
   if (!found) return NextResponse.json({ error: "This session is not available" }, { status: 404 });
   const { page, link, cfg } = found;
+  await releaseOldHolds(page.id);
 
   // The slot must be one the server would have offered (right day, hour, free).
   const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: cfg.timeZone }).format(new Date(b.slot));
@@ -79,8 +85,19 @@ export async function POST(req: Request) {
   if (free) await sendMail(email, `Confirmed: ${link.title}`, `<p>You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
 
   // Offer every way the creator set up: UPI for Indian buyers, a payment link (cards) for everyone else.
-  const pays: ({ kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
+  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
   if (!free) {
+    // If the creator connected their own Razorpay, the buyer can pay on the spot and the booking confirms itself.
+    const creds = cfg.currency === "INR" ? await credsForUser(page.user_id) : null;
+    if (creds) {
+      try {
+        const order = await createOrder(creds, cfg.price, id, { booking_id: id, page_id: page.id });
+        await run("UPDATE bookings SET provider = 'razorpay', provider_ref = $1 WHERE id = $2", [order.id, id]);
+        pays.push({ kind: "razorpay", keyId: creds.keyId, orderId: order.id, amount: order.amount, bookingId: id });
+      } catch (e) {
+        console.error("creator razorpay order", e);
+      }
+    }
     if (cfg.upiId && cfg.currency === "INR") pays.push({ kind: "upi", upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` });
     if (cfg.paymentUrl) pays.push({ kind: "link", link: cfg.paymentUrl });
   }
