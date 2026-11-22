@@ -800,9 +800,7 @@ function AccountTab({ email }: { email: string }) {
         <p className="text-[15px] font-semibold">Your page is yours</p>
         <p className="mt-1 text-[13px] text-fg/55">Download everything at any time: your pages, links, products, email list and bookings. The backup page is a plain web page you can put on any host, so your page can never vanish, even if Showz did.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- a file download, not a page */}
           <a href="/api/export?format=json" download className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg">Download everything</a>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- a file download, not a page */}
           <a href="/api/export?format=html" download className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Download backup page</a>
         </div>
       </div>
