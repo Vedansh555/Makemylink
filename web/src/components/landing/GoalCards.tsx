@@ -17,7 +17,7 @@ export function GoalCards({ handle }: { handle?: string }) {
   const q = handle ? `&handle=${encodeURIComponent(handle)}` : "";
   return (
     <div className="grid gap-5 md:grid-cols-2">
-      {GOALS.map((g, i) => {
+      {GOALS.map((g) => {
         const Icon = ICON[g.id];
         // The import card shows a finished example page, since it starts from the person's own.
         const preview = g.id === "import" ? getDemoProfile("kai")! : { ...previewFor(g.id, WHO[g.id], LOOK[g.id]), theme: LOOK[g.id] };
