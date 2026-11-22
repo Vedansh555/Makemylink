@@ -275,11 +275,11 @@ export function BookingModal({
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-black/75 p-0 backdrop-blur-md sm:items-center sm:p-4"
+      className="@container fixed inset-0 z-[70] flex items-end justify-center bg-black/75 p-0 backdrop-blur-md sm:items-center sm:p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-t-3xl border border-white/15 bg-[#121215] text-white shadow-2xl sm:rounded-3xl"
+        className="no-scrollbar relative max-h-[92%] w-full max-w-4xl overflow-y-auto overflow-x-hidden overscroll-contain rounded-t-3xl border border-white/15 bg-[#121215] text-white shadow-2xl @xl:rounded-3xl"
       >
         <button
           type="button"
@@ -292,7 +292,7 @@ export function BookingModal({
 
         {done ? (
           /* Success / Confirmation */
-          <div className="p-6 sm:p-8 text-center max-w-lg mx-auto">
+          <div className="p-6 @xl:p-8 text-center max-w-lg mx-auto">
             <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white text-black shadow-lg">
               <Check className="h-8 w-8 stroke-[2.5]" />
             </span>
@@ -423,9 +423,9 @@ export function BookingModal({
           </div>
         ) : (
           /* Cal.com 3-column / 2-step Booking UI */
-          <div className="grid grid-cols-1 md:grid-cols-12 md:divide-x md:divide-white/10">
+          <div className="grid grid-cols-1 @3xl:grid-cols-12 @3xl:divide-x @3xl:divide-white/10">
             {/* Col 1: Details (~4 cols) */}
-            <div className="p-6 md:p-7 md:col-span-4 flex flex-col justify-between border-b md:border-b-0 border-white/10">
+            <div className="p-6 @3xl:p-7 @3xl:col-span-4 flex flex-col justify-between border-b @3xl:border-b-0 border-white/10">
               <div className="space-y-4">
                 <p className="text-[13px] font-medium text-white/50">@{handle}</p>
                 <h3 className="text-[22px] font-bold leading-snug">{link.title}</h3>
@@ -464,7 +464,7 @@ export function BookingModal({
             </div>
 
             {/* Col 2 & 3: Calendar / Time Slots OR Form */}
-            <div className="md:col-span-8 flex flex-col">
+            <div className="@3xl:col-span-8 flex flex-col">
               <AnimatePresence mode="wait">
                 {slot ? (
                   /* Form Step */
@@ -473,7 +473,7 @@ export function BookingModal({
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -15 }}
-                    className="p-6 md:p-8 flex-1 flex flex-col justify-between"
+                    className="p-6 @3xl:p-8 flex-1 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -585,10 +585,10 @@ export function BookingModal({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="grid grid-cols-1 sm:grid-cols-12 flex-1 sm:divide-x sm:divide-white/10"
+                    className="grid grid-cols-1 @xl:grid-cols-12 flex-1 @xl:divide-x @xl:divide-white/10"
                   >
                     {/* Calendar grid */}
-                    <div className="p-5 sm:col-span-7 flex flex-col justify-between">
+                    <div className="p-5 @xl:col-span-7 flex flex-col justify-between">
                       <div>
                         <div className="mb-3.5 flex items-center justify-between">
                           <h4 className="text-[15px] font-semibold text-white">{monthLabel}</h4>
@@ -673,7 +673,7 @@ export function BookingModal({
                     </div>
 
                     {/* Time slots */}
-                    <div className="p-5 sm:col-span-5 flex flex-col border-t sm:border-t-0 border-white/10">
+                    <div className="p-5 @xl:col-span-5 flex flex-col border-t @xl:border-t-0 border-white/10">
                       <div className="flex items-center justify-between pb-3 border-b border-white/10">
                         <span className="text-[14px] font-semibold text-white">{dayHeader}</span>
                         <div className="flex items-center rounded-lg border border-white/10 bg-white/5 p-0.5 text-[10px] font-medium text-white/70">
@@ -714,7 +714,7 @@ export function BookingModal({
                             No slots on this date
                           </div>
                         ) : (
-                          <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
+                          <div className="no-scrollbar space-y-1.5 max-h-[300px] overflow-y-auto overscroll-contain">
                             {slotData.all.map((s) => {
                               const open = slotData.free.includes(s);
                               return (

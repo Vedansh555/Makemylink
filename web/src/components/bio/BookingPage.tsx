@@ -868,7 +868,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                               No slots configured for this day
                             </div>
                           ) : (
-                            <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+                            <div className="no-scrollbar space-y-2 max-h-[360px] overflow-y-auto overscroll-contain">
                               {slotData.all.map((s) => {
                                 const open = slotData.free.includes(s);
                                 return (
