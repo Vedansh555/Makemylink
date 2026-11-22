@@ -7,9 +7,8 @@ import { motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, MapPin, Play, QrCode, X } from "lucide-react";
 import type { BioLink, Profile } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
-import { OPERATOR } from "@/lib/legal";
 import { BookingModal, bookingPrice } from "./BookingModal";
-import { BookingTile } from "./BookingTile";
+import { BookingTile, useNextFree } from "./BookingTile";
 import { WhatsAppModal, WhatsAppIcon } from "./WhatsAppModal";
 import { fontClass, getTheme, readableOn, type ResolvedTheme, type ThemeTokens } from "@/lib/themes";
 import { LookArt } from "./LookArt";
@@ -380,6 +379,7 @@ function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: 
   const [done, setDone] = useState(false);
   const [err, setErr] = useState("");
   const [agree, setAgree] = useState(false);
+  const [typed, setTyped] = useState(false);
   if (done) return <p className={t.bio}>You&apos;re on the list ✓</p>;
   return (
     <form
@@ -394,10 +394,10 @@ function Subscribe({ t, handle, live }: { t: ThemeTokens; handle: string; live: 
       }}
     >
       <div className="flex items-center gap-2">
-        <input name="email" type="email" required placeholder="your@email.com" className={t.input} aria-label="Email address" />
+        <input name="email" type="email" required placeholder="your@email.com" className={t.input} aria-label="Email address" onChange={(e) => setTyped(!!e.target.value)} />
         <button className={`${t.button} shrink-0`}>Join</button>
       </div>
-      <ConsentCheck checked={agree} onChange={setAgree} className={t.bio} />
+      {live && typed && <ConsentCheck checked={agree} onChange={setAgree} className={t.bio} />}
       {err && <p className={t.bio}>{err}</p>}
     </form>
   );
@@ -407,7 +407,28 @@ function safeUrl(input?: string): string {
   return safeHref(input);
 }
 
-export function BioPage({ profile, embedded = false, plan = "pro", live = false, seeAll }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean; seeAll?: string }) {
+/** A heading on a real page; plain text inside the small phone previews, so the site's own pages keep one main heading. */
+function Heading({ level, plain, className, children }: { level: 1 | 2; plain: boolean; className: string; children: React.ReactNode }) {
+  if (plain) return <div className={className}>{children}</div>;
+  return level === 1 ? <h1 className={className}>{children}</h1> : <h2 className={className}>{children}</h2>;
+}
+
+/** "Verified by Showz": the owner proved a work or college email. */
+function VerifiedTick({ label }: { label: string }) {
+  return (
+    <span title={`Verified by Showz · ${label}`} aria-label={`Verified by Showz, ${label}`} className="ml-1.5 inline-grid h-[0.8em] w-[0.8em] translate-y-[-0.05em] place-items-center rounded-full bg-t-accent align-middle text-t-on-accent">
+      <svg viewBox="0 0 24 24" className="h-[70%] w-[70%]" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+    </span>
+  );
+}
+
+/** "Book · next: Tue 4 pm" under a booking card, in the theme's own type. */
+function NextFreeLine({ link, handle, live }: { link: BioLink; handle: string; live: boolean }) {
+  const next = useNextFree(link, handle, live);
+  return <span className="mt-1 block text-[12px] font-semibold normal-case tracking-normal">{next ? `Book · next: ${next.short}` : "Book a time"}</span>;
+}
+
+export function BioPage({ profile, embedded = false, plan = "pro", live = false, seeAll, verified }: { profile: Profile; embedded?: boolean; plan?: PlanId; live?: boolean; seeAll?: string; verified?: string | null }) {
   const [qrOpen, setQrOpen] = useState(false);
   const [booking, setBooking] = useState<BioLink | null>(null);
   const [chat, setChat] = useState<BioLink | null>(null);
@@ -466,8 +487,9 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={profile.avatar} alt={profile.name} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 28%" }} />
               <div className="absolute inset-x-3 bottom-3 rounded-[22px] border border-white/40 bg-t-bg/60 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl">
-                <h1 className={`${t.name} ${nameFont}`}>{profile.name}</h1>
+                <Heading level={1} plain={embedded} className={`${t.name} ${nameFont}`}>{profile.name}{verified && <VerifiedTick label={verified} />}</Heading>
                 <p className={`${t.meta} mt-1.5`}>@{profile.handle}{profile.location ? ` in ${profile.location}` : ""}</p>
+                {verified && <p className={`${t.meta} mt-1`}>Verified by Showz · {verified}</p>}
               </div>
             </div>
           ) : (
@@ -480,9 +502,15 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                   </span>
                 )}
               </div>
-              <h1 className={`${t.name} ${nameFont}`}>{profile.name}</h1>
+              <Heading level={1} plain={embedded} className={`${t.name} ${nameFont}`}>{profile.name}{verified && <VerifiedTick label={verified} />}</Heading>
               <div className={`${t.meta} flex items-center gap-2`}>
                 <span>@{profile.handle}</span>
+                {verified && (
+                  <>
+                    <span>·</span>
+                    <span>Verified · {verified}</span>
+                  </>
+                )}
                 {centered && profile.location && (
                   <>
                     <span>·</span>
@@ -601,6 +629,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                           <span className="mt-0.5 block text-[11px] font-normal uppercase tracking-[0.16em] opacity-60">
                             {l.booking.durationMin} min · {bookingPrice(l)}
                           </span>
+                          <NextFreeLine link={l} handle={profile.handle} live={live} />
                         </span>
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </button>
@@ -662,7 +691,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
         {profile.looks.length > 0 && (
           <motion.section variants={rise} custom={i++} className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between">
-              <h2 className={t.section + " flex-1"}>{profile.shopTitle || "Shop"}</h2>
+              <Heading level={2} plain={embedded} className={t.section + " flex-1"}>{profile.shopTitle || "Shop"}</Heading>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {profile.looks.map((look) => (
@@ -696,7 +725,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
         {/* Media kit */}
         {profile.showMediaKit && profile.mediaKit && (
           <motion.section variants={rise} custom={i++} className="flex flex-col gap-4">
-            <h2 className={t.section}>Media kit</h2>
+            <Heading level={2} plain={embedded} className={t.section}>Media kit</Heading>
             <div className="grid grid-cols-3 gap-2">
               {[
                 ["Followers", profile.mediaKit.followers],
@@ -732,7 +761,7 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
         {/* Subscribe */}
         {profile.showSubscribe && (
           <motion.section variants={rise} custom={i++} className="flex flex-col gap-3">
-            <h2 className={t.section}>Join my list</h2>
+            <Heading level={2} plain={embedded} className={t.section}>Join my list</Heading>
             <Subscribe t={t} handle={profile.handle} live={live} />
           </motion.section>
         )}
@@ -749,20 +778,20 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
           <button
             type="button"
             onClick={() => setQrOpen(true)}
-            className={`${t.badge} inline-flex items-center gap-2 rounded-full border border-t-fg/15 bg-t-fg/[0.04] px-4 py-1.5 text-[11px] uppercase tracking-[0.2em] transition hover:border-t-fg/40 hover:bg-t-fg/10 cursor-pointer`}
+            className={`${t.badge} inline-flex items-center gap-2 rounded-full border border-t-fg/15 bg-t-fg/[0.04] min-h-[40px] px-4 py-2 text-[11px] uppercase tracking-[0.2em] transition hover:border-t-fg/40 hover:bg-t-fg/10 cursor-pointer`}
           >
             <QrCode className="h-3.5 w-3.5" />
             <span>Show QR code</span>
           </button>
           {showBadge && (
-            <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
+            <Link href={`/?ref=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex min-h-[40px] items-center gap-1.5 px-2 text-[11px] uppercase tracking-[0.25em] hover:opacity-100`}>
               ✦ Made with <span className="font-display text-[15px] normal-case italic tracking-normal">Showz</span> · Get yours →
             </Link>
           )}
           {live && (
-            <a href={`mailto:${OPERATOR.supportEmail}?subject=${encodeURIComponent(`Report page @${profile.handle}`)}`} className={`${t.badge} text-[10px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100`}>
+            <Link href={`/report?page=${encodeURIComponent(profile.handle)}`} className={`${t.badge} inline-flex min-h-[40px] items-center px-2 text-[10px] uppercase tracking-[0.2em] opacity-50 hover:opacity-100`}>
               Report this page
-            </a>
+            </Link>
           )}
         </motion.footer>
       </motion.main>

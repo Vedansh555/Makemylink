@@ -517,7 +517,7 @@ export function Editor() {
       </header>
 
       {/* Mobile Sticky Bottom Floating Action Bar */}
-      <div className="fixed bottom-4 inset-x-4 z-40 flex items-center justify-between gap-2.5 rounded-full border border-fg/15 bg-bg/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden">
+      <div data-bottom-bar className="fixed bottom-4 inset-x-4 z-40 flex items-center justify-between gap-2.5 rounded-full border border-fg/15 bg-bg/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden">
         <div className="flex rounded-full bg-fg/8 p-0.5 text-[13px]">
           <button
             type="button"

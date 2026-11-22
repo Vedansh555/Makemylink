@@ -443,6 +443,73 @@ function GatewayRow({ title, sub, status, reload, provider, steps, fields, sandb
   );
 }
 
+/** "Verified by Showz": the owner proves a work or college email once, and their page shows a tick. */
+function BadgeCard() {
+  const [label, setLabel] = useState<string | null | undefined>(undefined);
+  const [email, setEmail] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => setLabel(d.user?.verifiedLabel ?? null)).catch(() => setLabel(null));
+  }, []);
+  async function send(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMsg("");
+    const r = await fetch("/api/verify-work", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+    const o = await r.json().catch(() => ({}));
+    setBusy(false);
+    setMsg(r.ok ? `We sent a link to ${email}. Open it to switch on your badge.` : (o.error ?? "Something went wrong"));
+  }
+  async function remove() {
+    await fetch("/api/verify-work", { method: "DELETE" });
+    setLabel(null);
+  }
+  if (label === undefined) return null;
+  return (
+    <div className={card}>
+      <p className="text-[15px] font-semibold">Verified badge</p>
+      {label ? (
+        <>
+          <p className="mt-1 text-[13px] text-fg/55">Your page shows a tick and &ldquo;Verified by Showz · {label}&rdquo;. Visitors know you are real.</p>
+          <button onClick={remove} className="mt-3 rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Remove badge</button>
+        </>
+      ) : (
+        <form onSubmit={send}>
+          <p className="mt-1 text-[13px] text-fg/55">Confirm a work or college email once (like you@company.com or you@iitr.ac.in) and your page gets a tick. Only the part after @ is shown. It helps people trust you before they pay.</p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]" />
+            <button disabled={busy} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">{busy ? "Sending…" : "Send link"}</button>
+          </div>
+          {msg && <p className="mt-2 text-[13px] text-fg/70">{msg}</p>}
+        </form>
+      )}
+    </div>
+  );
+}
+
+/** Invite a creator: both get a free Pro month once the invited creator gets their first lead or booking. */
+function InviteCard() {
+  const [handle, setHandle] = useState("");
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => setHandle(d.user?.handle ?? "")).catch(() => {});
+  }, []);
+  if (!handle) return null;
+  const url = `${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${handle}`;
+  return (
+    <div className={card}>
+      <p className="text-[15px] font-semibold">Invite a creator, both get a free month</p>
+      <p className="mt-1 text-[13px] text-fg/55">Share your invite link. When the creator you invite gets their first lead or booking, you both get a month of Pro free. The &ldquo;Made with Showz&rdquo; link on your page counts too.</p>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <input readOnly value={url} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]" />
+        <button onClick={() => { navigator.clipboard?.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); }} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">{copied ? "Copied" : "Copy link"}</button>
+        <a href={`https://wa.me/?text=${encodeURIComponent(`I made my page with Showz. Bookings with 0% commission and a free plan. Try it: ${url}`)}`} target="_blank" rel="noreferrer" className="rounded-xl border border-fg/20 px-4 py-2.5 text-center text-[13px]">Share on WhatsApp</a>
+      </div>
+    </div>
+  );
+}
+
 function Health({ d }: { d: Data }) {
   if (d.plan !== "pro") return <Locked>Pro checks your links every day and emails you when one breaks.</Locked>;
   return (
@@ -652,6 +719,16 @@ function AccountTab({ email }: { email: string }) {
         <div className="mt-4 flex flex-wrap gap-2">
           <button onClick={logout} className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Log out</button>
           <Link href="/forgot" className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Change password</Link>
+        </div>
+      </div>
+      <BadgeCard />
+      <InviteCard />
+      <div className={card}>
+        <p className="text-[15px] font-semibold">Your page is yours</p>
+        <p className="mt-1 text-[13px] text-fg/55">Download everything at any time: your pages, links, products, email list and bookings. The backup page is a plain web page you can put on any host, so your page can never vanish, even if Showz did.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a href="/api/export?format=json" className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg">Download everything</a>
+          <a href="/api/export?format=html" className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Download backup page</a>
         </div>
       </div>
       <div className={`${card} border-red-500/30`}>

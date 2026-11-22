@@ -8,6 +8,8 @@ import { esc, sendMail } from "@/lib/mail";
 import { getSession } from "@/lib/session";
 import { HOLD_MS, createOrder, credsForUser, paypalCreate, paypalCredsForUser } from "@/lib/gateway";
 import { SITE_URL } from "@/lib/site";
+import { sendBookingConfirmed } from "@/lib/bookingMail";
+import { rewardReferral } from "@/lib/referral";
 
 /** An online checkout nobody finished lets go of its time slot after a while. */
 const releaseOldHolds = (pageId: string) => run("UPDATE bookings SET status = 'cancelled' WHERE page_id = $1 AND provider IN ('razorpay','paypal') AND status = 'awaiting_payment' AND created_at < $2", [pageId, Date.now() - HOLD_MS]);
@@ -79,11 +81,12 @@ export async function POST(req: Request) {
   await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at, consented_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)", [
     id, page.id, link.id, name, email, b.slot, String(b.note ?? "").slice(0, 500), cfg.price, cfg.currency, free ? "confirmed" : "awaiting_payment", Date.now(),
   ]);
+  await rewardReferral(page.user_id, email).catch(() => {});
 
   const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: cfg.timeZone }).format(new Date(b.slot));
   const owner = await one<{ email: string }>("SELECT email FROM users WHERE id = $1", [page.user_id]);
   if (owner) await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${free ? "" : "<p>Mark it paid in your dashboard once the money arrives.</p>"}`);
-  if (free) await sendMail(email, `Confirmed: ${link.title}`, `<p>You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
+  if (free) await sendBookingConfirmed({ id, buyerName: name, buyerEmail: email, slot: b.slot, handle: page.handle, hostName: page.profile.name, link });
 
   // Offer every way the creator set up: UPI for Indian buyers, a payment link (cards) for everyone else.
   const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
@@ -124,8 +127,8 @@ export async function PATCH(req: Request) {
   if (blocked) return blocked;
   const { id, status } = (await req.json().catch(() => ({}))) as { id?: string; status?: string };
   if (!id || (status !== "confirmed" && status !== "cancelled")) return NextResponse.json({ error: "Bad request" }, { status: 400 });
-  const row = await one<{ buyer_email: string; slot_start: number; link_id: string; handle: string; status: string }>(
-    `SELECT b.buyer_email, b.slot_start, b.link_id, b.status, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.id = $1 AND p.user_id = $2`,
+  const row = await one<{ buyer_name: string; buyer_email: string; slot_start: number; link_id: string; handle: string; status: string }>(
+    `SELECT b.buyer_name, b.buyer_email, b.slot_start, b.link_id, b.status, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.id = $1 AND p.user_id = $2`,
     [id, session.userId],
   );
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -134,8 +137,7 @@ export async function PATCH(req: Request) {
     const page = await pageByHandle(row.handle);
     const link = page?.profile.links.find((l) => l.id === row.link_id);
     if (link?.booking) {
-      const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: link.booking.timeZone }).format(new Date(row.slot_start));
-      await sendMail(row.buyer_email, `Confirmed: ${link.title}`, `<p>Payment received. You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(link.booking.meetingUrl)}">${esc(link.booking.meetingUrl)}</a></p>`);
+      await sendBookingConfirmed({ id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page!.profile.name, link }, "paid");
     }
   }
   return NextResponse.json({ ok: true });

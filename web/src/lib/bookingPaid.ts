@@ -1,6 +1,7 @@
 import { one, run } from "./db";
 import { pageByHandle } from "./account";
 import { esc, sendMail } from "./mail";
+import { sendBookingConfirmed } from "./bookingMail";
 
 export interface PaidBooking {
   id: string;
@@ -47,7 +48,7 @@ export async function confirmPaidBooking(row: PaidBooking): Promise<{ ok: true; 
   }
 
   await run("UPDATE bookings SET status = 'confirmed' WHERE id = $1", [row.id]);
-  await sendMail(row.buyer_email, `Confirmed: ${link.title}`, `<p>Payment received. You are booked for <b>${esc(link.title)}</b> on ${esc(when)}.</p><p>Join here: <a href="${esc(cfg.meetingUrl)}">${esc(cfg.meetingUrl)}</a></p>`);
+  await sendBookingConfirmed({ id: row.id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page.profile.name, link }, "paid");
   if (owner) await sendMail(owner.email, `Paid booking: ${esc(row.buyer_name)}`, `<p>${esc(row.buyer_name)} (${esc(row.buyer_email)}) paid and booked <b>${esc(link.title)}</b> on ${esc(when)}. It is confirmed automatically.</p>`);
   return { ok: true, meetingUrl: cfg.meetingUrl };
 }

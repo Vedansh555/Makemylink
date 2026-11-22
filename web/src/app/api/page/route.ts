@@ -5,6 +5,7 @@ import { pageForUser, planForUser } from "@/lib/account";
 import { applyPlan } from "@/lib/plans";
 import type { Profile } from "@/lib/types";
 import { rateLimit, sameOriginOnly, sanitizeProfile } from "@/lib/security";
+import { pageUrls, unsafeUrls } from "@/lib/safebrowsing";
 
 // GET /api/page — return the logged-in user's saved Profile JSON
 export async function GET(req: Request) {
@@ -62,6 +63,12 @@ export async function PUT(req: Request) {
     // Free plan limits are enforced here, not just in the editor.
     const plan = await planForUser(session.userId);
     clean = applyPlan(clean, plan);
+
+    // Scam and malware links are refused before they go live (Google Safe Browsing).
+    const bad = await unsafeUrls(pageUrls(clean));
+    if (bad.length) {
+      return NextResponse.json({ error: `Google flags ${bad.length === 1 ? "this link" : "these links"} as unsafe, so it can't be published: ${bad.slice(0, 3).join(", ")}` }, { status: 422 });
+    }
 
     await run("UPDATE pages SET profile_json = $1, updated_at = $2 WHERE id = $3", [JSON.stringify(clean), now, existing.id]);
 

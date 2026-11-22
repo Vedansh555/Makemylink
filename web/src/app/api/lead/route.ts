@@ -4,6 +4,7 @@ import { one, run } from "@/lib/db";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { FREE_LIMITS } from "@/lib/plans";
 import { planForUser } from "@/lib/account";
+import { rewardReferral } from "@/lib/referral";
 import type { Profile } from "@/lib/types";
 
 // POST /api/lead {handle, linkId, name, email} — a visitor asks to chat on WhatsApp. We save them as a lead, then give back the WhatsApp link.
@@ -31,6 +32,7 @@ export async function POST(req: Request) {
     if ((c?.n ?? 0) >= FREE_LIMITS.subscribers) return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
   }
   await run("INSERT INTO subscribers (id, page_id, email, name, source, created_at, consented_at) VALUES ($1,$2,$3,$4,'whatsapp',$5,$5) ON CONFLICT (page_id, email) DO UPDATE SET name = EXCLUDED.name, consented_at = EXCLUDED.consented_at", [crypto.randomUUID(), page.id, email, name, Date.now()]);
+  await rewardReferral(page.user_id, email).catch(() => {});
   return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
 }
 

@@ -17,19 +17,33 @@ export interface PageRow {
   profile: Profile;
   plan: PlanId;
   updatedAt: number;
+  /** The owner confirmed their email address. */
+  emailVerified: boolean;
+  /** Set when Showz checked the owner's work or college email, e.g. "iitr.ac.in". */
+  verifiedLabel: string | null;
 }
 
 /** A page by handle together with the owner's plan, or null when the handle is unclaimed or the page was taken down by an admin. */
 export async function pageByHandle(handle: string): Promise<PageRow | null> {
-  const row = await one<{ id: string; user_id: string; handle: string; profile_json: string; updated_at: number }>(
-    "SELECT id, user_id, handle, profile_json, updated_at FROM pages WHERE handle = $1 AND suspended = FALSE",
+  const row = await one<{ id: string; user_id: string; handle: string; profile_json: string; updated_at: number; email_verified: boolean; verified_label: string | null }>(
+    "SELECT p.id, p.user_id, p.handle, p.profile_json, p.updated_at, u.email_verified, u.verified_label FROM pages p JOIN users u ON u.id = p.user_id WHERE p.handle = $1 AND p.suspended = FALSE",
     [handle.toLowerCase()],
   );
   if (!row) return null;
   try {
-    return { id: row.id, user_id: row.user_id, handle: row.handle, profile: JSON.parse(row.profile_json) as Profile, plan: await planForUser(row.user_id), updatedAt: row.updated_at };
+    return { id: row.id, user_id: row.user_id, handle: row.handle, profile: JSON.parse(row.profile_json) as Profile, plan: await planForUser(row.user_id), updatedAt: row.updated_at, emailVerified: !!row.email_verified, verifiedLabel: row.verified_label };
   } catch {
     return null;
+  }
+}
+
+/** A page is worth showing to search engines once it has a name and at least one link or product. */
+export function hasContent(profileJson: string): boolean {
+  try {
+    const p = JSON.parse(profileJson) as Profile;
+    return !!p.name?.trim() && ((p.links?.length ?? 0) > 0 || (p.looks?.length ?? 0) > 0);
+  } catch {
+    return false;
   }
 }
 

@@ -6,6 +6,7 @@ import type { BioLink } from "@/lib/types";
 import Link from "next/link";
 import { slotsForDay } from "@/lib/booking";
 import { ConsentCheck } from "./ConsentCheck";
+import { WhatsAppIcon } from "./WhatsAppModal";
 import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 
 const money = (price: number, cur: "INR" | "USD") => (price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`);
@@ -124,6 +125,9 @@ export function BookingModal({ link, handle, live, onClose }: { link: BioLink; h
                     Open meeting link
                   </a>
                 )}
+                <a href={`https://wa.me/?text=${encodeURIComponent(`I just booked "${link.title}". You can book too: ${typeof window !== "undefined" ? window.location.origin : ""}/${handle}`)}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl border border-white/30 px-4 py-3 font-semibold text-white">
+                  <WhatsAppIcon className="h-4 w-4" /> Share on WhatsApp
+                </a>
               </>
             ) : (
               <>

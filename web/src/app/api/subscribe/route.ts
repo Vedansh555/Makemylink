@@ -4,6 +4,7 @@ import { one, run } from "@/lib/db";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { FREE_LIMITS } from "@/lib/plans";
 import { planForUser } from "@/lib/account";
+import { rewardReferral } from "@/lib/referral";
 
 // POST /api/subscribe {handle, email} — a visitor joins a creator's list.
 export async function POST(req: Request) {
@@ -27,5 +28,6 @@ export async function POST(req: Request) {
     clean,
     Date.now(),
   ]);
+  await rewardReferral(page.user_id, clean).catch(() => {});
   return NextResponse.json({ ok: true });
 }

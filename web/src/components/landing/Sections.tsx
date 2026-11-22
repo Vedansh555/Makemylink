@@ -119,7 +119,7 @@ export function ThemeGallery() {
               const def = getTheme(p.theme).def;
               return (
                 <div key={`${p.handle}-${i}`} className="flex shrink-0 flex-col gap-5">
-                  <PhoneFrame profile={p} scale={0.58} />
+                  <PhoneFrame profile={p} scale={0.58} lazy />
                   <div className="flex items-center justify-between gap-4 px-1">
                     <div>
                       <h3 className="font-display text-[26px] italic leading-none">{def.label}</h3>
@@ -167,10 +167,10 @@ function StylePlayground() {
             {/* Phone preview: pinned under the nav on mobile so styles can be tapped and seen together */}
             <div className="sticky top-[76px] z-20 -mx-2 mb-3 flex items-center gap-4 rounded-2xl bg-bg/90 p-2 backdrop-blur-xl lg:static lg:mx-0 lg:mb-0 lg:flex-col lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
               <div className="lg:hidden">
-                <PhoneFrame profile={{ ...base, theme }} scale={0.28} />
+                <PhoneFrame profile={{ ...base, theme }} scale={0.28} lazy />
               </div>
               <div className="hidden lg:block">
-                <PhoneFrame profile={{ ...base, theme }} scale={0.56} />
+                <PhoneFrame profile={{ ...base, theme }} scale={0.56} lazy />
               </div>
               <div className="flex min-w-0 flex-1 flex-col items-start gap-2.5 lg:mt-4 lg:flex-none lg:flex-row lg:flex-wrap lg:items-center lg:justify-center lg:gap-3">
                 <span className="rounded-full border border-fg/10 bg-fg/5 px-3 py-1 text-[12px] font-medium text-fg/75 sm:text-[13px]">

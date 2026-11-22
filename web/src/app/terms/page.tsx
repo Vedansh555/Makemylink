@@ -33,6 +33,9 @@ export default function Terms() {
       </p>
       <h2>Your content</h2>
       <p>You keep ownership of what you publish. You give us a licence to host, copy and display it so the service works. You promise you have the right to publish it.</p>
+      <p><b>We never use your content, photos, likeness or your visitors&apos; details to train AI models</b>, and we never sell them.</p>
+      <h2>Your page can never vanish</h2>
+      <p>You can download everything at any time from your dashboard (Account, then &ldquo;Your page is yours&rdquo;): your pages, links, products, email list and bookings, plus a plain backup web page you can host anywhere. If we ever close Showz, we will tell you by email at least 60 days before, keep downloads open until the end, and never delete your page without that warning.</p>
       <h2>Availability</h2>
       <p>We work to keep the service running but cannot promise it will always be available or error-free. Features may change.</p>
       <h2>Limits of our responsibility</h2>

@@ -9,6 +9,7 @@ import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
 import { bookingPrice } from "./BookingModal";
 import { ConsentCheck } from "./ConsentCheck";
+import { WhatsAppIcon } from "./WhatsAppModal";
 import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 import { Background } from "./BioPage";
 import { Tilt } from "../ui/Tilt";
@@ -45,6 +46,8 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [slot, setSlot] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [agree, setAgree] = useState(false);
+  // Set when the buyer opened the "Change the time" link from their confirmation email.
+  const [resched, setResched] = useState<{ id: string; k: string; old: number } | null>(null);
   const [payErr, setPayErr] = useState("");
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
@@ -75,6 +78,14 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   // Coming back from PayPal: the server already took the payment, so just show the confirmation (or what went wrong).
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
+    const rid = q.get("reschedule");
+    const rk = q.get("k");
+    if (rid && rk) {
+      fetch(`/api/bookings/reschedule?id=${encodeURIComponent(rid)}&k=${encodeURIComponent(rk)}`)
+        .then((r) => r.json())
+        .then((x) => (x.slot ? setResched({ id: rid, k: rk, old: x.slot }) : setErr(x.error ?? "This link is not valid")))
+        .catch(() => {});
+    }
     const paid = q.get("paid");
     if (paid) {
       fetch(`/api/bookings/status?id=${encodeURIComponent(paid)}`)
@@ -149,6 +160,15 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     if (!live) return setDone({ status: "demo", pays: [] });
     setBusy(true);
     setErr("");
+    if (resched) {
+      const r = await fetch("/api/bookings/reschedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: resched.id, k: resched.k, slot }) });
+      const x = await r.json().catch(() => ({}));
+      setBusy(false);
+      if (!r.ok) return setErr(x.error ?? "Something went wrong");
+      setDone({ status: x.status === "confirmed" ? "confirmed" : "awaiting_payment", meetingUrl: x.meetingUrl, pays: [] });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: profile.handle, linkId: link.id, slot, name, email, note, consent: agree }) });
     const d = await res.json().catch(() => ({}));
     setBusy(false);
@@ -218,8 +238,13 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   <p className={`${t.meta} mt-1`}>{cfg.timeZone.replace("_", " ")}{!sameZone && ` · ${fmtTime(slot ?? 0, viewerTz)} your time`}</p>
                   {done.status === "confirmed" ? (
                     <div className="mt-6 space-y-3 text-[14px]">
-                      <p className="opacity-70">We emailed you the details. Join with this link:</p>
+                      <p className="opacity-70">{resched ? "Your new time is saved. We emailed you the details." : "We emailed you the details and a calendar file. Join with this link:"}</p>
                       {done.meetingUrl && <a href={done.meetingUrl} target="_blank" rel="noreferrer" className={`${cta} block break-all`}>Open meeting link</a>}
+                      {!resched && (
+                        <a href={`https://wa.me/?text=${encodeURIComponent(`I just booked "${link.title}" with ${profile.name}. You can book too: ${typeof window !== "undefined" ? window.location.origin : ""}/${profile.handle}`)}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-full border border-t-fg/25 px-5 py-3 font-semibold">
+                          <WhatsAppIcon className="h-4 w-4" /> Share on WhatsApp
+                        </a>
+                      )}
                     </div>
                   ) : (
                     <div className="mt-6 space-y-3 text-[14px]">
@@ -271,13 +296,21 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   <div>
                     <h1 className={`${nameFont} text-[34px] leading-[1.02] sm:text-[46px]`}>{link.title}</h1>
                     {cfg.description && <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed opacity-75">{cfg.description}</p>}
+                    {/* On phones the price, length and time zone sit in one row here, so the calendar comes right after. */}
+                    <div className="mt-4 flex flex-wrap gap-2 lg:hidden">
+                      <span className="rounded-full bg-t-accent px-3.5 py-1.5 text-[14px] font-bold text-t-on-accent shadow-[0_10px_22px_-10px_var(--t-accent)]">{price}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 bg-t-fg/[0.06] px-3 py-1.5 text-[13px]"><Clock className="h-3.5 w-3.5 opacity-70" />{cfg.durationMin} min</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 bg-t-fg/[0.06] px-3 py-1.5 text-[13px]"><Video className="h-3.5 w-3.5 opacity-70" />Video call</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-t-fg/15 bg-t-fg/[0.06] px-3 py-1.5 text-[13px]"><Globe className="h-3.5 w-3.5 opacity-70" />{cfg.timeZone.split("/").pop()!.replace("_", " ")}</span>
+                    </div>
+                    {!free && <p className="mt-2 text-[12px] opacity-60 lg:hidden">Paid straight to the host. Showz takes 0%.</p>}
                   </div>
                 </div>
               </Tilt>
             </motion.div>
 
             {/* Price */}
-            <motion.div {...enter(1)} className="col-span-2 lg:col-span-2">
+            <motion.div {...enter(1)} className="col-span-2 hidden lg:col-span-2 lg:block">
               <div className="relative flex h-full min-h-[150px] flex-col justify-between overflow-hidden rounded-[28px] bg-gradient-to-br from-t-accent to-t-accent2 p-6 text-t-on-accent shadow-[0_40px_80px_-30px_var(--t-accent),0_2px_0_rgba(255,255,255,0.35)_inset]">
                 <span className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/25 blur-2xl" />
                 <span className="relative text-[13px] font-medium opacity-80">{free ? "Free session" : "One session"}</span>
@@ -289,7 +322,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
             </motion.div>
 
             {/* Quick facts */}
-            <motion.div {...enter(2)} className="col-span-1 lg:col-span-2">
+            <motion.div {...enter(2)} className="col-span-1 hidden lg:col-span-2 lg:block">
               <div className="flex h-full min-h-[120px] flex-col justify-between rounded-[28px] bg-t-fg p-5 text-t-bg shadow-[0_30px_60px_-28px_rgba(0,0,0,0.7)] transition duration-300 hover:-translate-y-1">
                 <Clock className="h-5 w-5 opacity-70" />
                 <div>
@@ -298,7 +331,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                 </div>
               </div>
             </motion.div>
-            <motion.div {...enter(2.5)} className="col-span-1 lg:col-span-2">
+            <motion.div {...enter(2.5)} className="col-span-1 hidden lg:col-span-2 lg:block">
               <div className={`${card} flex h-full min-h-[120px] flex-col justify-between !p-5 transition duration-300 hover:-translate-y-1`}>
                 <Video className="h-5 w-5 opacity-70" />
                 <div>
@@ -307,7 +340,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                 </div>
               </div>
             </motion.div>
-            <motion.div {...enter(3)} className="col-span-2 lg:col-span-2">
+            <motion.div {...enter(3)} className="col-span-2 hidden lg:col-span-2 lg:block">
               <div className={`${card} flex h-full min-h-[120px] flex-col justify-between !p-5 transition duration-300 hover:-translate-y-1`}>
                 <Globe className="h-5 w-5 opacity-70" />
                 <div>
@@ -438,13 +471,16 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
               )}
               <form id="bookform" onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-2">
                 {!live && <p className="rounded-xl bg-t-fg/10 px-3 py-2 text-[12px] opacity-80 sm:col-span-2">Demo: try it. Nothing is booked or charged.</p>}
+                {resched && <p className="rounded-xl bg-t-accent/15 px-3.5 py-2.5 text-[13px] sm:col-span-2">Changing your booking from <b>{fmtDay(resched.old)} · {fmtTime(resched.old)}</b>. Pick a new time above.</p>}
+                {!resched && (<>
                 <input required disabled={!slot} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={80} className={field} autoComplete="name" />
                 <input required disabled={!slot} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className={field} autoComplete="email" />
                 <textarea disabled={!slot} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What would you like to talk about? (optional)" maxLength={500} rows={3} className={`${field} sm:col-span-2`} />
                 <ConsentCheck checked={agree} onChange={setAgree} className="sm:col-span-2" />
+                </>)}
                 {err && <p className="text-[13px] text-red-500 sm:col-span-2">{err}</p>}
                 <button disabled={!slot || busy} className={`${cta} hidden w-full disabled:opacity-40 disabled:shadow-none sm:col-span-2 lg:block`}>
-                  {busy ? "Booking…" : free ? "Confirm booking" : `Continue · ${price}`}
+                  {busy ? "Booking…" : resched ? "Move my booking here" : free ? "Confirm booking" : `Continue · ${price}`}
                 </button>
               </form>
             </motion.section>
@@ -458,14 +494,14 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
 
       {/* Phones and tablets: the price and the confirm button stay in reach */}
       {!done && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-t-fg/15 bg-t-bg/85 px-4 py-3 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-30 border-t border-t-fg/15 bg-t-bg/85 px-4 py-3 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
           <div className="mx-auto flex max-w-md items-center gap-3">
             <div className="min-w-0 flex-1 text-[13px] leading-tight">
               <p className="truncate font-semibold">{slot ? `${fmtDay(slot).split(",")[0] ?? ""} · ${fmtTime(slot)}` : "Pick a time"}</p>
               <p className="opacity-60">{link.title} · {price}</p>
             </div>
             <button form="bookform" disabled={!slot || busy} className={`${cta} shrink-0 !px-5 !py-3 disabled:opacity-40 disabled:shadow-none`}>
-              {busy ? "Booking…" : free ? "Confirm" : "Continue"}
+              {busy ? "Booking…" : resched ? "Move here" : free ? "Confirm" : "Continue"}
             </button>
           </div>
         </div>

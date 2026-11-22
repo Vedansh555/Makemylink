@@ -11,7 +11,20 @@ const KEY = "mml_cookie_notice";
 export function CookieNotice() {
   const [show, setShow] = useState(false);
   // The editor has a floating Edit / Preview / Publish bar at the bottom of phones; sit above it there.
-  const inEditor = usePathname().startsWith("/create");
+  const path = usePathname();
+  // Pages with a bar fixed to the bottom (editor, booking page) mark it with data-bottom-bar; the notice sits just above it.
+  const [lift, setLift] = useState(0);
+  useEffect(() => {
+    if (!show) return;
+    const measure = () => {
+      const bar = document.querySelector<HTMLElement>("[data-bottom-bar]");
+      const visible = !!bar && bar.getBoundingClientRect().height > 0 && getComputedStyle(bar).display !== "none";
+      setLift(visible ? window.innerHeight - bar!.getBoundingClientRect().top + 10 : 0);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [show, path]);
   useEffect(() => {
     try {
       if (!localStorage.getItem(KEY)) {
@@ -43,7 +56,8 @@ export function CookieNotice() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 12 }}
           transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}
-          className={`fixed right-4 z-[60] ${inEditor ? "bottom-24 lg:bottom-4" : "bottom-4"} flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-fg/10 bg-bg/95 py-2 pl-4 pr-2 text-[12px] text-fg shadow-[0_8px_28px_-10px_rgba(0,0,0,.35)] backdrop-blur-xl`}
+          style={lift ? { bottom: lift } : undefined}
+          className={`fixed bottom-4 right-4 z-[60] flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-fg/10 bg-bg/95 py-2 pl-4 pr-2 text-[12px] text-fg shadow-[0_8px_28px_-10px_rgba(0,0,0,.35)] backdrop-blur-xl`}
         >
           <span className="text-fg/65">
             Essential cookies only.{" "}

@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { BioPage } from "@/components/bio/BioPage";
 import { getDemoProfile } from "@/lib/demo";
-import { pageByHandle } from "@/lib/account";
+import { hasContent, pageByHandle } from "@/lib/account";
 import { applyPlan, publicProfile, type PlanId } from "@/lib/plans";
 import { run } from "@/lib/db";
 import { SITE_URL } from "@/lib/site";
@@ -12,15 +12,15 @@ import { latestVideo } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
 
-async function load(handle: string): Promise<{ profile: Profile; plan: PlanId; pageId?: string } | null> {
+async function load(handle: string): Promise<{ profile: Profile; plan: PlanId; pageId?: string; indexable: boolean; verifiedLabel?: string | null } | null> {
   try {
     const page = await pageByHandle(handle);
-    if (page) return { profile: publicProfile(applyPlan(page.profile, page.plan)), plan: page.plan, pageId: page.id };
+    if (page) return { profile: publicProfile(applyPlan(page.profile, page.plan)), plan: page.plan, pageId: page.id, verifiedLabel: page.verifiedLabel, indexable: page.emailVerified && hasContent(JSON.stringify(page.profile)) };
   } catch (err) {
     console.error("Error looking up handle in DB:", err);
   }
   const demo = getDemoProfile(handle.toLowerCase());
-  return demo ? { profile: demo, plan: "pro" } : null;
+  return demo ? { profile: demo, plan: "pro", indexable: true } : null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
@@ -34,6 +34,8 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
     title,
     description,
     alternates: { canonical: `${SITE_URL}/${profile.handle}` },
+    // New pages stay out of search until the owner confirms their email and adds content.
+    robots: found.indexable ? undefined : { index: false, follow: false },
     openGraph: { title, description, url: `${SITE_URL}/${profile.handle}`, type: "profile", images: profile.avatar?.startsWith("https://") ? [profile.avatar] : undefined },
     twitter: { card: "summary", title, description },
   };
@@ -83,7 +85,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <BioPage profile={profile} plan={plan} live={!!found.pageId} />
+      <BioPage profile={profile} plan={plan} live={!!found.pageId} verified={found.verifiedLabel} />
     </>
   );
 }

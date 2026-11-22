@@ -19,6 +19,7 @@ export function Pricing() {
         <p className="mt-5 max-w-[520px] text-fg/60">
           Start free. Upgrade to Pro when your page starts earning. No commission on bookings or sales, ever.
         </p>
+        <p className="mt-2 max-w-[560px] text-[13px] text-fg/45">We never train AI on your content. Download your whole page any time, so it can never vanish.</p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Toggle
@@ -48,7 +49,7 @@ export function Pricing() {
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-display text-[40px] italic leading-none">{p.name}</h3>
                 {p.highlight && (
-                  <span className="mt-1 shrink-0 rounded-full bg-[#ff5b37] px-3 py-1 text-[11px] font-semibold text-[#111]">Most loved</span>
+                  <span className="mt-1 shrink-0 rounded-full bg-[#ff5b37] px-3 py-1 text-[11px] font-semibold text-[#111]">For people who earn</span>
                 )}
               </div>
               <p className="mt-2 text-[14px] text-fg/55">{p.tagline}</p>

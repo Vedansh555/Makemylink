@@ -37,7 +37,7 @@ export function GoalCards({ handle }: { handle?: string }) {
                 <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#ff5b37] text-[#111]">
                   <Icon className="h-5 w-5" />
                 </span>
-                <span className="font-display text-[30px] leading-none text-fg/20">{String(i + 1).padStart(2, "0")}</span>
+                
               </div>
               <h3 className="mt-5 font-display text-[clamp(28px,3vw,36px)] leading-[1.02]">{g.title}</h3>
               <p className="mt-2.5 text-[14px] leading-relaxed text-fg/60">{g.blurb}</p>
@@ -51,7 +51,7 @@ export function GoalCards({ handle }: { handle?: string }) {
               <div className="absolute -inset-x-8 inset-y-12 -z-10 hidden rounded-full opacity-45 blur-3xl sm:block" style={{ background: GLOW[g.id] }} />
               <div className="origin-bottom transition-transform duration-500 group-active:-translate-y-2 sm:-rotate-3 sm:group-hover:-translate-y-2 sm:group-hover:rotate-0">
                 <div className="max-sm:[animation:phonedrift_5s_ease-in-out_infinite] motion-reduce:[animation:none]">
-                  <PhoneFrame interactive={false} profile={preview} scale={0.46} compactShadow />
+                  <PhoneFrame interactive={false} profile={preview} scale={0.46} compactShadow lazy />
                 </div>
               </div>
             </div>

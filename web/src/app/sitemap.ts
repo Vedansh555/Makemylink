@@ -4,14 +4,16 @@ import { demoProfiles } from "@/lib/demo";
 import { SITE_URL } from "@/lib/site";
 import { posts } from "@/content/blog";
 import { niches } from "@/content/niches";
+import { hasContent } from "@/lib/account";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const handles = new Set(demoProfiles.map((d) => d.handle));
   try {
-    const rows = await all<{ handle: string }>("SELECT handle FROM pages WHERE suspended = FALSE");
-    rows.forEach((r) => handles.add(r.handle));
+    // Only pages whose owner confirmed their email and that have real content, so spam or empty test pages are never listed.
+    const rows = await all<{ handle: string; profile_json: string }>("SELECT p.handle, p.profile_json FROM pages p JOIN users u ON u.id = p.user_id WHERE p.suspended = FALSE AND u.email_verified = TRUE");
+    rows.filter((r) => hasContent(r.profile_json)).forEach((r) => handles.add(r.handle));
   } catch {
     // Database unavailable: list the static and demo pages only.
   }

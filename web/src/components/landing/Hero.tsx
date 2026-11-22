@@ -74,7 +74,7 @@ export function Hero() {
                 placeholder="Paste your Linktree or Carrd link"
                 className="h-full min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-[#111] outline-none placeholder:text-[#111]/45"
               />
-              <button type="submit" className="h-full shrink-0 rounded-lg bg-[#ff5b37] px-5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">
+              <button type="submit" className="h-full min-h-[44px] shrink-0 rounded-lg bg-[#ff5b37] px-5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">
                 Import
               </button>
             </form>

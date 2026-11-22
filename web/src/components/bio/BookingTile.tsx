@@ -8,16 +8,13 @@ import { bookingPrice } from "./BookingModal";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/**
- * The booking card on a profile, drawn as a bento tile: what it is, what it costs, and the next free times,
- * so a visitor sees there is room before tapping. Tapping opens the booking window.
- */
-export function BookingTile({ link, handle, live, compact, onOpen }: { link: BioLink; handle: string; live: boolean; compact: boolean; onOpen: () => void }) {
+/** The first free day and its first few times for a booking card. On demo pages it is worked out locally; on real pages it asks the server. */
+export function useNextFree(link: BioLink, handle: string, live: boolean, enabled = true) {
   const cfg = link.booking!;
   const [next, setNext] = useState<{ label: string; times: number[] } | null>(null);
 
   useEffect(() => {
-    if (compact) return;
+    if (!enabled) return;
     let cancelled = false;
     const fmtYmd = new Intl.DateTimeFormat("en-CA", { timeZone: cfg.timeZone });
     const label = (ymd: string) => {
@@ -56,8 +53,19 @@ export function BookingTile({ link, handle, live, compact, onOpen }: { link: Bio
     return () => {
       cancelled = true;
     };
-  }, [cfg, compact, handle, link.id, live]);
+  }, [cfg, enabled, handle, link.id, live]);
 
+  const fmt = (ms: number) => new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", timeZone: cfg.timeZone }).format(new Date(ms)).replace(":00", "");
+  return next ? { ...next, short: `${next.label === "Today" || next.label === "Tomorrow" ? next.label : next.label.split(",")[0]!.split(" ")[0]} ${fmt(next.times[0]!)}` } : null;
+}
+
+/**
+ * The booking card on a profile, drawn as a bento tile: what it is, what it costs, and the next free times,
+ * so a visitor sees there is room before tapping. Tapping opens the booking window.
+ */
+export function BookingTile({ link, handle, live, compact, onOpen }: { link: BioLink; handle: string; live: boolean; compact: boolean; onOpen: () => void }) {
+  const cfg = link.booking!;
+  const next = useNextFree(link, handle, live, !compact);
   const price = bookingPrice(link);
   const fmt = (ms: number) => new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", timeZone: cfg.timeZone }).format(new Date(ms));
 

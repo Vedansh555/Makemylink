@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { one, run } from "./db";
 
-export type TokenPurpose = "reset" | "verify";
+export type TokenPurpose = "reset" | "verify" | "workmail";
 
 const hash = (t: string) => crypto.createHash("sha256").update(t).digest("hex");
 
