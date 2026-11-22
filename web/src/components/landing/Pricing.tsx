@@ -119,8 +119,8 @@ function SavingsCalculator({ region }: { region: Region }) {
     setMonthly(isIndia ? 35000 : 600);
   }, [isIndia]);
 
-  // Typical platforms take ~12% (10% platform fee + ~2% gateway fee or 14% on Topmate / 10% on Gumroad)
-  const otherFee = Math.round(monthly * 0.12);
+  // A typical marketplace cut. Payment-company fees apply on every platform, Showz included, so they are left out of both sides.
+  const otherFee = Math.round(monthly * 0.1);
   const showzFee = isIndia ? 299 : 8;
   const savedMonthly = Math.max(0, otherFee - showzFee);
   const savedYearly = savedMonthly * 12;
@@ -164,14 +164,14 @@ function SavingsCalculator({ region }: { region: Region }) {
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
-          <p className="text-[11px] uppercase tracking-wider text-fg/45">Platforms with a 12% cut</p>
+          <p className="text-[11px] uppercase tracking-wider text-fg/45">Platforms that take a 10% cut</p>
           <p className="mt-2 text-[20px] font-bold text-red-400">-{fmt(otherFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
-          <p className="mt-1 text-[11px] text-fg/40">Topmate, Gumroad, Beacons</p>
+          <p className="mt-1 text-[11px] text-fg/40">Before payment-company fees</p>
         </div>
         <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
           <p className="text-[11px] uppercase tracking-wider text-fg/45">Showz Pro flat fee</p>
           <p className="mt-2 text-[20px] font-bold text-fg">{fmt(showzFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
-          <p className="mt-1 text-[11px] text-fg/40">Zero percentage, ever</p>
+          <p className="mt-1 text-[11px] text-fg/40">No cut of your sales, ever</p>
         </div>
         <div className="rounded-2xl border border-[#ff5b37]/30 bg-[#ff5b37]/[0.08] p-4">
           <p className="text-[11px] uppercase tracking-wider text-[#ff5b37]">You keep extra</p>

@@ -51,6 +51,8 @@ export async function GET(req: Request) {
     checklist,
     plan,
     bookingPage: hasBooking,
+    hasProducts: profile.looks.length > 0,
+    hasChat: profile.links.some((l) => l.kind === "whatsapp"),
     pageId: page.id,
     handle: page.handle,
     days,

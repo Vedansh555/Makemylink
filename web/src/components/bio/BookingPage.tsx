@@ -343,7 +343,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   };
 
   return (
-    <div style={style} className="relative isolate min-h-screen bg-[#0b0b0e] text-white font-sans antialiased">
+    <div style={style} className="relative isolate min-h-screen overflow-x-clip bg-t-bg text-t-fg font-sans antialiased">
       <Background theme={theme} />
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute -left-28 -top-28 h-[500px] w-[500px] rounded-full bg-t-accent/15 blur-[130px]" />
@@ -355,22 +355,22 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg rounded-[28px] border border-white/10 bg-[#121215]/95 p-6 sm:p-8 text-center shadow-2xl backdrop-blur-2xl"
+            className="w-full max-w-lg rounded-[28px] border border-t-fg/10 bg-t-bg/95 p-6 sm:p-8 text-center shadow-2xl backdrop-blur-2xl"
           >
-            <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white text-black shadow-lg">
+            <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-t-fg text-t-bg shadow-lg">
               <Check className="h-8 w-8 stroke-[2.5]" />
             </span>
 
             {done.status === "demo" ? (
               <>
                 <h1 className={`${nameFont} mt-5 text-[28px] font-bold leading-tight`}>This is how it works</h1>
-                <p className="mt-3 text-[14px] leading-relaxed text-white/70">
+                <p className="mt-3 text-[14px] leading-relaxed text-t-fg/70">
                   Your visitor picks a time and pays you directly. You confirm and the meeting link arrives by email.
                   Showz takes 0% commission. Nothing was booked or charged here.
                 </p>
                 <Link
                   href="/create?focus=booking"
-                  className="mt-6 block rounded-xl bg-white px-5 py-3.5 text-[14px] font-bold text-black transition hover:bg-white/90"
+                  className="mt-6 block rounded-xl bg-t-fg px-5 py-3.5 text-[14px] font-bold text-t-bg transition hover:bg-t-fg/90"
                 >
                   Add a booking card to my page
                 </Link>
@@ -381,12 +381,12 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   {done.status === "confirmed" ? "You're booked!" : "Time held for you"}
                 </h1>
                 {slot && (
-                  <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3.5 text-left text-[14px]">
-                    <p className="font-semibold text-white">{fmtFullDay(slot)}</p>
-                    <p className="mt-0.5 text-white/70">
+                  <div className="mt-4 rounded-xl border border-t-fg/10 bg-t-fg/5 p-3.5 text-left text-[14px]">
+                    <p className="font-semibold text-t-fg">{fmtFullDay(slot)}</p>
+                    <p className="mt-0.5 text-t-fg/70">
                       {fmtSlotTime(slot, false)} - {fmtSlotTime(slot + cfg.durationMin * 60_000, false)} ({cfg.durationMin}m)
                     </p>
-                    <p className="mt-1 text-[12px] text-white/50">
+                    <p className="mt-1 text-[12px] text-t-fg/50">
                       Time zone: {cfg.timeZone.replace("_", " ")}
                       {!sameZone && ` · ${fmtSlotTime(slot, false, viewerTz)} your time`}
                     </p>
@@ -395,7 +395,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
 
                 {done.status === "confirmed" ? (
                   <div className="mt-6 space-y-3 text-[14px]">
-                    <p className="text-white/70">
+                    <p className="text-t-fg/70">
                       {resched
                         ? "Your new time is saved. We emailed you the updated details."
                         : "We emailed you the confirmation and a calendar invite. Join with this link:"}
@@ -405,7 +405,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         href={done.meetingUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="block rounded-xl bg-white px-5 py-3.5 font-bold text-black transition hover:bg-white/90"
+                        className="block rounded-xl bg-t-fg px-5 py-3.5 font-bold text-t-bg transition hover:bg-t-fg/90"
                       >
                         Open Google Meet Link
                       </a>
@@ -419,7 +419,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         )}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3 font-semibold text-white hover:bg-white/10 transition"
+                        className="flex items-center justify-center gap-2 rounded-xl border border-t-fg/20 bg-t-fg/5 px-5 py-3 font-semibold text-t-fg hover:bg-t-fg/10 transition"
                       >
                         <WhatsAppIcon className="h-4 w-4" /> Share on WhatsApp
                       </a>
@@ -427,7 +427,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   </div>
                 ) : (
                   <div className="mt-6 space-y-3 text-[14px]">
-                    <p className="text-white/70">
+                    <p className="text-t-fg/70">
                       {done.pays.some((p) => p.kind === "razorpay" || p.kind === "paypal")
                         ? `One step left: pay ${price} to hold your spot. Your meeting link appears as soon as payment is completed.`
                         : `One step left: pay ${price} directly to ${profile.name}. Your meeting link is sent as soon as they confirm.`}
@@ -439,7 +439,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           key="rzp"
                           type="button"
                           onClick={() => payOnline(p)}
-                          className="block w-full rounded-xl bg-white px-5 py-3.5 font-bold text-black transition hover:bg-white/90"
+                          className="block w-full rounded-xl bg-t-fg px-5 py-3.5 font-bold text-t-bg transition hover:bg-t-fg/90"
                         >
                           Pay {price} now
                         </button>
@@ -447,7 +447,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         <a
                           key="pp"
                           href={p.url}
-                          className="block rounded-xl bg-white px-5 py-3.5 font-bold text-black transition hover:bg-white/90"
+                          className="block rounded-xl bg-t-fg px-5 py-3.5 font-bold text-t-bg transition hover:bg-t-fg/90"
                         >
                           Pay {price} with PayPal
                         </a>
@@ -459,12 +459,12 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           >
                             Pay with UPI App
                           </a>
-                          <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[13px]">
-                            <span className="font-mono text-white/90">{p.upiId}</span>
+                          <div className="flex items-center justify-between rounded-xl border border-t-fg/15 bg-t-fg/5 px-3 py-2 text-[13px]">
+                            <span className="font-mono text-t-fg/90">{p.upiId}</span>
                             <button
                               type="button"
                               onClick={() => copyUpi(p.upiId)}
-                              className="inline-flex items-center gap-1 rounded-md bg-white/10 px-2 py-1 text-[11px] font-medium text-white hover:bg-white/20"
+                              className="inline-flex items-center gap-1 rounded-md bg-t-fg/10 px-2 py-1 text-[11px] font-medium text-t-fg hover:bg-t-fg/20"
                             >
                               <Copy className="h-3 w-3" /> {copiedUpi ? "Copied" : "Copy"}
                             </button>
@@ -476,7 +476,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           href={p.link}
                           target="_blank"
                           rel="noreferrer"
-                          className="block rounded-xl border border-white/20 bg-white/5 px-5 py-3 font-semibold text-white hover:bg-white/10"
+                          className="block rounded-xl border border-t-fg/20 bg-t-fg/5 px-5 py-3 font-semibold text-t-fg hover:bg-t-fg/10"
                         >
                           Pay via card or link
                         </a>
@@ -489,21 +489,21 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
 
             <Link
               href={`/${profile.handle}`}
-              className="mt-7 inline-block text-[13px] text-white/60 hover:text-white underline underline-offset-4"
+              className="mt-7 inline-block text-[13px] text-t-fg/60 hover:text-t-fg underline underline-offset-4"
             >
               Back to {profile.name}&apos;s profile
             </Link>
           </motion.div>
         ) : (
           /* Main Cal.com 3-Column Shell */
-          <div className="w-full max-w-5xl rounded-[28px] border border-white/10 bg-[#121215]/95 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-12 md:divide-x md:divide-white/10">
+          <div className="w-full max-w-5xl rounded-[28px] border border-t-fg/10 bg-t-bg/95 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-12 md:divide-x md:divide-t-fg/10">
               {/* Column 1: Host & Meeting Details (~280px / 4 cols) */}
-              <div className="p-6 md:p-7 md:col-span-4 flex flex-col justify-between border-b md:border-b-0 border-white/10">
+              <div className="p-6 md:p-7 md:col-span-4 flex flex-col justify-between border-b md:border-b-0 border-t-fg/10">
                 <div className="space-y-5">
                   <Link
                     href={`/${profile.handle}`}
-                    className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white/60 hover:text-white transition"
+                    className="inline-flex items-center gap-1.5 text-[13px] font-medium text-t-fg/60 hover:text-t-fg transition"
                   >
                     <ArrowLeft className="h-3.5 w-3.5" /> Back to {profile.name}
                   </Link>
@@ -514,25 +514,25 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                       <img
                         src={profile.avatar}
                         alt=""
-                        className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10"
+                        className="h-12 w-12 rounded-full object-cover ring-2 ring-t-fg/10"
                       />
                     ) : (
-                      <span className="grid h-12 w-12 place-items-center rounded-full bg-white/10 text-[18px] font-bold text-white">
+                      <span className="grid h-12 w-12 place-items-center rounded-full bg-t-fg/10 text-[18px] font-bold text-t-fg">
                         {profile.name.charAt(0)}
                       </span>
                     )}
                     <div className="min-w-0">
-                      <p className="truncate text-[15px] font-medium text-white/70">{profile.name}</p>
-                      <p className="truncate text-[13px] text-white/40">@{profile.handle}</p>
+                      <p className="truncate text-[15px] font-medium text-t-fg/70">{profile.name}</p>
+                      <p className="truncate text-[13px] text-t-fg/40">@{profile.handle}</p>
                     </div>
                   </div>
 
                   <div>
-                    <h1 className={`${nameFont} text-[24px] sm:text-[28px] font-bold leading-tight text-white`}>
+                    <h1 className={`${nameFont} text-[24px] sm:text-[28px] font-bold leading-tight text-t-fg`}>
                       {link.title}
                     </h1>
                     {cfg.description && (
-                      <p className="mt-2 text-[14px] leading-relaxed text-white/65 line-clamp-3">
+                      <p className="mt-2 text-[14px] leading-relaxed text-t-fg/65 line-clamp-3">
                         {cfg.description}
                       </p>
                     )}
@@ -548,21 +548,21 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                   )}
 
                   {/* Metadata spec items (Cal.com layout) */}
-                  <div className="space-y-3 pt-2 text-[14px] text-white/75">
+                  <div className="space-y-3 pt-2 text-[14px] text-t-fg/75">
                     <div className="flex items-center gap-2.5">
-                      <Clock className="h-4 w-4 text-white/50 shrink-0" />
+                      <Clock className="h-4 w-4 text-t-fg/50 shrink-0" />
                       <span>{cfg.durationMin}m</span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <Video className="h-4 w-4 text-white/50 shrink-0" />
+                      <Video className="h-4 w-4 text-t-fg/50 shrink-0" />
                       <span>Google Meet</span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <Globe className="h-4 w-4 text-white/50 shrink-0" />
+                      <Globe className="h-4 w-4 text-t-fg/50 shrink-0" />
                       <span className="truncate">
                         {cfg.timeZone.replace("_", " ")}
                         {!sameZone && (
-                          <span className="block text-[12px] text-white/40">
+                          <span className="block text-[12px] text-t-fg/40">
                             Your time: {viewerTz.replace("_", " ")}
                           </span>
                         )}
@@ -572,10 +572,10 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                 </div>
 
                 {/* Price & 0% fee assurance */}
-                <div className="mt-6 pt-5 border-t border-white/10">
+                <div className="mt-6 pt-5 border-t border-t-fg/10">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-[13px] text-white/50 font-medium">{free ? "Free Session" : "Fee"}</span>
-                    <span className="text-[22px] font-bold text-white">{price}</span>
+                    <span className="text-[13px] text-t-fg/50 font-medium">{free ? "Free Session" : "Fee"}</span>
+                    <span className="text-[22px] font-bold text-t-fg">{price}</span>
                   </div>
                   <p className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-400/90 font-medium">
                     <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Direct host payout · Showz takes 0%
@@ -597,26 +597,26 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                       className="p-6 md:p-8 flex-1 flex flex-col justify-between"
                     >
                       <div>
-                        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                        <div className="flex items-center justify-between pb-4 border-b border-t-fg/10">
                           <button
                             type="button"
                             onClick={() => setSlot(null)}
-                            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white/70 hover:text-white transition"
+                            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-t-fg/70 hover:text-t-fg transition"
                           >
                             <ArrowLeft className="h-4 w-4" /> Change date or time
                           </button>
-                          <span className="text-[12px] font-medium text-white/50">Step 2 of 2</span>
+                          <span className="text-[12px] font-medium text-t-fg/50">Step 2 of 2</span>
                         </div>
 
                         {/* Selected Time Pill */}
-                        <div className="mt-5 rounded-2xl border border-white/15 bg-white/[0.04] p-4 flex items-center justify-between">
+                        <div className="mt-5 rounded-2xl border border-t-fg/15 bg-t-fg/[0.04] p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="grid h-10 w-10 place-items-center rounded-xl bg-white text-black font-bold">
+                            <div className="grid h-10 w-10 place-items-center rounded-xl bg-t-fg text-t-bg font-bold">
                               <CalendarIcon className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="text-[15px] font-semibold text-white">{fmtFullDay(slot)}</p>
-                              <p className="text-[13px] text-white/70">
+                              <p className="text-[15px] font-semibold text-t-fg">{fmtFullDay(slot)}</p>
+                              <p className="text-[13px] text-t-fg/70">
                                 {fmtSlotTime(slot, use24h)} - {fmtSlotTime(slot + cfg.durationMin * 60_000, use24h)} (
                                 {cfg.durationMin}m)
                                 {!sameZone && ` · ${fmtSlotTime(slot, use24h, viewerTz)} local`}
@@ -626,7 +626,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           <button
                             type="button"
                             onClick={() => setSlot(null)}
-                            className="text-[12px] font-medium text-white/50 hover:text-white underline underline-offset-2"
+                            className="text-[12px] font-medium text-t-fg/50 hover:text-t-fg underline underline-offset-2"
                           >
                             Change
                           </button>
@@ -634,17 +634,17 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
 
                         <form id="bookform" onSubmit={submit} className="mt-6 space-y-4">
                           {!live && (
-                            <p className="rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-[12px] text-white/70">
+                            <p className="rounded-xl border border-t-fg/10 bg-t-fg/5 px-3.5 py-2 text-[12px] text-t-fg/70">
                               Demo mode: Nothing is charged or booked. You can test the exact booking experience.
                             </p>
                           )}
 
                           <div>
-                            <label className="block text-[12px] font-medium uppercase tracking-wider text-white/60 mb-1.5">
+                            <label className="block text-[12px] font-medium uppercase tracking-wider text-t-fg/60 mb-1.5">
                               Your Name *
                             </label>
                             <div className="relative">
-                              <User className="absolute left-3.5 top-3.5 h-4 w-4 text-white/40" />
+                              <User className="absolute left-3.5 top-3.5 h-4 w-4 text-t-fg/40" />
                               <input
                                 required
                                 value={name}
@@ -652,17 +652,17 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                 placeholder="e.g. Rahul Sharma"
                                 maxLength={80}
                                 autoComplete="name"
-                                className="w-full rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-[14px] text-white outline-none placeholder:text-white/30 focus:border-white/50 transition"
+                                className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 pl-10 pr-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50 transition"
                               />
                             </div>
                           </div>
 
                           <div>
-                            <label className="block text-[12px] font-medium uppercase tracking-wider text-white/60 mb-1.5">
+                            <label className="block text-[12px] font-medium uppercase tracking-wider text-t-fg/60 mb-1.5">
                               Email Address *
                             </label>
                             <div className="relative">
-                              <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-white/40" />
+                              <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-t-fg/40" />
                               <input
                                 required
                                 type="email"
@@ -670,31 +670,31 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="you@example.com"
                                 autoComplete="email"
-                                className="w-full rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-[14px] text-white outline-none placeholder:text-white/30 focus:border-white/50 transition"
+                                className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 pl-10 pr-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50 transition"
                               />
                             </div>
-                            <p className="mt-1 text-[11px] text-white/40">Calendar invite and meeting link sent here</p>
+                            <p className="mt-1 text-[11px] text-t-fg/40">Calendar invite and meeting link sent here</p>
                           </div>
 
                           <div>
-                            <label className="block text-[12px] font-medium uppercase tracking-wider text-white/60 mb-1.5">
+                            <label className="block text-[12px] font-medium uppercase tracking-wider text-t-fg/60 mb-1.5">
                               What would you like to discuss? <span className="opacity-50">(optional)</span>
                             </label>
                             <div className="relative">
-                              <MessageSquare className="absolute left-3.5 top-3.5 h-4 w-4 text-white/40" />
+                              <MessageSquare className="absolute left-3.5 top-3.5 h-4 w-4 text-t-fg/40" />
                               <textarea
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
                                 placeholder="Briefly share topics, questions, or goals for our call..."
                                 maxLength={500}
                                 rows={2}
-                                className="w-full rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-2.5 text-[14px] text-white outline-none placeholder:text-white/30 focus:border-white/50 transition resize-none"
+                                className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 pl-10 pr-4 py-2.5 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50 transition resize-none"
                               />
                             </div>
                           </div>
 
                           <div className="pt-1">
-                            <ConsentCheck checked={agree} onChange={setAgree} className="text-white/80" />
+                            <ConsentCheck checked={agree} onChange={setAgree} className="text-t-fg/80" />
                           </div>
 
                           {err && <p className="text-[13px] text-red-400 font-medium">{err}</p>}
@@ -702,7 +702,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           <button
                             type="submit"
                             disabled={busy}
-                            className="w-full rounded-xl bg-white py-3.5 text-[15px] font-bold text-black transition hover:bg-white/90 disabled:opacity-50 shadow-lg cursor-pointer"
+                            className="w-full rounded-xl bg-t-fg py-3.5 text-[15px] font-bold text-t-bg transition hover:bg-t-fg/90 disabled:opacity-50 shadow-lg cursor-pointer"
                           >
                             {busy
                               ? "Processing…"
@@ -715,7 +715,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         </form>
                       </div>
 
-                      <div className="mt-6 flex items-center justify-center gap-1.5 text-[12px] text-white/40">
+                      <div className="mt-6 flex items-center justify-center gap-1.5 text-[12px] text-t-fg/40">
                         <Lock className="h-3.5 w-3.5" /> End-to-end encrypted · Direct creator booking
                       </div>
                     </motion.div>
@@ -726,14 +726,14 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="grid grid-cols-1 lg:grid-cols-12 flex-1 lg:divide-x lg:divide-white/10"
+                      className="grid grid-cols-1 lg:grid-cols-12 flex-1 lg:divide-x lg:divide-t-fg/10"
                     >
                       {/* Center: Month Calendar Grid (~330px / 7 cols) */}
                       <div className="p-5 sm:p-6 lg:col-span-7 flex flex-col justify-between">
                         <div>
                           {/* Calendar Navigation Header */}
                           <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-[16px] font-semibold text-white tracking-tight">{monthLabel}</h2>
+                            <h2 className="text-[16px] font-semibold text-t-fg tracking-tight">{monthLabel}</h2>
                             <div className="flex items-center gap-1.5">
                               <button
                                 type="button"
@@ -742,7 +742,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                   setView((v) => (v.m === 0 ? { y: v.y - 1, m: 11 } : { y: v.y, m: v.m - 1 }))
                                 }
                                 aria-label="Previous month"
-                                className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70 hover:text-white hover:border-white/30 disabled:opacity-20 transition"
+                                className="grid h-8 w-8 place-items-center rounded-lg border border-t-fg/10 bg-t-fg/5 text-t-fg/70 hover:text-t-fg hover:border-t-fg/30 disabled:opacity-20 transition"
                               >
                                 <ChevronLeft className="h-4 w-4" />
                               </button>
@@ -753,7 +753,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                   setView((v) => (v.m === 11 ? { y: v.y + 1, m: 0 } : { y: v.y, m: v.m + 1 }))
                                 }
                                 aria-label="Next month"
-                                className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70 hover:text-white hover:border-white/30 disabled:opacity-20 transition"
+                                className="grid h-8 w-8 place-items-center rounded-lg border border-t-fg/10 bg-t-fg/5 text-t-fg/70 hover:text-t-fg hover:border-t-fg/30 disabled:opacity-20 transition"
                               >
                                 <ChevronRight className="h-4 w-4" />
                               </button>
@@ -763,7 +763,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                           {/* Weekdays Row: MON, TUE, WED, THU, FRI, SAT, SUN */}
                           <div className="grid grid-cols-7 gap-1 text-center mb-1">
                             {WEEKDAYS.map((w) => (
-                              <span key={w} className="py-1 text-[11px] font-semibold text-white/40 tracking-wider">
+                              <span key={w} className="py-1 text-[11px] font-semibold text-t-fg/40 tracking-wider">
                                 {w}
                               </span>
                             ))}
@@ -777,7 +777,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                               return (
                                 <span
                                   key={`prev-${i}`}
-                                  className="aspect-square grid place-items-center text-[13px] text-white/15 cursor-default select-none"
+                                  className="aspect-square grid place-items-center text-[13px] text-t-fg/15 cursor-default select-none"
                                 >
                                   {prevD}
                                 </span>
@@ -801,15 +801,15 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                   aria-label={`${k}${open ? ", available" : ", unavailable"}`}
                                   className={`relative aspect-square rounded-xl text-[14px] font-medium transition cursor-pointer select-none flex flex-col items-center justify-center ${
                                     selected
-                                      ? "bg-white text-black font-bold shadow-lg scale-[1.04] z-10"
+                                      ? "bg-t-fg text-t-bg font-bold shadow-lg scale-[1.04] z-10"
                                       : open
-                                      ? "bg-[#202024] text-white hover:bg-[#2b2b32] hover:scale-[1.02]"
-                                      : "text-white/20 bg-transparent cursor-default"
-                                  } ${isToday && !selected ? "ring-1 ring-white/30" : ""}`}
+                                      ? "bg-t-fg/[0.08] text-t-fg hover:bg-t-fg/[0.14] hover:scale-[1.02]"
+                                      : "text-t-fg/20 bg-transparent cursor-default"
+                                  } ${isToday && !selected ? "ring-1 ring-t-fg/30" : ""}`}
                                 >
                                   <span>{d}</span>
                                   {open && !selected && (
-                                    <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-white/60" />
+                                    <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-t-fg/60" />
                                   )}
                                 </button>
                               );
@@ -818,23 +818,23 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         </div>
 
                         {days === null ? (
-                          <p className="mt-4 text-[12px] text-white/40">Loading availability…</p>
+                          <p className="mt-4 text-[12px] text-t-fg/40">Loading availability…</p>
                         ) : days && !Object.values(days).some((x) => x.free > 0) ? (
-                          <p className="mt-4 text-[12px] text-white/50">No free dates this month. Check next month.</p>
+                          <p className="mt-4 text-[12px] text-t-fg/50">No free dates this month. Check next month.</p>
                         ) : null}
                       </div>
 
                       {/* Right: Selected Day Header + 12h/24h toggle + Time Slots (~240px / 5 cols) */}
-                      <div className="p-5 sm:p-6 lg:col-span-5 flex flex-col border-t lg:border-t-0 border-white/10">
-                        <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
-                          <h3 className="text-[15px] font-semibold text-white tracking-tight">{dayHeader}</h3>
+                      <div className="p-5 sm:p-6 lg:col-span-5 flex flex-col border-t lg:border-t-0 border-t-fg/10">
+                        <div className="flex items-center justify-between pb-3.5 border-b border-t-fg/10">
+                          <h3 className="text-[15px] font-semibold text-t-fg tracking-tight">{dayHeader}</h3>
                           {/* 12h / 24h Toggle Pill */}
-                          <div className="flex items-center rounded-lg border border-white/10 bg-white/5 p-0.5 text-[11px] font-medium text-white/70">
+                          <div className="flex items-center rounded-lg border border-t-fg/10 bg-t-fg/5 p-0.5 text-[11px] font-medium text-t-fg/70">
                             <button
                               type="button"
                               onClick={() => setUse24h(false)}
                               className={`rounded px-2 py-0.5 transition ${
-                                !use24h ? "bg-white/20 text-white font-semibold" : "hover:text-white"
+                                !use24h ? "bg-t-fg/20 text-t-fg font-semibold" : "hover:text-t-fg"
                               }`}
                             >
                               12h
@@ -843,7 +843,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                               type="button"
                               onClick={() => setUse24h(true)}
                               className={`rounded px-2 py-0.5 transition ${
-                                use24h ? "bg-white/20 text-white font-semibold" : "hover:text-white"
+                                use24h ? "bg-t-fg/20 text-t-fg font-semibold" : "hover:text-t-fg"
                               }`}
                             >
                               24h
@@ -854,17 +854,17 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         {/* Time slots vertical column */}
                         <div className="mt-4 flex-1">
                           {!day ? (
-                            <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-white/10 text-[13px] text-white/40">
+                            <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-t-fg/10 text-[13px] text-t-fg/40">
                               Choose a date from the calendar
                             </div>
                           ) : slotData === null ? (
                             <div className="space-y-2">
                               {[1, 2, 3, 4].map((n) => (
-                                <div key={n} className="h-11 w-full animate-pulse rounded-xl bg-white/5" />
+                                <div key={n} className="h-11 w-full animate-pulse rounded-xl bg-t-fg/5" />
                               ))}
                             </div>
                           ) : slotData.all.length === 0 ? (
-                            <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-white/10 text-[13px] text-white/40">
+                            <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-t-fg/10 text-[13px] text-t-fg/40">
                               No slots configured for this day
                             </div>
                           ) : (
@@ -879,8 +879,8 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                     onClick={() => setSlot(s)}
                                     className={`w-full py-2.5 px-4 rounded-xl text-center text-[14px] font-medium transition cursor-pointer ${
                                       open
-                                        ? "border border-white/10 hover:border-white/40 bg-white/[0.04] hover:bg-white/[0.09] text-white/90 hover:text-white"
-                                        : "border border-white/5 bg-transparent opacity-30 line-through text-white/40 cursor-not-allowed"
+                                        ? "border border-t-fg/10 hover:border-t-fg/40 bg-t-fg/[0.04] hover:bg-t-fg/[0.09] text-t-fg/90 hover:text-t-fg"
+                                        : "border border-t-fg/5 bg-transparent opacity-30 line-through text-t-fg/40 cursor-not-allowed"
                                     }`}
                                   >
                                     <span>{fmtSlotTime(s, use24h)}</span>
@@ -900,14 +900,14 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
         )}
 
         {/* Footer Link & Branding */}
-        <div className="mt-6 text-center text-[12px] text-white/40 space-x-2">
-          <Link href={`/${profile.handle}`} className="hover:text-white/80 underline underline-offset-4">
+        <div className="mt-6 text-center text-[12px] text-t-fg/40 space-x-2">
+          <Link href={`/${profile.handle}`} className="hover:text-t-fg/80 underline underline-offset-4">
             {profile.name}
           </Link>
           <span>·</span>
           <Link
             href={`/?ref=${encodeURIComponent(profile.handle)}`}
-            className="hover:text-white/80 underline underline-offset-4"
+            className="hover:text-t-fg/80 underline underline-offset-4"
           >
             Powered by Showz
           </Link>

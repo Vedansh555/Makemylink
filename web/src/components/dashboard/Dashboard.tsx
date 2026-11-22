@@ -13,6 +13,8 @@ interface Data {
   plan: "free" | "pro";
   pageId: string;
   bookingPage?: boolean;
+  hasProducts?: boolean;
+  hasChat?: boolean;
   handle: string;
   days: number;
   daily: { day: string; kind: string; n: number }[];
@@ -258,21 +260,24 @@ function Overview({ d, goBilling }: { d: Data; goBilling: () => void }) {
           ) : <div className="mt-3"><Locked goBilling={goBilling}>See where your visitors are.</Locked></div>}
         </div>
       </div>
-      <AnnounceKit handle={d.handle} />
+      <AnnounceKit handle={d.handle} booking={!!d.bookingPage} products={!!d.hasProducts} chat={!!d.hasChat} />
     </div>
   );
 }
 
-function AnnounceKit({ handle }: { handle: string }) {
+function AnnounceKit({ handle, booking, products, chat }: { handle: string; booking: boolean; products: boolean; chat: boolean }) {
   const [channel, setChannel] = useState<"linkedin" | "instagram" | "whatsapp">("linkedin");
   const [copied, setCopied] = useState(false);
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
   const pageUrl = `${siteUrl}/${handle}`;
 
+  // The words follow what the page actually offers: bookings, products, a chat button, or just links.
+  const offer = booking ? "You can now book a time with me directly" : products ? "Everything I make and recommend is now in one place" : chat ? "You can now message me directly" : "All my links are now in one place";
+  const detail = booking ? "pick a slot that suits you and pay in a minute" : products ? "tap any item to get it" : chat ? "one tap opens a chat with me" : "my latest work, socials and more";
   const posts = {
-    linkedin: `I'm now taking 1:1 sessions & client project bookings directly on my new page — with instant calendar & zero platform cut. Book a slot or check it out: ${pageUrl}`,
-    instagram: `Updated my bio! Check out all my links, featured picks, and direct bookings here: ${pageUrl}`,
-    whatsapp: `Hey! You can find my latest work, links, and book a time with me directly here: ${pageUrl}`,
+    linkedin: `${offer}: ${detail}. ${pageUrl}`,
+    instagram: `New link in my bio ✨ ${offer.toLowerCase()} — ${detail}. ${pageUrl}`,
+    whatsapp: `Hi! ${offer}: ${detail}. ${pageUrl}`,
   };
 
   const copy = () => {
