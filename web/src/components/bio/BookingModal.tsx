@@ -12,7 +12,6 @@ import {
   Lock,
   Mail,
   MessageSquare,
-  ShieldCheck,
   User,
   Video,
   X,
@@ -457,9 +456,6 @@ export function BookingModal({
                   <span className="text-[12px] text-white/50">{free ? "Free session" : "Price"}</span>
                   <span className="text-[20px] font-bold text-white">{price}</span>
                 </div>
-                <p className="mt-1 flex items-center gap-1 text-[11px] text-emerald-400">
-                  <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> 100% direct host payout · 0% fee
-                </p>
               </div>
             </div>
 

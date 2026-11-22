@@ -15,7 +15,6 @@ import {
   Lock,
   Mail,
   MessageSquare,
-  ShieldCheck,
   User,
   Video,
 } from "lucide-react";
@@ -577,9 +576,6 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                     <span className="text-[13px] text-t-fg/50 font-medium">{free ? "Free Session" : "Fee"}</span>
                     <span className="text-[22px] font-bold text-t-fg">{price}</span>
                   </div>
-                  <p className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-400/90 font-medium">
-                    <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Direct host payout · Showz takes 0%
-                  </p>
                 </div>
               </div>
 
