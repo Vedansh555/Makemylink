@@ -80,6 +80,9 @@ export function Pricing() {
           );
         })}
       </div>
+
+      <SavingsCalculator region={region} />
+
       <p className="mt-8 text-center text-[12px] text-fg/40">
         {region === "IN"
           ? "Prices for India. Pay with UPI, cards or netbanking."
@@ -101,6 +104,81 @@ function Toggle({ options, value, onChange }: { options: [string, string][]; val
           {label}
         </button>
       ))}
+    </div>
+  );
+}
+
+function SavingsCalculator({ region }: { region: Region }) {
+  const isIndia = region === "IN";
+  const min = isIndia ? 5000 : 100;
+  const max = isIndia ? 150000 : 3000;
+  const step = isIndia ? 5000 : 50;
+  const [monthly, setMonthly] = useState(isIndia ? 35000 : 600);
+
+  useEffect(() => {
+    setMonthly(isIndia ? 35000 : 600);
+  }, [isIndia]);
+
+  // Typical platforms take ~12% (10% platform fee + ~2% gateway fee or 14% on Topmate / 10% on Gumroad)
+  const otherFee = Math.round(monthly * 0.12);
+  const showzFee = isIndia ? 299 : 8;
+  const savedMonthly = Math.max(0, otherFee - showzFee);
+  const savedYearly = savedMonthly * 12;
+
+  const fmt = (val: number) => (isIndia ? `₹${val.toLocaleString("en-IN")}` : `$${val.toLocaleString("en-US")}`);
+
+  return (
+    <div className="mx-auto mt-14 max-w-3xl rounded-[28px] border border-fg/10 bg-fg/[0.03] p-6 sm:p-8 text-left">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+        <div>
+          <h3 className="text-[20px] font-semibold text-fg">Calculate your savings with 0% commission</h3>
+          <p className="mt-1 text-[13px] text-fg/55">
+            Whether you offer 1:1 sessions, freelance project bookings, or digital downloads.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-[#ff5b37]/15 px-3 py-1 text-[11px] font-bold text-[#ff5b37]">
+          0% cut on Showz
+        </span>
+      </div>
+
+      <div className="mt-6">
+        <div className="flex items-center justify-between text-[14px]">
+          <span className="text-fg/60">Your estimated monthly sales / bookings</span>
+          <span className="font-display text-[22px] font-bold text-fg">{fmt(monthly)}</span>
+        </div>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={monthly}
+          onChange={(e) => setMonthly(Number(e.target.value))}
+          aria-label="Estimated monthly earnings"
+          className="mt-3 w-full accent-[#ff5b37] cursor-pointer"
+        />
+        <div className="mt-1 flex justify-between text-[11px] text-fg/40 font-mono">
+          <span>{fmt(min)}/mo</span>
+          <span>{fmt(max)}/mo</span>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
+          <p className="text-[11px] uppercase tracking-wider text-fg/45">Platforms with a 12% cut</p>
+          <p className="mt-2 text-[20px] font-bold text-red-400">-{fmt(otherFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
+          <p className="mt-1 text-[11px] text-fg/40">Topmate, Gumroad, Beacons</p>
+        </div>
+        <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
+          <p className="text-[11px] uppercase tracking-wider text-fg/45">Showz Pro flat fee</p>
+          <p className="mt-2 text-[20px] font-bold text-fg">{fmt(showzFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
+          <p className="mt-1 text-[11px] text-fg/40">Zero percentage, ever</p>
+        </div>
+        <div className="rounded-2xl border border-[#ff5b37]/30 bg-[#ff5b37]/[0.08] p-4">
+          <p className="text-[11px] uppercase tracking-wider text-[#ff5b37]">You keep extra</p>
+          <p className="mt-2 text-[22px] font-bold text-emerald-400">+{fmt(savedMonthly)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
+          <p className="mt-1 text-[11px] text-emerald-400/70 font-semibold">{fmt(savedYearly)} saved per year</p>
+        </div>
+      </div>
     </div>
   );
 }

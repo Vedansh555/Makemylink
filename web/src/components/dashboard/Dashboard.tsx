@@ -258,6 +258,79 @@ function Overview({ d, goBilling }: { d: Data; goBilling: () => void }) {
           ) : <div className="mt-3"><Locked goBilling={goBilling}>See where your visitors are.</Locked></div>}
         </div>
       </div>
+      <AnnounceKit handle={d.handle} />
+    </div>
+  );
+}
+
+function AnnounceKit({ handle }: { handle: string }) {
+  const [channel, setChannel] = useState<"linkedin" | "instagram" | "whatsapp">("linkedin");
+  const [copied, setCopied] = useState(false);
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const pageUrl = `${siteUrl}/${handle}`;
+
+  const posts = {
+    linkedin: `I'm now taking 1:1 sessions & client project bookings directly on my new page — with instant calendar & zero platform cut. Book a slot or check it out: ${pageUrl}`,
+    instagram: `Updated my bio! Check out all my links, featured picks, and direct bookings here: ${pageUrl}`,
+    whatsapp: `Hey! You can find my latest work, links, and book a time with me directly here: ${pageUrl}`,
+  };
+
+  const copy = () => {
+    navigator.clipboard?.writeText(posts[channel]);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className={card}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[15px] font-semibold">Announce your page</p>
+          <p className="mt-1 text-[13px] text-fg/55">Ready-to-post announcements for your social channels. Tap to copy and get your first visits.</p>
+        </div>
+        <div className="flex rounded-full border border-fg/10 bg-fg/5 p-1 text-[12px]">
+          {(["linkedin", "instagram", "whatsapp"] as const).map((ch) => (
+            <button
+              key={ch}
+              type="button"
+              onClick={() => { setChannel(ch); setCopied(false); }}
+              className={`rounded-full px-3 py-1.5 capitalize transition ${channel === ch ? "bg-fg text-bg font-medium" : "text-fg/60 hover:text-fg"}`}
+            >
+              {ch === "linkedin" ? "LinkedIn / X" : ch === "instagram" ? "Instagram" : "WhatsApp"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4 rounded-xl border border-fg/10 bg-bg/80 p-3.5 text-[13px] text-fg/80 leading-relaxed font-mono">
+        {posts[channel]}
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={copy}
+          className="rounded-xl bg-fg px-4 py-2 text-[13px] font-semibold text-bg transition hover:bg-[#ff5b37] hover:text-[#111]"
+        >
+          {copied ? "Copied ✓" : "Copy text"}
+        </button>
+        {channel === "whatsapp" && (
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(posts.whatsapp)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-xl border border-fg/20 px-4 py-2 text-[13px] text-fg/70 hover:text-fg"
+          >
+            Share on WhatsApp ↗
+          </a>
+        )}
+        <a
+          href={`/${handle}`}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-xl border border-fg/20 px-4 py-2 text-[13px] text-fg/70 hover:text-fg"
+        >
+          Open page ↗
+        </a>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, MapPin, Play, QrCode, X } from "lucide-react";
-import type { BioLink, Profile } from "@/lib/types";
+import type { BioLink, Profile, Review } from "@/lib/types";
 import { linkIsLive, type PlanId } from "@/lib/plans";
 import { BookingModal, bookingPrice } from "./BookingModal";
 import { BookingTile, useNextFree } from "./BookingTile";
@@ -407,6 +407,39 @@ function safeUrl(input?: string): string {
   return safeHref(input);
 }
 
+/** Kind words from clients or customers: three at first, the rest one tap away. */
+function Reviews({ t, reviews }: { t: ThemeTokens; reviews: Review[] }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? reviews : reviews.slice(0, 3);
+  return (
+    <>
+      <div className="flex flex-col gap-2.5">
+        {shown.map((r) => (
+          <figure key={r.id} className="rounded-2xl border border-t-fg/15 bg-t-fg/[0.04] p-4 text-left">
+            {r.rating ? (
+              <div className="mb-1.5 flex gap-0.5 text-t-accent" aria-label={`${r.rating} out of 5 stars`}>
+                {Array.from({ length: 5 }, (_, k) => (
+                  <svg key={k} viewBox="0 0 24 24" className={`h-3.5 w-3.5 ${k < r.rating! ? "" : "opacity-25"}`} fill="currentColor" aria-hidden><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.5 6.6-.8z" /></svg>
+                ))}
+              </div>
+            ) : null}
+            <blockquote className={`${t.bio} !text-left !normal-case !tracking-normal`}>&ldquo;{r.quote}&rdquo;</blockquote>
+            <figcaption className={`${t.meta} mt-2 !normal-case`}>
+              {r.name}
+              {r.role ? ` · ${r.role}` : ""}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      {reviews.length > 3 && !all && (
+        <button type="button" onClick={() => setAll(true)} className={`${t.meta} min-h-[40px] self-center underline underline-offset-4`}>
+          Show all {reviews.length}
+        </button>
+      )}
+    </>
+  );
+}
+
 /** A heading on a real page; plain text inside the small phone previews, so the site's own pages keep one main heading. */
 function Heading({ level, plain, className, children }: { level: 1 | 2; plain: boolean; className: string; children: React.ReactNode }) {
   if (plain) return <div className={className}>{children}</div>;
@@ -719,6 +752,17 @@ export function BioPage({ profile, embedded = false, plan = "pro", live = false,
                 </Tilt>
               ))}
             </div>
+          </motion.section>
+        )}
+
+        {/* Reviews */}
+        {(profile.reviews?.length ?? 0) > 0 && (
+          <motion.section variants={rise} custom={i++} className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <Heading level={2} plain={embedded} className={t.section}>Kind words</Heading>
+              {profile.proof && <span className={`${t.meta}`}>{profile.proof}</span>}
+            </div>
+            <Reviews t={t} reviews={profile.reviews!} />
           </motion.section>
         )}
 

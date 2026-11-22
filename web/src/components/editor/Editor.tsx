@@ -36,7 +36,7 @@ const fontOptions: [string, string][] = [
   ["grotesk", "Space Grotesk (mono-ish)"],
   ["sans", "Inter (plain sans)"],
 ];
-import type { ArtKind, BioLink, BlockSize, BookingConfig, Look, Profile, Store } from "@/lib/types";
+import type { ArtKind, BioLink, BlockSize, BookingConfig, Look, Profile, Review, Store } from "@/lib/types";
 import { FREE_LIMITS, isFreeTheme, type PlanId } from "@/lib/plans";
 import { shareSlug } from "@/lib/share";
 import { isBlankProfile, isGoal, starterFor } from "@/lib/templates";
@@ -1042,6 +1042,53 @@ export function Editor() {
                   </div>
                 </div>
               ))}
+            </Panel>
+          </div>
+
+          {/* Reviews Section */}
+          <div id="section-reviews" className={`${tab === "content" ? "block" : "hidden"} order-[5]`}>
+            <Panel
+              title="Reviews"
+              hint="Kind words from clients or customers. Moving from another platform? Paste your best reviews here so your page doesn't start from zero."
+              action={
+                <button
+                  type="button"
+                  onClick={() => set("reviews", [...(p.reviews ?? []), { id: crypto.randomUUID().slice(0, 8), name: "", quote: "", rating: 5 }])}
+                  disabled={(p.reviews?.length ?? 0) >= 12}
+                  className="flex items-center gap-1 rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold disabled:opacity-40"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Add review
+                </button>
+              }
+            >
+              <Field label="One line of proof (optional)">
+                <input className={inputCls} value={p.proof ?? ""} maxLength={80} placeholder="4.9 ★ from 180+ sessions · 500+ happy customers" onChange={(e) => set("proof", e.target.value)} />
+              </Field>
+              {!(p.reviews?.length) && <p className="text-[13px] text-fg/45">No reviews yet. Add two or three: real words from real people make visitors trust you.</p>}
+              {(p.reviews ?? []).map((r, idx) => {
+                const upd = (patch: Partial<Review>) => set("reviews", (p.reviews ?? []).map((x) => (x.id === r.id ? { ...x, ...patch } : x)));
+                return (
+                  <div key={r.id} className="space-y-2.5 rounded-2xl border border-fg/10 bg-fg/[0.02] p-3.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex gap-0.5" role="radiogroup" aria-label={`Stars for review ${idx + 1}`}>
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <button key={n} type="button" aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => upd({ rating: r.rating === n ? undefined : n })} className="grid h-8 w-8 place-items-center">
+                            <Star className={`h-4 w-4 ${n <= (r.rating ?? 0) ? "fill-[#ff5b37] text-[#ff5b37]" : "text-fg/25"}`} />
+                          </button>
+                        ))}
+                      </div>
+                      <IconBtn label="Remove review" onClick={() => set("reviews", (p.reviews ?? []).filter((x) => x.id !== r.id))}>
+                        <Trash2 className="h-4 w-4" />
+                      </IconBtn>
+                    </div>
+                    <textarea className={inputCls} rows={2} maxLength={400} value={r.quote} placeholder="What they said" onChange={(e) => upd({ quote: e.target.value })} />
+                    <div className="grid gap-2.5 sm:grid-cols-2">
+                      <input className={inputCls} maxLength={60} value={r.name} placeholder="Their name" onChange={(e) => upd({ name: e.target.value })} />
+                      <input className={inputCls} maxLength={80} value={r.role ?? ""} placeholder="Who they are (optional)" onChange={(e) => upd({ role: e.target.value })} />
+                    </div>
+                  </div>
+                );
+              })}
             </Panel>
           </div>
 

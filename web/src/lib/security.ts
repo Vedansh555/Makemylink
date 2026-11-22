@@ -134,6 +134,14 @@ export function sanitizeProfile(raw: unknown, handle: string): Profile {
     booking: l.kind === "booking" ? cleanBooking(l.booking) : undefined,
   }));
   out.hideBadge = !!p.hideBadge;
+  out.proof = p.proof === undefined ? undefined : str(p.proof, 80);
+  out.reviews = (Array.isArray(p.reviews) ? p.reviews : []).slice(0, 12).map((r) => ({
+    id: str(r.id, 64),
+    name: str(r.name, 60),
+    role: r.role === undefined ? undefined : str(r.role, 80),
+    quote: str(r.quote, 400),
+    rating: typeof r.rating === "number" && r.rating >= 1 && r.rating <= 5 ? Math.round(r.rating) : undefined,
+  })).filter((r) => r.name && r.quote);
   out.looks = (Array.isArray(p.looks) ? p.looks : []).slice(0, 100).map((l) => ({
     ...l,
     id: str(l.id, 64),

@@ -89,6 +89,17 @@ export interface Socials {
   email?: string;
 }
 
+/** A kind word from a client, customer or fan, added by the page owner (or brought over from another platform). */
+export interface Review {
+  id: string;
+  name: string;
+  /** Who they are, e.g. "SDE at Flipkart" or "Bought the preset pack". */
+  role?: string;
+  quote: string;
+  /** 1 to 5 stars, optional. */
+  rating?: number;
+}
+
 export interface MediaKit {
   followers: string;
   engagement: string;
@@ -118,6 +129,9 @@ export interface Profile {
   mediaKit?: MediaKit;
   showMediaKit: boolean;
   showSubscribe: boolean;
+  reviews?: Review[];
+  /** One line of proof shown above the reviews, e.g. "4.9 ★ from 180+ sessions" or "500+ happy customers". */
+  proof?: string;
   /** Pro only: remove the "Made with Showz" badge. */
   hideBadge?: boolean;
 }
