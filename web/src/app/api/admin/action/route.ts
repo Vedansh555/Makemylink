@@ -5,7 +5,7 @@ import { deleteAccount } from "@/lib/account";
 import { runLinkCheck } from "@/lib/linkcheck";
 import { rateLimit, sameOriginOnly } from "@/lib/security";
 
-type Body = { action?: string; userId?: string; days?: number };
+type Body = { action?: string; userId?: string; days?: number; reportId?: string };
 
 // POST — admin actions. Every action here is limited to admins, and destructive ones need the user id.
 export async function POST(req: Request) {
@@ -14,6 +14,12 @@ export async function POST(req: Request) {
   const blocked = sameOriginOnly(req) ?? rateLimit(`admin:${admin}`, 60, 60 * 1000);
   if (blocked) return blocked;
   const b = (await req.json().catch(() => ({}))) as Body;
+
+  if (b.action === "resolve_report") {
+    if (typeof b.reportId !== "string") return NextResponse.json({ error: "Report not found" }, { status: 404 });
+    await run("UPDATE reports SET resolved_at = $1 WHERE id = $2", [Date.now(), b.reportId]);
+    return NextResponse.json({ ok: true });
+  }
 
   if (b.action === "linkcheck") {
     return NextResponse.json({ checked: await runLinkCheck() });

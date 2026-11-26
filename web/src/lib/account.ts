@@ -69,6 +69,7 @@ export async function deleteAccount(uid: string) {
     }
     await tx.query("DELETE FROM pages WHERE user_id = $1", [uid]);
     await tx.query("DELETE FROM password_resets WHERE user_id = $1", [uid]);
+    await tx.query("DELETE FROM creator_gateways WHERE user_id = $1", [uid]);
     await tx.query("UPDATE payments SET user_id = NULL WHERE user_id = $1", [uid]);
     await tx.query("DELETE FROM users WHERE id = $1", [uid]);
   });

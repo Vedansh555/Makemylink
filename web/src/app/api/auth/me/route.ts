@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminUserId } from "@/lib/admin";
 import { getSession, setSessionCookie } from "@/lib/session";
 import { one } from "@/lib/db";
 import { planForUser } from "@/lib/account";
@@ -32,6 +33,11 @@ export async function GET() {
       planRenewsAt: user.plan_renews_at,
       emailVerified: user.email_verified,
       verifiedLabel: user.verified_label,
+      isAdmin: !!(await adminUserId()),
+      invites: await one<{ joined: number; rewarded: number }>(
+        "SELECT COUNT(*)::int AS joined, COUNT(*) FILTER (WHERE u.referral_rewarded)::int AS rewarded FROM users u WHERE u.referred_by IN (SELECT handle FROM pages WHERE user_id = $1)",
+        [user.id],
+      ),
     },
   });
 }

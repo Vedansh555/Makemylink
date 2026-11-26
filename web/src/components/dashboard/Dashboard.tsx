@@ -21,7 +21,7 @@ interface Data {
   perLink: { target: string; title: string; n: number }[];
   countries: { country: string; n: number }[];
   subscribers: { total: number; recent: { email: string; name?: string | null; source?: string | null; created_at: number }[]; limit: number | null };
-  bookings: { id: string; title: string; buyer_name: string; buyer_email: string; slot_start: number; note: string; amount: number; currency: string; status: string }[];
+  bookings: { id: string; title: string; buyer_name: string; buyer_email: string; slot_start: number; note: string; amount: number; currency: string; status: string; provider?: string | null }[];
   health: { link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }[];
   checklist: { key: string; label: string; done: boolean; href?: string }[];
 }
@@ -43,6 +43,7 @@ export function Dashboard() {
   const [email, setEmail] = useState("");
   const [verified, setVerified] = useState(true);
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const load = useCallback(async () => {
     const me = await fetch("/api/auth/me");
@@ -50,6 +51,7 @@ export function Dashboard() {
     const u = (await me.json()).user;
     setEmail(u.email);
     setVerified(u.emailVerified !== false);
+    setIsAdmin(!!u.isAdmin);
     const [r, pr] = await Promise.all([fetch(`/api/dashboard${pageId ? `?page=${encodeURIComponent(pageId)}` : ""}`), fetch("/api/pages")]);
     if (pr.ok) setPages(await pr.json());
     if (r.ok) setData(await r.json());
@@ -66,6 +68,7 @@ export function Dashboard() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
         <Logo />
         <div className="flex items-center gap-3 text-[13px]">
+          {isAdmin && <Link href="/admin" className="rounded-lg bg-fg px-3.5 py-2 font-semibold text-bg">Admin</Link>}
           <Link href={data ? `/create?page=${data.pageId}` : "/create"} className="rounded-lg border border-fg/15 px-3.5 py-2 hover:border-fg/40">Edit page</Link>
           {data && <Link href={`/${data.handle}`} className="hidden text-fg/55 hover:text-fg sm:block">/{data.handle}</Link>}
         </div>
@@ -88,6 +91,7 @@ export function Dashboard() {
             </select>
           </label>
         )}
+        <ReturnNotice />
         {!verified && <VerifyBanner />}
         {error && <p className="mt-6 text-[14px] text-red-400">{error}</p>}
         {!data && !error && <p className="mt-8 text-fg/50">Loading…</p>}
@@ -105,6 +109,26 @@ export function Dashboard() {
         )}
       </div>
     </main>
+  );
+}
+
+/** Says what happened after the person comes back from an email link or a payment page. */
+function ReturnNotice() {
+  const params = useSearchParams();
+  const [closed, setClosed] = useState(false);
+  const note: [boolean, string] | null =
+    params.get("verified") === "1" ? [true, "Your email is confirmed. Thank you."]
+    : params.get("verify") === "expired" ? [false, "That confirmation link has expired or was already used. Use Resend link to get a new one."]
+    : params.get("badge") === "1" ? [true, "Your Verified badge is on. Your page now shows the tick."]
+    : params.get("badge") === "expired" ? [false, "That badge link has expired or was already used. Send a new one below."]
+    : params.get("paid") === "failed" ? [false, "The payment didn't go through, so your plan hasn't changed. If money left your account, email us with the reference."]
+    : null;
+  if (!note || closed) return null;
+  return (
+    <div role="status" className={`mt-6 flex items-start gap-3 rounded-2xl border p-4 text-[14px] ${note[0] ? "border-emerald-500/30 bg-emerald-500/[0.07]" : "border-[#ff5b37]/40 bg-[#ff5b37]/[0.07]"}`}>
+      <span className="min-w-0 flex-1">{note[1]}</span>
+      <button onClick={() => setClosed(true)} className="shrink-0 text-[13px] font-semibold underline underline-offset-4">Close</button>
+    </div>
   );
 }
 
@@ -393,6 +417,15 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
               <p className="font-semibold">{b.title} · {b.buyer_name}</p>
               <p className="text-fg/55">{new Date(b.slot_start).toLocaleString()} · {b.buyer_email}</p>
               {b.note && <p className="text-fg/45">“{b.note}”</p>}
+              {b.amount > 0 && b.status !== "cancelled" && (
+                <p className="text-[12px] text-fg/45">
+                  {b.provider === "razorpay" || b.provider === "paypal"
+                    ? `${b.status === "confirmed" ? "Paid online with" : "Waiting for payment on"} ${b.provider === "razorpay" ? "Razorpay" : "PayPal"}`
+                    : b.provider === "paypal_pending"
+                      ? b.status === "confirmed" ? "Paid with PayPal" : "PayPal is reviewing this payment: check PayPal, then Mark paid"
+                      : b.status === "confirmed" ? "Marked paid by you" : "Payment link: check the money arrived, then Mark paid"}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[12px] uppercase tracking-wider text-fg/50">{b.amount ? `${b.currency === "INR" ? "₹" : "$"}${b.amount}` : "Free"} · {b.status.replace("_", " ")}</span>
@@ -576,9 +609,10 @@ function BadgeCard() {
 /** Invite a creator: both get a free Pro month once the invited creator gets their first lead or booking. */
 function InviteCard() {
   const [handle, setHandle] = useState("");
+  const [invites, setInvites] = useState<{ joined: number; rewarded: number } | null>(null);
   const [copied, setCopied] = useState(false);
   useEffect(() => {
-    fetch("/api/auth/me").then((r) => r.json()).then((d) => setHandle(d.user?.handle ?? "")).catch(() => {});
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => { setHandle(d.user?.handle ?? ""); setInvites(d.user?.invites ?? null); }).catch(() => {});
   }, []);
   if (!handle) return null;
   const url = `${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${handle}`;
@@ -586,6 +620,11 @@ function InviteCard() {
     <div className={card}>
       <p className="text-[15px] font-semibold">Invite a creator, both get a free month</p>
       <p className="mt-1 text-[13px] text-fg/55">Share your invite link. When the creator you invite gets their first lead or booking, you both get a month of Pro free. The &ldquo;Made with Showz&rdquo; link on your page counts too.</p>
+      {invites && (
+        <p className="mt-2 text-[13px] font-semibold">
+          {invites.joined} joined with your link · {invites.rewarded} free month{invites.rewarded === 1 ? "" : "s"} earned
+        </p>
+      )}
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <input readOnly value={url} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-xl border border-fg/15 bg-bg px-3.5 py-2.5 text-[13px]" />
         <button onClick={() => { navigator.clipboard?.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); }} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg">{copied ? "Copied" : "Copy link"}</button>

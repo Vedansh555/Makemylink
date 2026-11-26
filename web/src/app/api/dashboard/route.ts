@@ -3,6 +3,7 @@ import { all, one } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { pageForUser, planForUser } from "@/lib/account";
 import { FREE_LIMITS } from "@/lib/plans";
+import { settleHolds } from "@/lib/bookingPaid";
 import type { Profile } from "@/lib/types";
 
 // GET /api/dashboard — everything the dashboard shows, for the logged-in creator.
@@ -14,6 +15,8 @@ export async function GET(req: Request) {
   const profile = JSON.parse(page.profile_json) as Profile;
   const plan = await planForUser(session.userId);
   const pid = page.id;
+  // Show online payments as confirmed even if the buyer never came back from the payment window.
+  await settleHolds(pid, 60_000).catch(() => {});
 
   const days = plan === "pro" ? 30 : FREE_LIMITS.analyticsDays;
   const since = Date.now() - days * 86_400_000;
@@ -30,7 +33,7 @@ export async function GET(req: Request) {
     : [];
   const subs = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM subscribers WHERE page_id = $1", [pid]);
   const recentSubs = await all<{ email: string; name: string | null; source: string | null; created_at: number }>("SELECT email, name, source, created_at FROM subscribers WHERE page_id = $1 ORDER BY created_at DESC LIMIT 25", [pid]);
-  const bookings = await all("SELECT id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status FROM bookings WHERE page_id = $1 ORDER BY slot_start DESC LIMIT 50", [pid]);
+  const bookings = await all("SELECT id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, provider FROM bookings WHERE page_id = $1 ORDER BY slot_start DESC LIMIT 50", [pid]);
   const health = await all<{ link_id: string; url: string; status: number | null; ok: boolean; checked_at: number }>("SELECT link_id, url, status, ok, checked_at FROM link_health WHERE page_id = $1", [pid]);
 
   const verified = await one<{ email_verified: boolean }>("SELECT email_verified FROM users WHERE id = $1", [session.userId]);

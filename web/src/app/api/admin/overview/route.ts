@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { all, one } from "@/lib/db";
 import { adminUserId } from "@/lib/admin";
+import { setupStatus } from "@/lib/setupStatus";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
     [now, week],
   );
   const users = await all(
-    `SELECT u.id, u.email, u.plan, u.plan_renews_at, u.created_at, u.email_verified, p.handle, COALESCE(p.suspended, FALSE) AS suspended,
+    `SELECT u.id, u.email, u.plan, u.plan_renews_at, u.created_at, u.email_verified, u.verified_label, u.referred_by, p.handle, COALESCE(p.suspended, FALSE) AS suspended,
             (SELECT COUNT(*)::int FROM events e WHERE e.page_id = p.id AND e.kind = 'view') AS views
      FROM users u LEFT JOIN pages p ON p.user_id = u.id
      WHERE ($1 = '' OR LOWER(u.email) LIKE '%' || $1 || '%' OR LOWER(COALESCE(p.handle, '')) LIKE '%' || $1 || '%')
@@ -31,5 +32,9 @@ export async function GET(req: Request) {
     [q],
   );
   const payments = await all("SELECT provider, amount, currency, status, created_at FROM payments ORDER BY created_at DESC LIMIT 10");
-  return NextResponse.json({ totals, users, payments });
+  const reports = await all(
+    `SELECT r.id, r.handle, r.reason, r.details, r.reporter_email, r.created_at, p.user_id, COALESCE(p.suspended, FALSE) AS suspended
+     FROM reports r LEFT JOIN pages p ON p.handle = r.handle WHERE r.resolved_at IS NULL ORDER BY r.created_at DESC LIMIT 50`,
+  );
+  return NextResponse.json({ totals, users, payments, reports, setup: setupStatus() });
 }

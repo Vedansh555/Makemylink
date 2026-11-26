@@ -443,7 +443,8 @@ export function Editor() {
         setPublishSuccess(true);
         setPublishOpen(true);
       } else {
-        alert("Failed to publish changes to your live page.");
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        alert(res.status === 401 ? "You're logged out. Log in again, then publish." : `Not published: ${d.error ?? "something went wrong. Please try again."}`);
       }
     } catch (err) {
       console.error(err);

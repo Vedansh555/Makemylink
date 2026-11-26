@@ -14,11 +14,15 @@ interface User {
   handle: string | null;
   suspended: boolean;
   views: number;
+  verified_label: string | null;
+  referred_by: string | null;
 }
 interface Overview {
   totals: { users: number; pro: number; new7: number; pages: number; suspended: number; subs: number; bookings: number };
   users: User[];
   payments: { provider: string; amount: number; currency: string; status: string; created_at: number }[];
+  reports: { id: string; handle: string; reason: string; details: string | null; reporter_email: string | null; created_at: number; user_id: string | null; suspended: boolean }[];
+  setup: { label: string; state: "ok" | "warn" | "off"; note: string }[];
 }
 
 const card = "rounded-2xl border border-fg/10 bg-fg/[0.03] p-5";
@@ -70,7 +74,44 @@ export function AdminPanel() {
           ))}
         </div>
 
-        <div className={`${card} mt-4 flex flex-wrap items-center justify-between gap-3`}>
+        <h2 className="mt-10 font-display text-[28px] italic">Page reports {data?.reports.length ? <span className="ml-1 rounded-full bg-[#ff5b37] px-2.5 py-0.5 align-middle font-sans text-[13px] font-bold not-italic text-[#111]">{data.reports.length}</span> : null}</h2>
+        <div className={`${card} mt-3`}>
+          {data?.reports.length ? (
+            <ul className="divide-y divide-fg/10">
+              {data.reports.map((r) => (
+                <li key={r.id} className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 text-[13px]">
+                    <p className="font-semibold">
+                      <Link href={`/${r.handle}`} target="_blank" className="underline">/{r.handle}</Link> · {r.reason}
+                      {r.suspended && <span className="ml-2 rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-semibold text-red-400">TAKEN DOWN</span>}
+                    </p>
+                    {r.details && <p className="mt-1 whitespace-pre-wrap text-fg/65 [overflow-wrap:anywhere]">{r.details}</p>}
+                    <p className="mt-1 text-[11px] text-fg/45">{new Date(r.created_at).toLocaleString()}{r.reporter_email ? ` · from ${r.reporter_email}` : ""}</p>
+                  </div>
+                  <div className="flex shrink-0 gap-1.5">
+                    {r.user_id && !r.suspended && <button disabled={busy} className={`${btn} !border-red-500/40 text-red-400`} onClick={() => act({ action: "suspend", userId: r.user_id }, `Take down /${r.handle}? Visitors will see a 404.`)}>Take down</button>}
+                    <button disabled={busy} className={btn} onClick={() => act({ action: "resolve_report", reportId: r.id })}>Mark done</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : <p className="text-[14px] text-fg/50">No open reports.</p>}
+        </div>
+
+        <h2 className="mt-10 font-display text-[28px] italic">Setup status</h2>
+        <div className="mt-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {data?.setup.map((s) => (
+            <div key={s.label} className={`${card} !p-4`}>
+              <p className="flex items-center gap-2 text-[13px] font-semibold">
+                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.state === "ok" ? "bg-emerald-500" : s.state === "warn" ? "bg-amber-500" : "bg-red-500"}`} />
+                {s.label}
+              </p>
+              <p className="mt-1 text-[12px] leading-snug text-fg/55 [overflow-wrap:anywhere]">{s.note}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className={`${card} mt-10 flex flex-wrap items-center justify-between gap-3`}>
           <div>
             <p className="text-[14px] font-semibold">Broken-link check</p>
             <p className="text-[12px] text-fg/50">Checks every live link on Pro pages now. Email alerts go out for links that just broke.</p>
@@ -95,10 +136,10 @@ export function AdminPanel() {
             </thead>
             <tbody>
               {data?.users.map((u) => (
-                <tr key={u.id} className="border-b border-fg/5 align-top last:border-0">
+                <tr key={u.id + (u.handle ?? '')} className="border-b border-fg/5 align-top last:border-0">
                   <td className="p-3">
                     <p className="font-medium">{u.email}</p>
-                    <p className="text-[11px] text-fg/45">{u.email_verified ? "verified" : "not verified"}</p>
+                    <p className="text-[11px] text-fg/45">{u.email_verified ? "verified" : "not verified"}{u.verified_label ? ` · badge: ${u.verified_label}` : ""}{u.referred_by ? ` · invited by @${u.referred_by}` : ""}</p>
                   </td>
                   <td className="p-3">
                     {u.handle ? <Link href={`/${u.handle}`} target="_blank" className="underline">/{u.handle}</Link> : "–"}

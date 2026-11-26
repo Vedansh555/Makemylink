@@ -8,5 +8,7 @@ export async function adminUserId(): Promise<string | null> {
   const session = await getSession();
   if (!session?.userId) return null;
   const u = await one<{ email: string; email_verified: boolean }>("SELECT email, email_verified FROM users WHERE id = $1", [session.userId]);
-  return u && allowed.includes(u.email.toLowerCase()) ? session.userId : null;
+  if (!u || !allowed.includes(u.email.toLowerCase())) return null;
+  // Once emails can be sent, the address must be confirmed, so nobody can claim an admin address that isn't theirs.
+  return !process.env.RESEND_API_KEY || u.email_verified ? session.userId : null;
 }
