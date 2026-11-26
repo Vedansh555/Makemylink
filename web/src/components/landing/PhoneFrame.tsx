@@ -9,7 +9,7 @@ const W = 390;
 const H = 800;
 
 /** A phone mockup that renders a real, live bio page at a reduced scale. */
-export function PhoneFrame({ profile, scale = 0.62, className = "", plan, interactive = true, compactShadow = false, lazy = false }: { profile: Profile; scale?: number; className?: string; plan?: PlanId; interactive?: boolean; compactShadow?: boolean; lazy?: boolean }) {
+export function PhoneFrame({ profile, scale = 0.62, className = "", plan, interactive = true, compactShadow = false, tightShadow = false, lazy = false }: { profile: Profile; scale?: number; className?: string; plan?: PlanId; interactive?: boolean; compactShadow?: boolean; tightShadow?: boolean; lazy?: boolean }) {
   // Lower phones on the home page draw their page only when scrolled near, so the first load stays light.
   const box = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(!lazy);
@@ -21,7 +21,10 @@ export function PhoneFrame({ profile, scale = 0.62, className = "", plan, intera
   }, [shown]);
   // Inside a box that crops its contents (the goal cards on phones) a big soft shadow gets cut into a grey rectangle,
   // so there it stays small and tight. From the sm breakpoint up the box does not crop and the full shadow returns.
-  const shadow = compactShadow
+  // In the editor the phone sits between white panels and bars: a wide shadow would be sliced by them into pale strips.
+  const shadow = tightShadow
+    ? "shadow-[0_14px_26px_-18px_rgba(0,0,0,.45),inset_0_0_0_1px_rgba(255,255,255,.08)]"
+    : compactShadow
     ? "shadow-[0_18px_30px_-18px_rgba(0,0,0,.5),inset_0_0_0_1px_rgba(255,255,255,.08)] sm:shadow-[0_40px_120px_-30px_rgba(0,0,0,.8),inset_0_0_0_1px_rgba(255,255,255,.08)]"
     : "shadow-[0_40px_120px_-30px_rgba(0,0,0,.8),inset_0_0_0_1px_rgba(255,255,255,.08)]";
   return (

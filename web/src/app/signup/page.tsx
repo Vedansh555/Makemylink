@@ -4,7 +4,7 @@ import { SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Logo } from "@/components/landing/Nav";
+import { AuthError, AuthField, AuthShell, PasswordInput, authButton, authInput } from "@/components/auth/AuthShell";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -47,91 +47,51 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-4 py-12 text-fg">
-      <div className="mb-8">
-        <Logo />
-      </div>
-
-      <div className="w-full max-w-md rounded-3xl border border-fg/10 bg-fg/[0.025] p-6 backdrop-blur-sm sm:p-10">
-        <h1 className="font-display text-[36px] italic leading-tight text-center">
-          Claim your link
-        </h1>
-        <p className="mt-2 text-center text-[14px] text-fg/50">
-          Sign up to save, customize, and publish your live page.
-        </p>
-
-        {error && (
-          <div className="mt-5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-[13px] text-red-500">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Handle</span>
-            <div className="flex items-center rounded-xl border border-fg/10 bg-fg/[0.04] pl-3.5 transition focus-within:border-fg/35 focus-within:bg-fg/[0.07]">
-              <span className="max-w-[60%] shrink-0 truncate select-none text-[14px] text-fg/40">{SITE_HOST}/</span>
-              <input
-                type="text"
-                required
-                value={handle}
-                onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
-                placeholder="yourname"
-                className="min-w-0 flex-1 bg-transparent py-2.5 pr-3.5 text-[14px] text-fg outline-none placeholder:text-fg/30"
-              />
-            </div>
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Email</span>
+    <AuthShell
+      title="Claim your link"
+      intro="Pick your page address and publish in two minutes."
+      footer={<>Already have an account? <Link href="/login" className="font-semibold text-fg underline underline-offset-4 hover:text-[#ff5b37]">Log in</Link></>}
+    >
+      {error && <AuthError>{error}</AuthError>}
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
+        <AuthField label="Your page address">
+          <label className="flex h-[52px] items-center rounded-xl border border-fg/15 bg-bg pl-4 transition focus-within:border-[#ff5b37] focus-within:ring-4 focus-within:ring-[#ff5b37]/15">
+            <span className="max-w-[55%] shrink-0 select-none truncate text-[15px] text-fg/45">{SITE_HOST}/</span>
             <input
-              type="email"
+              type="text"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-fg/10 bg-fg/[0.04] px-3.5 py-2.5 text-[14px] text-fg outline-none transition placeholder:text-fg/30 focus:border-fg/35 focus:bg-fg/[0.07]"
+              value={handle}
+              onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+              placeholder="yourname"
+              aria-label="Your page address"
+              autoCapitalize="none"
+              spellCheck={false}
+              className="h-full min-w-0 flex-1 bg-transparent pr-4 text-[15px] font-semibold text-fg outline-none placeholder:font-normal placeholder:text-fg/35"
             />
           </label>
+        </AuthField>
 
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-fg/45">Password</span>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 8 characters"
-              className="w-full rounded-xl border border-fg/10 bg-fg/[0.04] px-3.5 py-2.5 text-[14px] text-fg outline-none transition placeholder:text-fg/30 focus:border-fg/35 focus:bg-fg/[0.07]"
-            />
-          </label>
+        <AuthField label="Email">
+          <input type="email" required autoComplete="email" aria-label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={authInput} />
+        </AuthField>
 
-          <label className="flex items-start gap-2.5 text-[13px] leading-snug text-fg/60">
-            <input type="checkbox" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#ff5b37]" />
-            <span>
-              I agree to the <Link href="/terms" target="_blank" className="text-fg underline">Terms of Service</Link>, the{" "}
-              <Link href="/privacy" target="_blank" className="text-fg underline">Privacy Policy</Link> and the{" "}
-              <Link href="/refund" target="_blank" className="text-fg underline">Refund Policy</Link>.
-            </span>
-          </label>
+        <AuthField label="Password">
+          <PasswordInput required minLength={8} autoComplete="new-password" aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" />
+        </AuthField>
 
-          <button
-            type="submit"
-            disabled={loading || !agreed}
-            className="mt-3 w-full rounded-full bg-[#ff5b37] py-3 text-[14px] font-semibold text-[#111] transition hover:brightness-110 disabled:opacity-50"
-          >
-            {loading ? "Creating account…" : "Create free account"}
-          </button>
-        </form>
+        <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-relaxed text-fg/60">
+          <input type="checkbox" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#ff5b37]" />
+          <span>
+            I agree to the <Link href="/terms" target="_blank" className="text-fg underline">Terms of Service</Link>, the{" "}
+            <Link href="/privacy" target="_blank" className="text-fg underline">Privacy Policy</Link> and the{" "}
+            <Link href="/refund" target="_blank" className="text-fg underline">Refund Policy</Link>.
+          </span>
+        </label>
 
-        <p className="mt-6 text-center text-[13px] text-fg/45">
-          Already have an account?{" "}
-          <Link href="/login" className="text-fg underline hover:text-[#ff5b37]">
-            Log in
-          </Link>
-        </p>
-      </div>
-    </div>
+        <button type="submit" disabled={loading || !agreed} className={authButton}>
+          {loading ? "Creating account…" : "Create free account"}
+        </button>
+      </form>
+    </AuthShell>
   );
 }
