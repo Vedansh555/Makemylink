@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const REASONS = ["Scam or fraud", "Phishing or fake login", "Pretending to be someone else", "Harassment or hate", "Adult or illegal content", "Something else"];
+const REASONS = ["Scam or fraud", "Phishing or fake login", "Pretending to be someone else", "Copyright or trademark", "Harassment or hate", "Adult or illegal content", "Something else"];
 
 export function ReportForm({ initial }: { initial: string }) {
   const [handle, setHandle] = useState(initial);

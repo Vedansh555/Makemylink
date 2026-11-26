@@ -16,7 +16,7 @@ export default function Contact() {
       <h2>Privacy and data requests</h2>
       <p>To see, correct or delete your data, email us from your account email. Our grievance officer is {OPERATOR.grievanceOfficer}, reachable at the same address.</p>
       <h2>Who runs Showz</h2>
-      <p>{OPERATOR.names}, {OPERATOR.place}.</p>
+      <p>{OPERATOR.names}, {OPERATOR.place}. <Link href="/about" className="underline">About us</Link>.</p>
       <h2>Delivery</h2>
       <p>Showz is a digital service. Nothing is shipped. Pro starts as soon as your payment is confirmed.</p>
       <p>See also our <Link href="/refund" className="underline">Refund and Cancellation Policy</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>.</p>

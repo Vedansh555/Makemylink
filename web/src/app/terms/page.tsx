@@ -34,6 +34,15 @@ export default function Terms() {
       <h2>Your content</h2>
       <p>You keep ownership of what you publish. You give us a licence to host, copy and display it so the service works. You promise you have the right to publish it.</p>
       <p><b>We never use your content, photos, likeness or your visitors&apos; details to train AI models</b>, and we never sell them.</p>
+      <h2 id="copyright">Copyright and trademark complaints</h2>
+      <p>If a page on Showz uses your photo, writing, music, product, brand name or logo without permission, email <a href={`mailto:${OPERATOR.supportEmail}?subject=Copyright%20complaint`} className="underline">{OPERATOR.supportEmail}</a> with the subject &quot;Copyright complaint&quot; and include:</p>
+      <ul>
+        <li>your name and contact details, and, if you act for someone else, who that is;</li>
+        <li>the address of the Showz page and exactly what on it is yours;</li>
+        <li>a link to your original work, or your trademark registration or other proof that it is yours;</li>
+        <li>a statement that the use is not authorised and that what you have told us is true.</li>
+      </ul>
+      <p>You can also use <Link href="/report" className="underline">Report a page</Link>. We reply within 2 working days. We may remove the content or suspend the page, and we tell its owner why. If you are the owner and believe this was a mistake, reply with your reasons and any proof, and we will look again. We close the accounts of people who repeatedly use work that is not theirs. A false complaint may make you responsible for the harm it causes.</p>
       <h2>Your page can never vanish</h2>
       <p>You can download everything at any time from your dashboard (Account, then &ldquo;Your page is yours&rdquo;): your pages, links, products, email list and bookings, plus a plain backup web page you can host anywhere. If we ever close Showz, we will tell you by email at least 60 days before, keep downloads open until the end, and never delete your page without that warning.</p>
       <h2>Availability</h2>

@@ -5,7 +5,7 @@ import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { esc, sendMail } from "@/lib/mail";
 import { SITE_URL } from "@/lib/site";
 
-const REASONS = ["Scam or fraud", "Phishing or fake login", "Pretending to be someone else", "Harassment or hate", "Adult or illegal content", "Something else"];
+const REASONS = ["Scam or fraud", "Phishing or fake login", "Pretending to be someone else", "Copyright or trademark", "Harassment or hate", "Adult or illegal content", "Something else"];
 
 // POST {handle, reason, details, email}: anyone can report a page. Admins get an email and can suspend it from /admin.
 export async function POST(req: Request) {

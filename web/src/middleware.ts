@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const OWN_HOST = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://showz.me").host;
 const isOwn = (h: string) => h === OWN_HOST || h.startsWith("localhost") || h.startsWith("127.0.0.1") || h.endsWith(".onrender.com") || h.endsWith(".vercel.app");
 
-const SITE_PAGES = new Set(["admin", "blog", "contact", "cookies", "create", "dashboard", "for", "forgot", "login", "preview", "privacy", "refund", "report", "reset", "signup", "start", "terms"]);
+const SITE_PAGES = new Set(["about", "admin", "blog", "contact", "cookies", "create", "dashboard", "for", "forgot", "login", "preview", "privacy", "refund", "report", "reset", "signup", "start", "terms"]);
 
 // hostname -> handle, remembered briefly so a visit does not need a lookup every time
 const domainCache = new Map<string, { handle: string | null; until: number }>();
