@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import { all, run } from "@/lib/db";
 import { pageByHandle } from "@/lib/account";
 import { sendBookingReminder } from "@/lib/bookingMail";
+import { settleHolds } from "@/lib/bookingPaid";
 
 // Call every 15 minutes from a scheduler (Render cron job or cron-job.org): GET /api/cron/reminders with "Authorization: Bearer $CRON_SECRET".
 // Emails buyers a day before and an hour before each confirmed booking.
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // First confirm any online payment whose buyer never came back, and free slots nobody paid for.
+  const settled = await settleHolds(null, 3 * 60_000).catch(() => ({ confirmed: 0, released: 0 }));
   const now = Date.now();
   const rows = await all<{ id: string; link_id: string; buyer_name: string; buyer_email: string; slot_start: number; reminded_24: boolean; reminded_1: boolean; handle: string }>(
     `SELECT b.id, b.link_id, b.buyer_name, b.buyer_email, b.slot_start, b.reminded_24, b.reminded_1, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id
@@ -31,5 +34,5 @@ export async function GET(req: Request) {
       sent++;
     }
   }
-  return NextResponse.json({ sent });
+  return NextResponse.json({ sent, ...settled });
 }

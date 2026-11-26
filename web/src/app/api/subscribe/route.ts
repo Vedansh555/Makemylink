@@ -22,10 +22,11 @@ export async function POST(req: Request) {
     const c = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM subscribers WHERE page_id = $1", [page.id]);
     if ((c?.n ?? 0) >= FREE_LIMITS.subscribers) return NextResponse.json({ error: "This list is full right now." }, { status: 409 });
   }
-  await run("INSERT INTO subscribers (id, page_id, email, created_at, consented_at) VALUES ($1,$2,$3,$4,$4) ON CONFLICT (page_id, email) DO NOTHING", [
+  await run("INSERT INTO subscribers (id, page_id, email, created_at, consented_at) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (page_id, email) DO NOTHING", [
     crypto.randomUUID(),
     page.id,
     clean,
+    Date.now(),
     Date.now(),
   ]);
   await rewardReferral(page.user_id, clean).catch(() => {});

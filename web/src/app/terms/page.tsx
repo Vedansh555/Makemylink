@@ -29,7 +29,7 @@ export default function Terms() {
       <p>Refunds are covered in our <Link href="/refund" className="underline">Refund and Cancellation Policy</Link>.</p>
       <h2>Bookings and sales between you and your visitors</h2>
       <p>
-        If you offer paid sessions or products through your page, the agreement is between you and your customer. Payments for bookings go directly to you (for example to your UPI ID or your own payment link). We do not hold that money, and we are not responsible for the quality, delivery or refund of what you sell. You are responsible for any taxes that apply to you.
+        If you offer paid sessions or products through your page, the agreement is between you and your customer. Payments for bookings go directly to you (through your own Razorpay or PayPal account, or your own payment link). We do not hold that money, and we are not responsible for the quality, delivery or refund of what you sell. You are responsible for any taxes that apply to you.
       </p>
       <h2>Your content</h2>
       <p>You keep ownership of what you publish. You give us a licence to host, copy and display it so the service works. You promise you have the right to publish it.</p>

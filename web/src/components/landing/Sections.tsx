@@ -492,7 +492,7 @@ export function Features() {
                   <span key={t} className={`rounded-lg border py-1.5 text-center ${i === 1 ? "border-[#ff5b37] bg-[#ff5b37]/10 font-semibold" : "border-fg/15 text-fg/65"}`}>{t}</span>
                 ))}
               </div>
-              <p className="mt-3 text-[11px] text-fg/45">Paid by UPI. The meeting link is emailed after you confirm.</p>
+              <p className="mt-3 text-[11px] text-fg/45">Paid straight to you. The meeting link is emailed once payment is confirmed.</p>
             </div>
           </Card>
         </Reveal>
@@ -657,7 +657,7 @@ export function Compare() {
 
 const faqs: [string, string][] = [
   ["Who is Showz for?", "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you."],
-  ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays your UPI ID (or your own payment link for dollars). You confirm payment and they get your meeting link by email. We take no cut."],
+  ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays you directly. Connect your own Razorpay or PayPal and the booking confirms by itself, or add your payment link and confirm it yourself. They get your meeting link by email. We take no cut."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
   ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
   ["Can I bring my existing page?", "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, or almost any public link page, and we copy your picture, links, groups, social handles and shop items. Some sites, like Beacons, block automated reading, so for those you add links by hand. Another tool's design can't be copied, so you pick one of our styles."],

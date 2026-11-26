@@ -6,13 +6,13 @@ import { slotsForDay } from "@/lib/booking";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { esc, sendMail } from "@/lib/mail";
 import { getSession } from "@/lib/session";
-import { HOLD_MS, createOrder, credsForUser, paypalCreate, paypalCredsForUser } from "@/lib/gateway";
+import { createOrder, credsForUser, paypalCreate, paypalCredsForUser } from "@/lib/gateway";
+import { settleHolds } from "@/lib/bookingPaid";
+import { payLinkHost } from "@/lib/payLink";
 import { SITE_URL } from "@/lib/site";
 import { sendBookingConfirmed } from "@/lib/bookingMail";
 import { rewardReferral } from "@/lib/referral";
 
-/** An online checkout nobody finished lets go of its time slot after a while. */
-const releaseOldHolds = (pageId: string) => run("UPDATE bookings SET status = 'cancelled' WHERE page_id = $1 AND provider IN ('razorpay','paypal') AND status = 'awaiting_payment' AND created_at < $2", [pageId, Date.now() - HOLD_MS]);
 
 async function findConfig(handle: string, linkId: string) {
   const page = await pageByHandle(handle);
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
   const u = new URL(req.url);
   const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "");
   if (!found) return NextResponse.json({ slots: [] });
-  await releaseOldHolds(found.page.id);
+  await settleHolds(found.page.id);
   const month = u.searchParams.get("month") ?? "";
   if (/^\d{4}-\d{2}$/.test(month)) {
     // For the calendar: how many times are free and how many exist on each day of the month.
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
   const found = await findConfig(b.handle ?? "", b.linkId ?? "");
   if (!found) return NextResponse.json({ error: "This session is not available" }, { status: 404 });
   const { page, link, cfg } = found;
-  await releaseOldHolds(page.id);
+  await settleHolds(page.id);
 
   // The slot must be one the server would have offered (right day, hour, free).
   const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: cfg.timeZone }).format(new Date(b.slot));
@@ -78,18 +78,17 @@ export async function POST(req: Request) {
 
   const id = crypto.randomUUID();
   const free = cfg.price === 0;
-  await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at, consented_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)", [
-    id, page.id, link.id, name, email, b.slot, String(b.note ?? "").slice(0, 500), cfg.price, cfg.currency, free ? "confirmed" : "awaiting_payment", Date.now(),
+  await run("INSERT INTO bookings (id, page_id, link_id, buyer_name, buyer_email, slot_start, note, amount, currency, status, created_at, consented_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)", [
+    id, page.id, link.id, name, email, b.slot, String(b.note ?? "").slice(0, 500), cfg.price, cfg.currency, free ? "confirmed" : "awaiting_payment", Date.now(), Date.now(),
   ]);
   await rewardReferral(page.user_id, email).catch(() => {});
 
   const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: cfg.timeZone }).format(new Date(b.slot));
   const owner = await one<{ email: string }>("SELECT email FROM users WHERE id = $1", [page.user_id]);
-  if (owner) await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${free ? "" : "<p>Mark it paid in your dashboard once the money arrives.</p>"}`);
   if (free) await sendBookingConfirmed({ id, buyerName: name, buyerEmail: email, slot: b.slot, handle: page.handle, hostName: page.profile.name, link });
 
-  // Offer every way the creator set up: UPI for Indian buyers, a payment link (cards) for everyone else.
-  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "upi"; upiId: string; link: string } | { kind: "link"; link: string })[] = [];
+  // How the buyer can pay: the creator's own Razorpay or PayPal (confirms by itself), and/or the creator's payment link.
+  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "link"; link: string })[] = [];
   if (!free) {
     // If the creator connected their own Razorpay, the buyer can pay on the spot and the booking confirms itself.
     const creds = cfg.currency === "INR" ? await credsForUser(page.user_id) : null;
@@ -113,8 +112,18 @@ export async function POST(req: Request) {
         console.error("creator paypal order", e);
       }
     }
-    if (cfg.upiId && cfg.currency === "INR") pays.push({ kind: "upi", upiId: cfg.upiId, link: `upi://pay?pa=${encodeURIComponent(cfg.upiId)}&pn=${encodeURIComponent(page.profile.name)}&am=${cfg.price}&cu=INR&tn=${encodeURIComponent(link.title)}` });
-    if (cfg.paymentUrl) pays.push({ kind: "link", link: cfg.paymentUrl });
+    if (payLinkHost(cfg.paymentUrl)) pays.push({ kind: "link", link: cfg.paymentUrl! });
+  }
+  if (owner) {
+    const online = pays.some((p) => p.kind !== "link");
+    const next = free
+      ? ""
+      : online
+        ? "<p>It confirms by itself once they pay on your page.</p>"
+        : pays.length
+          ? "<p>Check the money has arrived, then press <b>Mark paid</b> in your dashboard. The buyer is then emailed the meeting link.</p>"
+          : "<p><b>They had no way to pay on your page.</b> Send them your payment details, then press Mark paid in your dashboard. To fix this, connect Razorpay or PayPal, or add a payment link to the booking card.</p>";
+    await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${next}`);
   }
   return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pays });
 }

@@ -39,8 +39,6 @@ export interface BookingConfig {
   endHour: number;
   /** IANA time zone of the creator, e.g. Asia/Kolkata. */
   timeZone: string;
-  /** INR sessions are paid straight to the creator's UPI ID (0% fee, no middleman). */
-  upiId?: string;
   /** USD sessions are paid through the creator's own Stripe/PayPal payment link. */
   paymentUrl?: string;
 }

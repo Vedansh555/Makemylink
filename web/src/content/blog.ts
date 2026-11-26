@@ -32,12 +32,12 @@ export const posts: Post[] = [
       { h2: "How marketplace booking pages make money", p: ["Booking marketplaces typically take a percentage of each paid session. That is fair when the marketplace sends you the customer. It is expensive when your own audience on Instagram, LinkedIn or YouTube is the one booking you.", "A percentage also grows with your success: the more you earn, the more you pay, for the same software."] },
       { h2: "What a flat fee changes", p: ["With a flat monthly plan, a ₹3,000 session costs you the same to host as a ₹300 one. Showz Pro is ₹299 a month in India and $8 elsewhere, with 0% commission on bookings."] },
       { h2: "What you need on a booking page", ul: ["Your available days and hours, in your own time zone", "A price per session in rupees or dollars", "Automatic confirmation email with the meeting link", "A page that looks like you, not like every other mentor"] },
-      { h2: "How payment works on Showz", p: ["For rupee sessions the buyer pays your UPI ID directly, so the money never passes through us. For dollar sessions you add your own payment link. You confirm payment in your dashboard and the meeting link is emailed to the buyer."] },
+      { h2: "How payment works on Showz", p: ["Buyers pay you directly, so the money never passes through us. Connect your own Razorpay (rupees, including UPI) or PayPal (dollars) and bookings confirm by themselves, or add your payment link and confirm each payment in your dashboard. The meeting link is then emailed to the buyer."] },
       { h2: "When a marketplace is still the better choice", p: ["If you have no audience and want a platform to find you clients, a marketplace's discovery can be worth its commission. Compare current pricing on each site before you decide."] },
     ],
     faq: [
       { q: "Does Showz charge a commission on bookings?", a: "No. Pro is a flat ₹299 per month in India or $8 per month elsewhere, and bookings carry 0% platform commission." },
-      { q: "How do buyers pay for a session?", a: "Rupee sessions are paid to your UPI ID. Dollar sessions use a payment link you provide. You confirm payment and the meeting link is emailed automatically." },
+      { q: "How do buyers pay for a session?", a: "Through your own Razorpay or PayPal, which confirms the booking automatically, or through your payment link, which you confirm. The meeting link is emailed to the buyer." },
     ],
   },
   {
@@ -85,13 +85,13 @@ export const posts: Post[] = [
     answer: "Stan Store is popular for creator e-commerce, but its $29/mo ($348/year) minimum price tag is steep for emerging and international creators. A flat-fee link-in-bio with 0% commission on 1:1 bookings lets you monetize your audience without expensive monthly software overhead.",
     body: [
       { h2: "The true cost of creator store builders", p: ["Tools like Stan Store bundle email capture, digital products, and calendar bookings into one dashboard, but charge a minimum of $29 per month (₹2,400+/mo in India) just to keep your store online, even during slow months.", "For creators starting out, high recurring software subscriptions eat directly into your profits before you even make your first sale."] },
-      { h2: "How the flat-fee model works", p: ["With Showz, you can start completely free with 8 links and 10 designer themes. When you are ready to take paid bookings, Pro is just ₹299 per month in India or $8 globally with 0% platform commission.", "For Indian creators, payments go straight to your personal UPI ID with zero intermediary fees. For international clients, you connect your own Stripe or PayPal link directly."] },
+      { h2: "How the flat-fee model works", p: ["With Showz, you can start completely free with 8 links and 10 designer themes. When you are ready to take paid bookings, Pro is just ₹299 per month in India or $8 globally with 0% platform commission.", "Indian creators connect their own Razorpay (UPI, cards and netbanking) or share a payment link. For international clients, you connect your own PayPal or add your payment link. Showz takes no cut; your payment company charges its own fee."] },
       { h2: "Key differences: Stan Store vs Showz", ul: ["Pricing: Stan Store starts at $29/mo (~₹2,400/mo); Showz Pro is ₹299/mo ($8/mo global) with a generous free-forever tier", "Design: Stan Store uses a standard list-style checkout template; Showz provides 135 aesthetic Bento themes", "Payments: Showz supports direct peer-to-peer UPI with 0% commission in India, plus global payment links"] },
       { h2: "Which one should you choose?", p: ["If you require complex multi-step course funnels and affiliate partner tiers, Stan Store is designed for high-volume US creators. If you want a stunning aesthetic link-in-bio to take paid 1:1 bookings, show off product recommendations, and grow an email list at a fair price, Showz is the leaner, more profitable choice."] },
     ],
     faq: [
       { q: "Does Showz charge a percentage of my bookings?", a: "No. Showz charges 0% commission on bookings and sales on both Free and Pro plans." },
-      { q: "How do Indian creators receive booking payments?", a: "Clients pay your UPI ID directly. The money hits your bank account instantly with no platform holding period." },
+      { q: "How do Indian creators receive booking payments?", a: "Clients pay into your own Razorpay account (UPI, cards or netbanking) or your payment link. Showz never holds the money; your payment company settles it to your bank." },
     ],
   },
   {
@@ -107,7 +107,7 @@ export const posts: Post[] = [
       { h2: "3. Who owns your email list?", p: ["Your subscribers are your business. Look for a plan that lets you export them."] },
       { h2: "4. Fees on your sales", p: ["Some tools take a percentage of what you sell on lower plans. Read the pricing page for the plan you will actually use."] },
       { h2: "5. Does it look like you?", p: ["Themes and layout matter, especially for fashion, beauty and photography creators."] },
-      { h2: "Where Showz fits", p: ["Showz has rupee pricing (₹299 per month for Pro), UPI-paid bookings, a real email list with CSV export, and 135 themes. The free plan is enough to start."] },
+      { h2: "Where Showz fits", p: ["Showz has rupee pricing (₹299 per month for Pro), bookings paid by UPI or card through your own Razorpay, a real email list with CSV export, and 135 themes. The free plan is enough to start."] },
     ],
     faq: [
       { q: "What is the best link-in-bio tool for Indian creators?", a: "The best tool is the one that supports UPI, bills in rupees, lets you export your audience and does not take a commission on your sales. Showz is built around those four points." },
@@ -140,12 +140,12 @@ export const posts: Post[] = [
     answer: "Use a link-in-bio page with a booking card: set your days, hours, price and meeting link, then put that one page link in your Instagram bio.",
     body: [
       { h2: "Step 1: Create your page", p: ["Sign up, choose a handle and a theme."] },
-      { h2: "Step 2: Add a booking card (Pro)", p: ["In the editor choose 'Add booking'. Set a title, the price, the length, your days and hours, your time zone, your meeting link and your UPI ID."] },
+      { h2: "Step 2: Add a booking card (Pro)", p: ["In the editor choose 'Add booking'. Set a title, the price, the length, your days and hours, your time zone, your meeting link, then connect Razorpay or PayPal or add your payment link."] },
       { h2: "Step 3: Share one link", p: ["Put your page link in your Instagram, LinkedIn and YouTube bios. Visitors pick a time, enter their email and pay."] },
       { h2: "Step 4: Confirm and meet", p: ["You get an email for each booking. Mark it paid in your dashboard and the buyer receives the meeting link."] },
     ],
     faq: [
-      { q: "Do I need a business account to take bookings?", a: "No. For rupee sessions buyers pay your personal or business UPI ID directly." },
+      { q: "Do I need a business account to take bookings?", a: "You can take bookings with a payment link. To have them confirm automatically, you need your own Razorpay or PayPal account." },
     ],
   },
   {

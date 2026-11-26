@@ -19,7 +19,7 @@ export const niches: Niche[] = [
     goal: "portfolio",
     benefits: [
       { title: "Bento Grid Visuals", desc: "Show photos in 1x1, 2x1, or 2x2 cards that look like a designer portfolio, not an endless list of text links." },
-      { title: "Direct Shoot Bookings", desc: "Let clients pick a date, choose a shoot package, and pay you directly via UPI or card." },
+      { title: "Direct Shoot Bookings", desc: "Let clients pick a date, choose a shoot package, and pay you directly by UPI or card." },
       { title: "Sell Presets & Prints", desc: "Showcase your Lightroom presets or print shop with visual product tiles linking straight to checkout." },
     ],
     faq: [
@@ -40,7 +40,7 @@ export const niches: Niche[] = [
       { title: "Email Lead Magnet", desc: "Offer a free 7-day challenge or diet guide to collect verified client emails into your own exportable database." },
     ],
     faq: [
-      { q: "Can clients pay in rupees with UPI?", a: "Yes. Indian clients pay your personal or business UPI ID directly, hitting your bank account immediately." },
+      { q: "Can clients pay in rupees with UPI?", a: "Yes. Connect your own Razorpay and Indian clients can pay by UPI on your page, or share a Razorpay payment link. The money goes to your account." },
       { q: "Can I export my client email list?", a: "Yes. Download your full subscriber list as a CSV at any time to import into any email marketing tool." },
     ],
   },

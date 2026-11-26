@@ -1,4 +1,5 @@
-import { one, run } from "./db";
+import { all, one, run } from "./db";
+import { HOLD_MS, credsForUser, fetchOrder } from "./gateway";
 import { pageByHandle } from "./account";
 import { esc, sendMail } from "./mail";
 import { sendBookingConfirmed } from "./bookingMail";
@@ -47,8 +48,49 @@ export async function confirmPaidBooking(row: PaidBooking): Promise<{ ok: true; 
     }
   }
 
-  await run("UPDATE bookings SET status = 'confirmed' WHERE id = $1", [row.id]);
+  // Only the call that actually changes the status sends the emails, even if two arrive together.
+  const changed = await one("UPDATE bookings SET status = 'confirmed' WHERE id = $1 AND status <> 'confirmed' RETURNING id", [row.id]);
+  if (!changed) return { ok: true, meetingUrl: cfg.meetingUrl };
   await sendBookingConfirmed({ id: row.id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page.profile.name, link }, "paid");
   if (owner) await sendMail(owner.email, `Paid booking: ${esc(row.buyer_name)}`, `<p>${esc(row.buyer_name)} (${esc(row.buyer_email)}) paid and booked <b>${esc(link.title)}</b> on ${esc(when)}. It is confirmed automatically.</p>`);
   return { ok: true, meetingUrl: cfg.meetingUrl };
+}
+
+/**
+ * Looks after online checkouts that never reported back. A buyer may pay and close the tab (common after switching to a
+ * UPI app), so for Razorpay we ask the creator's account whether the order was paid before letting the slot go.
+ * Paid orders are confirmed; unpaid ones are released once the hold has run out. If Razorpay can't be reached, nothing changes.
+ * A PayPal order that was never returned from has taken no money, so it is simply released.
+ */
+export async function settleHolds(pageId: string | null, checkAfterMs: number = HOLD_MS): Promise<{ confirmed: number; released: number }> {
+  const params: unknown[] = [Date.now() - checkAfterMs];
+  if (pageId) params.push(pageId);
+  const rows = await all<PaidBooking & { created_at: number }>(
+    `SELECT b.id, b.page_id, b.link_id, b.buyer_name, b.buyer_email, b.slot_start, b.amount, b.currency, b.status, b.provider, b.provider_ref, b.created_at, p.handle, p.user_id
+     FROM bookings b JOIN pages p ON p.id = b.page_id
+     WHERE b.status = 'awaiting_payment' AND b.provider IN ('razorpay','paypal') AND b.created_at < $1 ${pageId ? "AND b.page_id = $2" : ""}
+     ORDER BY b.created_at ASC LIMIT 20`,
+    params,
+  );
+  let confirmed = 0;
+  let released = 0;
+  for (const row of rows) {
+    const expired = row.created_at < Date.now() - HOLD_MS;
+    if (row.provider === "razorpay" && row.provider_ref) {
+      const creds = await credsForUser(row.user_id);
+      if (creds) {
+        const order = await fetchOrder(creds, row.provider_ref).catch(() => null);
+        if (!order) continue;
+        if (order.currency === "INR" && order.amount === row.amount * 100 && order.amount_paid >= order.amount && order.notes?.booking_id === row.id) {
+          if ((await confirmPaidBooking(row)).ok) confirmed++;
+          continue;
+        }
+      }
+    }
+    if (expired) {
+      await run("UPDATE bookings SET status = 'cancelled' WHERE id = $1 AND status = 'awaiting_payment'", [row.id]);
+      released++;
+    }
+  }
+  return { confirmed, released };
 }

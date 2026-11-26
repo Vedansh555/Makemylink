@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Copy,
   Globe,
   Lock,
   Mail,
@@ -22,6 +21,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { slotsForDay } from "@/lib/booking";
 import { ConsentCheck } from "./ConsentCheck";
+import { payLinkHost } from "@/lib/payLink";
 import { WhatsAppIcon } from "./WhatsAppModal";
 import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 
@@ -32,7 +32,6 @@ export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, 
 type Pay =
   | RazorpayPay
   | { kind: "paypal"; url: string }
-  | { kind: "upi"; upiId: string; link: string }
   | { kind: "link"; link: string };
 
 type Result = { status: "confirmed" | "awaiting_payment" | "demo"; meetingUrl?: string; pays: Pay[] };
@@ -95,8 +94,7 @@ export function BookingModal({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Result | null>(null);
-  const [copiedUpi, setCopiedUpi] = useState(false);
-
+  
   const viewerTz = useMemo(() => {
     try {
       return Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -263,11 +261,6 @@ export function BookingModal({
     }
   }
 
-  const copyUpi = (text: string) => {
-    void navigator.clipboard.writeText(text);
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
 
   return (
     <div
@@ -377,35 +370,18 @@ export function BookingModal({
                       >
                         Pay {price} now
                       </button>
-                    ) : p.kind === "upi" ? (
-                      <div key="upi" className="space-y-2">
-                        <a
-                          href={p.link}
-                          className="block rounded-xl bg-[#25d366] px-4 py-3 font-bold text-black"
-                        >
-                          Pay with UPI App
-                        </a>
-                        <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-[13px]">
-                          <span className="font-mono text-white/90">{p.upiId}</span>
-                          <button
-                            type="button"
-                            onClick={() => copyUpi(p.upiId)}
-                            className="inline-flex items-center gap-1 rounded-md bg-white/10 px-2 py-1 text-[11px] font-medium text-white hover:bg-white/20"
-                          >
-                            <Copy className="h-3 w-3" /> {copiedUpi ? "Copied" : "Copy"}
-                          </button>
-                        </div>
-                      </div>
                     ) : (
-                      <a
-                        key="link"
-                        href={p.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block rounded-xl border border-white/30 px-4 py-3 font-semibold text-white"
-                      >
-                        Pay via card or link
-                      </a>
+                      <div key="link">
+                          <a
+                            href={p.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={done.pays.length > 1 ? "block rounded-xl border border-white/30 px-4 py-3 font-semibold text-white" : "block w-full rounded-xl bg-white px-4 py-3 font-bold text-black"}
+                          >
+                            {done.pays.length > 1 ? "Or pay with the creator's payment link" : `Pay ${price}`}
+                          </a>
+                          <p className="mt-2 text-[12px] text-white/50">Opens {payLinkHost(p.link) ?? "the creator's payment page"}. Pay exactly {price}; the host confirms it and emails your meeting link.</p>
+                        </div>
                     ),
                   )}
                 </div>

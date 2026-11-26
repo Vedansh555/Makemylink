@@ -10,7 +10,7 @@ export function GET() {
 ## Plans
 - Free: 10 themes, up to 8 links, 6 products, 100 emails, 7-day analytics. Shows a Showz badge.
 - Pro: ₹299/month or ₹2,999/year in India; $8/month or $79/year elsewhere. All themes, bookings with 0% commission, card sizes, unlimited links, CSV export of emails, 30-day analytics, scheduled links, daily broken-link check, no badge.
-- India pays through Razorpay (UPI, cards, netbanking). Other countries pay through Stripe.
+- India pays through Razorpay (UPI, cards, netbanking). Other countries pay through PayPal.
 
 ## Key pages
 - [Home](${SITE_URL}/)

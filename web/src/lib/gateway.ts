@@ -121,8 +121,15 @@ export async function paypalCapture(c: PaypalCreds, orderId: string) {
   const token = await ppToken(c);
   if (!token) return null;
   const res = await fetch(`${ppBase(c)}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, signal: AbortSignal.timeout(20_000) });
-  const o = (await res.json().catch(() => ({}))) as { purchase_units?: { payments?: { captures?: { status: string; custom_id?: string; amount: { currency_code: string; value: string } }[] } }[] };
-  const cap = o.purchase_units?.[0]?.payments?.captures?.[0];
-  if (!cap || cap.status !== "COMPLETED") return null;
-  return { bookingId: cap.custom_id ?? "", currency: cap.amount.currency_code, value: Number(cap.amount.value) };
+  type Order = { purchase_units?: { payments?: { captures?: { status: string; custom_id?: string; amount: { currency_code: string; value: string } }[] } }[] };
+  let o = (await res.json().catch(() => ({}))) as Order;
+  let cap = o.purchase_units?.[0]?.payments?.captures?.[0];
+  if (!cap) {
+    // Already captured (the buyer reloaded the page, or our first reply was lost): read the order to see what was paid.
+    const again = await fetch(`${ppBase(c)}/v2/checkout/orders/${encodeURIComponent(orderId)}`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(15_000) });
+    o = (await again.json().catch(() => ({}))) as Order;
+    cap = o.purchase_units?.[0]?.payments?.captures?.[0];
+  }
+  if (!cap || (cap.status !== "COMPLETED" && cap.status !== "PENDING")) return null;
+  return { pending: cap.status === "PENDING", bookingId: cap.custom_id ?? "", currency: cap.amount.currency_code, value: Number(cap.amount.value) };
 }

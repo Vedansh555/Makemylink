@@ -45,6 +45,7 @@ import { LookArt } from "../bio/LookArt";
 import { ThemePicker } from "../bio/ThemePicker";
 import { Logo } from "../landing/Nav";
 import { PhoneFrame } from "../landing/PhoneFrame";
+import { normalisePayLink, payLinkHost } from "@/lib/payLink";
 import { QRCodeCanvas } from "../ui/QRCodeCanvas";
 
 const stores: Store[] = ["LTK", "ShopMy", "Amazon", "Myntra", "Nykaa", "Own store"];
@@ -170,6 +171,63 @@ function BookingSection({ icon, title, hint, children }: { icon: React.ReactNode
   );
 }
 
+/** The creator's two ways to be paid: connect Razorpay or PayPal (confirms by itself), or paste a payment link (they confirm). */
+function PayHelp({ b, up }: { b: BookingConfig; up: (patch: Partial<BookingConfig>) => void }) {
+  const [connected, setConnected] = useState<{ razorpay: boolean; paypal: boolean } | null>(null);
+  useEffect(() => {
+    fetch("/api/gateway")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setConnected({ razorpay: !!d.razorpay?.connected, paypal: !!d.paypal?.connected }))
+      .catch(() => {});
+  }, []);
+  const rupees = b.currency === "INR";
+  const name = rupees ? "Razorpay" : "PayPal";
+  const auto = !!connected && (rupees ? connected.razorpay : connected.paypal);
+  const link = b.paymentUrl ?? "";
+  const host = payLinkHost(link);
+  const note = "rounded-xl border px-3.5 py-3 text-[12.5px] leading-snug";
+
+  if (b.price === 0) return <p className={`${note} border-fg/10 text-fg/60`}>This call is free, so no payment is needed.</p>;
+  return (
+    <div className="grid gap-3">
+      <div className={`${note} flex flex-wrap items-center justify-between gap-2 ${auto ? "border-emerald-500/30 bg-emerald-500/[0.07]" : "border-fg/10 bg-fg/[0.03]"}`}>
+        <span className="min-w-0 flex-1">
+          {auto ? (
+            <><b>{name} is connected.</b> Buyers pay on your page and the booking confirms by itself.</>
+          ) : (
+            <><b>Automatic:</b> connect {name} so {rupees ? "rupee" : "dollar"} bookings are paid on your page and confirm by themselves{rupees ? " (UPI, cards and netbanking)" : ""}.</>
+          )}
+        </span>
+        <Link href="/dashboard?tab=bookings" target="_blank" className="shrink-0 rounded-full border border-fg/20 px-3.5 py-2 text-[12px] font-semibold">
+          {auto ? "Manage" : `Connect ${name}`}
+        </Link>
+      </div>
+
+      <Field label={auto ? "Payment link (optional second way to pay)" : "Or your payment link (you confirm each payment)"}>
+        <input
+          className={bkField}
+          type="url"
+          inputMode="url"
+          value={link}
+          onChange={(e) => up({ paymentUrl: e.target.value })}
+          onBlur={(e) => up({ paymentUrl: normalisePayLink(e.target.value) })}
+          placeholder={rupees ? "https://razorpay.me/@yourname" : "https://paypal.me/yourname"}
+          aria-label="Your payment link"
+        />
+      </Field>
+
+      {link && !host && <p className="text-[12.5px] text-red-500">That doesn&apos;t look like a web link. It should start with https://</p>}
+      {host && (
+        <p className="text-[12.5px] text-fg/55">
+          Buyers are sent to <b>{host}</b>. After the money arrives, press <b>Mark paid</b> in your dashboard.{" "}
+          <a href={link} target="_blank" rel="noreferrer" className="underline">Test the link</a>
+        </p>
+      )}
+      {!auto && !host && <p className={`${note} border-[#ff5b37]/40 bg-[#ff5b37]/[0.07]`}><b>Buyers can&apos;t pay yet.</b> Connect {name} or add a payment link before you publish.</p>}
+    </div>
+  );
+}
+
 function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: BookingConfig) => void }) {
   const up = (patch: Partial<BookingConfig>) => onChange({ ...b, ...patch });
   const sym = b.currency === "INR" ? "₹" : "$";
@@ -220,15 +278,8 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
         <input className={bkField} value={b.meetingUrl} onChange={(e) => up({ meetingUrl: e.target.value })} placeholder="https://meet.google.com/abc-defg-hij" aria-label="Meeting link" />
       </BookingSection>
 
-      <BookingSection icon={<Wallet className="h-[18px] w-[18px]" />} title="How people pay you" hint="Money goes straight to you. Showz takes 0%. Fill in one or both.">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="UPI ID (for buyers in India)">
-            <input className={bkField} value={b.upiId ?? ""} onChange={(e) => up({ upiId: e.target.value })} placeholder="name@okbank" />
-          </Field>
-          <Field label="Card or PayPal link (for everyone else)">
-            <input className={bkField} value={b.paymentUrl ?? ""} onChange={(e) => up({ paymentUrl: e.target.value })} placeholder="https://paypal.me/yourname" />
-          </Field>
-        </div>
+      <BookingSection icon={<Wallet className="h-[18px] w-[18px]" />} title="How people pay you" hint="Money goes straight to you. Showz takes 0%.">
+        <PayHelp b={b} up={up} />
       </BookingSection>
 
       <BookingSection icon={<CalendarDays className="h-[18px] w-[18px]" />} title="When you are free" hint="People can only book inside these days and hours, in your time zone.">

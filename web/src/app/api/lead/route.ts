@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     // The visitor can still chat when the free list is full; we just don't store them.
     if ((c?.n ?? 0) >= FREE_LIMITS.subscribers) return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
   }
-  await run("INSERT INTO subscribers (id, page_id, email, name, source, created_at, consented_at) VALUES ($1,$2,$3,$4,'whatsapp',$5,$5) ON CONFLICT (page_id, email) DO UPDATE SET name = EXCLUDED.name, consented_at = EXCLUDED.consented_at", [crypto.randomUUID(), page.id, email, name, Date.now()]);
+  await run("INSERT INTO subscribers (id, page_id, email, name, source, created_at, consented_at) VALUES ($1,$2,$3,$4,'whatsapp',$5,$6) ON CONFLICT (page_id, email) DO UPDATE SET name = EXCLUDED.name, consented_at = EXCLUDED.consented_at", [crypto.randomUUID(), page.id, email, name, Date.now(), Date.now()]);
   await rewardReferral(page.user_id, email).catch(() => {});
   return NextResponse.json({ ok: true, url: waUrl(phone, link.whatsapp!.message, name) });
 }

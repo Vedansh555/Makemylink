@@ -422,11 +422,11 @@ function GatewayCard() {
   return (
     <div className={card}>
       <p className="text-[15px] font-semibold">Get paid automatically</p>
-      <p className="mt-1 text-[13px] text-fg/55">Connect your own account so bookings are paid on the page and confirm by themselves, with no clicking &ldquo;Mark paid&rdquo;. The money goes straight to your account, never through Showz. Until you connect, buyers pay your UPI ID or payment link.</p>
+      <p className="mt-1 text-[13px] text-fg/55">Connect your own account so bookings are paid on the page and confirm by themselves, with no clicking &ldquo;Mark paid&rdquo;. The money goes straight to your account, never through Showz. Until you connect, buyers pay through the payment link on your booking card, and you press &ldquo;Mark paid&rdquo;.</p>
       <div className="mt-4 divide-y divide-fg/10">
         <GatewayRow
           title="Razorpay"
-          sub="For bookings priced in rupees (₹)."
+          sub="For bookings priced in rupees (₹). Buyers can pay by UPI, card or netbanking."
           status={info?.razorpay}
           reload={load}
           provider="razorpay"
@@ -443,6 +443,13 @@ function GatewayCard() {
           fields={[{ name: "clientId", label: "Client ID" }, { name: "clientSecret", label: "Secret", secret: true }]}
           sandboxOption
         />
+        <div className="flex flex-wrap items-center justify-between gap-2 py-4 last:pb-0">
+          <div>
+            <p className="text-[14px] font-semibold">Payment link</p>
+            <p className="text-[13px] text-fg/55">No keys needed: paste a link such as razorpay.me or paypal.me into a booking card. You confirm each payment.</p>
+          </div>
+          <Link href="/create?focus=booking" className="rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Add in editor</Link>
+        </div>
       </div>
     </div>
   );
@@ -469,7 +476,7 @@ function GatewayRow({ title, sub, status, reload, provider, steps, fields, sandb
     reload();
   }
   async function disconnect() {
-    if (!confirm(`Disconnect ${title}? New bookings go back to manual payment (your UPI ID or payment link).`)) return;
+    if (!confirm(`Disconnect ${title}? New bookings go back to manual payment (your payment link).`)) return;
     await fetch(`/api/gateway?provider=${provider}`, { method: "DELETE" });
     reload();
   }

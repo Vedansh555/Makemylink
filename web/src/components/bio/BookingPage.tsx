@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Copy,
   Globe,
   Lock,
   Mail,
@@ -23,6 +22,7 @@ import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
 import { bookingPrice } from "./BookingModal";
 import { ConsentCheck } from "./ConsentCheck";
+import { payLinkHost } from "@/lib/payLink";
 import { WhatsAppIcon } from "./WhatsAppModal";
 import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 import { Background } from "./BioPage";
@@ -30,7 +30,6 @@ import { Background } from "./BioPage";
 type Pay =
   | RazorpayPay
   | { kind: "paypal"; url: string }
-  | { kind: "upi"; upiId: string; link: string }
   | { kind: "link"; link: string };
 
 type Result = {
@@ -105,8 +104,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [payErr, setPayErr] = useState("");
-  const [copiedUpi, setCopiedUpi] = useState(false);
-
+  
   // Reschedule & Status states
   const [resched, setResched] = useState<{ id: string; k: string; old: number } | null>(null);
   const [done, setDone] = useState<Result | null>(null);
@@ -157,6 +155,8 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
         .catch(() => {});
     } else if (q.get("pay") === "failed") {
       setErr("We could not confirm your PayPal payment. If money left your account, contact the host with your booking details.");
+    } else if (q.get("pay") === "pending") {
+      setErr("PayPal is still checking your payment. Your time is held, and the host will email you the meeting link once it arrives.");
     } else if (q.get("pay") === "cancelled") {
       setErr("Payment was cancelled. Pick a time and try again.");
     }
@@ -335,11 +335,6 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     }
   }
 
-  const copyUpi = (text: string) => {
-    void navigator.clipboard.writeText(text);
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
 
   return (
     <div style={style} className="relative isolate min-h-screen overflow-x-clip bg-t-bg text-t-fg font-sans antialiased">
@@ -450,35 +445,18 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                         >
                           Pay {price} with PayPal
                         </a>
-                      ) : p.kind === "upi" ? (
-                        <div key="upi" className="space-y-2">
+                      ) : (
+                        <div key="link">
                           <a
                             href={p.link}
-                            className="block rounded-xl bg-[#25d366] px-5 py-3.5 font-bold text-black transition hover:bg-[#25d366]/90"
+                            target="_blank"
+                            rel="noreferrer"
+                            className={done.pays.length > 1 ? "block rounded-xl border border-t-fg/20 bg-t-fg/5 px-5 py-3 font-semibold text-t-fg hover:bg-t-fg/10" : "block w-full rounded-xl bg-t-fg px-5 py-3.5 font-bold text-t-bg transition hover:bg-t-fg/90"}
                           >
-                            Pay with UPI App
+                            {done.pays.length > 1 ? "Or pay with the creator's payment link" : `Pay ${price}`}
                           </a>
-                          <div className="flex items-center justify-between rounded-xl border border-t-fg/15 bg-t-fg/5 px-3 py-2 text-[13px]">
-                            <span className="font-mono text-t-fg/90">{p.upiId}</span>
-                            <button
-                              type="button"
-                              onClick={() => copyUpi(p.upiId)}
-                              className="inline-flex items-center gap-1 rounded-md bg-t-fg/10 px-2 py-1 text-[11px] font-medium text-t-fg hover:bg-t-fg/20"
-                            >
-                              <Copy className="h-3 w-3" /> {copiedUpi ? "Copied" : "Copy"}
-                            </button>
-                          </div>
+                          <p className="mt-2 text-[12px] text-t-fg/50">Opens {payLinkHost(p.link) ?? "the creator's payment page"}. Pay exactly {price}; the host confirms it and emails your meeting link.</p>
                         </div>
-                      ) : (
-                        <a
-                          key="link"
-                          href={p.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="block rounded-xl border border-t-fg/20 bg-t-fg/5 px-5 py-3 font-semibold text-t-fg hover:bg-t-fg/10"
-                        >
-                          Pay via card or link
-                        </a>
                       ),
                     )}
                   </div>
