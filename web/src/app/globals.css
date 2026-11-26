@@ -180,3 +180,15 @@ body {
 .gh-orb { animation: gh-drift 24s ease-in-out infinite alternate; }
 @keyframes gh-drift { to { transform: translate(34px, -26px) scale(1.08); } }
 @media (prefers-reduced-motion: reduce) { .gh-orb { animation: none; } }
+
+/* Savings calculator slider: a thick track filled up to the handle (--fill), with a large handle that is easy to drag. */
+.showz-range { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; cursor: pointer; }
+.showz-range::-webkit-slider-runnable-track { height: 10px; border-radius: 99px; background: linear-gradient(to right, #ff5b37 var(--fill), color-mix(in srgb, var(--fg) 10%, transparent) var(--fill)); }
+.showz-range::-moz-range-track { height: 10px; border-radius: 99px; background: color-mix(in srgb, var(--fg) 10%, transparent); }
+.showz-range::-moz-range-progress { height: 10px; border-radius: 99px; background: #ff5b37; }
+.showz-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin-top: -10px; border-radius: 99px; background: #fff; border: 7px solid #ff5b37; box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
+.showz-range::-moz-range-thumb { width: 16px; height: 16px; border-radius: 99px; background: #fff; border: 7px solid #ff5b37; box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.35); }
+.showz-range:active::-webkit-slider-thumb { transform: scale(1.12); }
+.showz-range:focus-visible { outline: none; }
+.showz-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(255, 91, 55, 0.3); }
+.showz-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 5px rgba(255, 91, 55, 0.3); }

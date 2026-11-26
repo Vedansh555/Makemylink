@@ -81,12 +81,12 @@ export function Pricing() {
         })}
       </div>
 
-      <SavingsCalculator region={region} />
+      <SavingsCalculator region={region} billing={billing} />
 
       <p className="mt-8 text-center text-[12px] text-fg/40">
         {region === "IN"
           ? "Prices for India. Pay with UPI, cards or netbanking."
-          : "Prices in USD. Pay by card, Apple Pay or Google Pay."}
+          : "Prices in US dollars. Pay with PayPal or card."}
       </p>
     </section>
   );
@@ -108,76 +108,88 @@ function Toggle({ options, value, onChange }: { options: [string, string][]; val
   );
 }
 
-function SavingsCalculator({ region }: { region: Region }) {
-  const isIndia = region === "IN";
-  const min = isIndia ? 5000 : 100;
-  const max = isIndia ? 150000 : 3000;
-  const step = isIndia ? 5000 : 50;
-  const [monthly, setMonthly] = useState(isIndia ? 35000 : 600);
+/** Sample monthly sales per region: where the slider starts, its range and the one-tap choices. */
+const SALES = {
+  IN: { min: 5000, max: 150000, step: 1000, start: 35000, picks: [10000, 35000, 75000, 150000] },
+  GLOBAL: { min: 100, max: 5000, step: 50, start: 800, picks: [250, 800, 2000, 5000] },
+} satisfies Record<Region, { min: number; max: number; step: number; start: number; picks: number[] }>;
 
-  useEffect(() => {
-    setMonthly(isIndia ? 35000 : 600);
-  }, [isIndia]);
+/** What a 10% platform cut costs compared with Showz Pro's flat price, for the sales figure the visitor picks. */
+function SavingsCalculator({ region, billing }: { region: Region; billing: Billing }) {
+  const r = SALES[region];
+  const [monthly, setMonthly] = useState<number>(r.start);
+  useEffect(() => setMonthly(SALES[region].start), [region]);
 
-  // A typical marketplace cut. Payment-company fees apply on every platform, Showz included, so they are left out of both sides.
-  const otherFee = Math.round(monthly * 0.1);
-  const showzFee = isIndia ? 299 : 8;
-  const savedMonthly = Math.max(0, otherFee - showzFee);
-  const savedYearly = savedMonthly * 12;
-
-  const fmt = (val: number) => (isIndia ? `₹${val.toLocaleString("en-IN")}` : `$${val.toLocaleString("en-US")}`);
+  const price = plans.find((p) => p.id === "pro")!.price[region][billing];
+  const showzYear = billing === "yearly" ? price : price * 12;
+  const cutYear = Math.round(monthly * 0.1) * 12;
+  const keptYear = Math.max(0, cutYear - showzYear);
+  const money = (v: number) => formatPrice(Math.round(v), region);
+  const fill = ((monthly - r.min) / (r.max - r.min)) * 100;
+  const widest = Math.max(cutYear, showzYear);
 
   return (
-    <div className="mx-auto mt-14 max-w-3xl rounded-[28px] border border-fg/10 bg-fg/[0.03] p-6 sm:p-8 text-left">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-        <div>
-          <h3 className="text-[20px] font-semibold text-fg">Calculate your savings with 0% commission</h3>
-          <p className="mt-1 text-[13px] text-fg/55">
-            Whether you offer 1:1 sessions, freelance project bookings, or digital downloads.
-          </p>
-        </div>
-        <span className="shrink-0 rounded-full bg-[#ff5b37]/15 px-3 py-1 text-[11px] font-bold text-[#ff5b37]">
-          0% cut on Showz
-        </span>
-      </div>
+    <div className="mx-auto mt-5 grid max-w-4xl overflow-hidden rounded-[32px] border border-fg/10 bg-fg/[0.03] text-left md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div className="p-7 sm:p-10">
+        <h3 className="font-display text-[clamp(34px,4vw,46px)] leading-[1]">See what you keep.</h3>
+        <p className="mt-3 text-[14px] leading-relaxed text-fg/60">Drag to the amount you sell in a month: sessions, projects or products.</p>
 
-      <div className="mt-6">
-        <div className="flex items-center justify-between text-[14px]">
-          <span className="text-fg/60">Your estimated monthly sales / bookings</span>
-          <span className="font-display text-[22px] font-bold text-fg">{fmt(monthly)}</span>
-        </div>
+        <p className="mt-8 flex items-baseline gap-2">
+          <output className="font-display text-[clamp(52px,6vw,68px)] leading-none tabular-nums">{money(monthly)}</output>
+          <span className="text-[14px] text-fg/50">a month</span>
+        </p>
         <input
           type="range"
-          min={min}
-          max={max}
-          step={step}
+          min={r.min}
+          max={r.max}
+          step={r.step}
           value={monthly}
           onChange={(e) => setMonthly(Number(e.target.value))}
-          aria-label="Estimated monthly earnings"
-          className="mt-3 w-full accent-[#ff5b37] cursor-pointer"
+          aria-label="Your monthly sales"
+          aria-valuetext={`${money(monthly)} a month`}
+          className="showz-range mt-3"
+          style={{ "--fill": `${fill}%` } as React.CSSProperties}
         />
-        <div className="mt-1 flex justify-between text-[11px] text-fg/40 font-mono">
-          <span>{fmt(min)}/mo</span>
-          <span>{fmt(max)}/mo</span>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {r.picks.map((v) => (
+            <button key={v} type="button" onClick={() => setMonthly(v)} aria-pressed={monthly === v} className={`min-h-[40px] rounded-xl border px-1 text-[13px] font-semibold tabular-nums transition ${monthly === v ? "border-fg bg-fg text-bg" : "border-fg/15 text-fg/70 hover:border-fg/40"}`}>
+              {money(v)}
+            </button>
+          ))}
         </div>
+
+        <dl className="mt-9 space-y-5">
+          {[
+            { label: "A platform that takes 10%", value: cutYear, bar: "bg-fg/25" },
+            { label: "Showz Pro, flat price", value: showzYear, bar: "bg-[#ff5b37]" },
+          ].map((row) => (
+            <div key={row.label}>
+              <div className="flex items-baseline justify-between gap-3 text-[14px]">
+                <dt className="text-fg/65">{row.label}</dt>
+                <dd className="shrink-0 font-semibold tabular-nums">
+                  {money(row.value)} <span className="font-normal text-fg/45">a year</span>
+                </dd>
+              </div>
+              <div className="mt-2 h-3 overflow-hidden rounded-full bg-fg/[0.06]">
+                <div className={`h-full rounded-full transition-[width] duration-300 ${row.bar}`} style={{ width: `${Math.max(2.5, (row.value / widest) * 100)}%` }} />
+              </div>
+            </div>
+          ))}
+        </dl>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
-          <p className="text-[11px] uppercase tracking-wider text-fg/45">Platforms that take a 10% cut</p>
-          <p className="mt-2 text-[20px] font-bold text-red-400">-{fmt(otherFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
-          <p className="mt-1 text-[11px] text-fg/40">Before payment-company fees</p>
-        </div>
-        <div className="rounded-2xl border border-fg/10 bg-bg/50 p-4">
-          <p className="text-[11px] uppercase tracking-wider text-fg/45">Showz Pro flat fee</p>
-          <p className="mt-2 text-[20px] font-bold text-fg">{fmt(showzFee)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
-          <p className="mt-1 text-[11px] text-fg/40">No cut of your sales, ever</p>
-        </div>
-        <div className="rounded-2xl border border-[#ff5b37]/30 bg-[#ff5b37]/[0.08] p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[#ff5b37]">You keep extra</p>
-          <p className="mt-2 text-[22px] font-bold text-emerald-400">+{fmt(savedMonthly)}<span className="text-[12px] font-normal text-fg/50">/mo</span></p>
-          <p className="mt-1 text-[11px] text-emerald-400/70 font-semibold">{fmt(savedYearly)} saved per year</p>
-        </div>
+      <div className="flex flex-col items-center justify-center bg-[#ff5b37] px-7 py-12 text-center text-[#141414] sm:px-10">
+        <p className="text-[15px] font-semibold">Extra in your pocket every year</p>
+        <p className="mt-3 max-w-full font-display text-[clamp(60px,7vw,92px)] leading-[0.95] tabular-nums [overflow-wrap:anywhere]">{money(keptYear)}</p>
+        <p className="mt-4 text-[15px]">
+          That is about <b className="tabular-nums">{money(keptYear / 12)}</b> a month.
+        </p>
+        <Link href="/start" className="mt-8 inline-flex min-h-[52px] w-full max-w-[260px] items-center justify-center rounded-xl bg-[#141414] px-6 text-[15px] font-semibold text-white transition hover:bg-black">
+          Create your free page
+        </Link>
+        <p className="mt-6 max-w-[300px] text-[12px] leading-relaxed text-[#141414]/70">
+          Compared with a 10% cut on every sale, with Pro billed {billing}. Payment-company fees apply on any platform and are left out of both.
+        </p>
       </div>
     </div>
   );

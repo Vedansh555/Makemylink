@@ -66,5 +66,5 @@ export function detectRegion(): Region {
 }
 
 export function formatPrice(amount: number, region: Region) {
-  return region === "IN" ? `₹${amount.toLocaleString("en-IN")}` : `$${amount}`;
+  return region === "IN" ? `₹${amount.toLocaleString("en-IN")}` : `$${amount.toLocaleString("en-US")}`;
 }
