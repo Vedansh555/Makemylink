@@ -60,6 +60,30 @@ export async function paypalCapture(orderId: string) {
   return { captureId: cap.id, userId, period: period as Period, currency: cap.amount.currency_code, value: Number(cap.amount.value) };
 }
 
+/** Asks PayPal whether a webhook message really came from PayPal for our app. The raw text is passed through untouched. */
+export async function paypalVerifyWebhook(rawBody: string, headers: Headers): Promise<boolean> {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  if (!webhookId || !paypalConfigured()) return false;
+  const fields = {
+    auth_algo: headers.get("paypal-auth-algo"),
+    cert_url: headers.get("paypal-cert-url"),
+    transmission_id: headers.get("paypal-transmission-id"),
+    transmission_sig: headers.get("paypal-transmission-sig"),
+    transmission_time: headers.get("paypal-transmission-time"),
+    webhook_id: webhookId,
+  };
+  if (Object.values(fields).some((v) => !v)) return false;
+  const token = await paypalToken();
+  const res = await fetch(`${paypalBase()}/v1/notifications/verify-webhook-signature`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: `${JSON.stringify(fields).slice(0, -1)},"webhook_event":${rawBody}}`,
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) throw new Error(`PayPal webhook check failed: ${res.status}`);
+  return ((await res.json()) as { verification_status?: string }).verification_status === "SUCCESS";
+}
+
 // ---------- Razorpay ----------
 const rzpAuth = () => Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString("base64");
 
