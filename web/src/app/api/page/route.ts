@@ -64,10 +64,10 @@ export async function PUT(req: Request) {
     const plan = await planForUser(session.userId);
     clean = applyPlan(clean, plan);
 
-    // Scam and malware links are refused before they go live (Google Safe Browsing).
+    // Known phishing links are refused before they go live (open-source Phishing.Database list).
     const bad = await unsafeUrls(pageUrls(clean));
     if (bad.length) {
-      return NextResponse.json({ error: `Google flags ${bad.length === 1 ? "this link" : "these links"} as unsafe, so it can't be published: ${bad.slice(0, 3).join(", ")}` }, { status: 422 });
+      return NextResponse.json({ error: `${bad.length === 1 ? "This link is" : "These links are"} on a public list of phishing sites, so the page can't be published: ${bad.slice(0, 3).join(", ")}. If you think this is a mistake, contact us.` }, { status: 422 });
     }
 
     await run("UPDATE pages SET profile_json = $1, updated_at = $2 WHERE id = $3", [JSON.stringify(clean), now, existing.id]);

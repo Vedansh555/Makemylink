@@ -1,3 +1,5 @@
+import { phishingListSize } from "./safebrowsing";
+
 /** Which outside services are switched on. Only yes/no and plain words: never a key or its value. Shown to admins. */
 export interface SetupItem {
   label: string;
@@ -20,7 +22,7 @@ export function setupStatus(): SetupItem[] {
     item("Pro payments abroad", has("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET"), "PayPal live", "PayPal keys missing", env.PAYPAL_ENV === "sandbox" ? "Sandbox: no real money" : undefined),
     item("PayPal webhook", has("PAYPAL_WEBHOOK_ID"), "ID set", "Add PAYPAL_WEBHOOK_ID"),
     item("Creator key lock", has("PAYOUT_KEY_SECRET"), "Own secret set", "Using the login secret. Changing it later disconnects creators' payment keys"),
-    item("Scam link check", has("GOOGLE_SAFE_BROWSING_KEY"), "On", "Off: add GOOGLE_SAFE_BROWSING_KEY"),
+    item("Scam link check", true, phishingListSize() ? `On: ${phishingListSize().toLocaleString("en-IN")} known phishing sites loaded` : "On: free open-source list, loads on the first publish. No key needed", ""),
     item("Support email", has("NEXT_PUBLIC_SUPPORT_EMAIL"), env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "", "Showing the default Gmail address"),
     item("Image storage", has("R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"), "On", "Off: photos are saved inside pages"),
     item("Automatic custom domains", has("RENDER_API_KEY", "RENDER_SERVICE_ID"), "On", "Off: add each creator's domain in Render by hand"),
