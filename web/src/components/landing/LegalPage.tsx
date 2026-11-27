@@ -1,4 +1,4 @@
-import { Footer } from "./Sections";
+import { Footer } from "./Footer";
 import { Nav } from "./Nav";
 
 /** Shared shell for text pages (terms, privacy, refunds, cookies, contact): same nav, type and footer as the home page. */

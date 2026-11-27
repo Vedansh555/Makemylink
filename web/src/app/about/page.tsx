@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarCheck, Download, Link2, Mail } from "lucide-react";
 import { Nav } from "@/components/landing/Nav";
-import { Footer } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { OPERATOR } from "@/lib/legal";
 
 export const metadata: Metadata = {

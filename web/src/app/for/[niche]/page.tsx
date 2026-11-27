@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Nav } from "@/components/landing/Nav";
 import { Pricing } from "@/components/landing/Pricing";
-import { Footer, ThemeGallery, FinalCTA } from "@/components/landing/Sections";
+import { ThemeGallery, FinalCTA } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { niches, nicheBySlug } from "@/content/niches";
 import { SITE_URL } from "@/lib/site";
 

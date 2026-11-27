@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Footer } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { GoalCards } from "@/components/landing/GoalCards";
 import { Nav } from "@/components/landing/Nav";
 

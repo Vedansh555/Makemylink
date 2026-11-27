@@ -3,7 +3,8 @@ import { Hero } from "@/components/landing/Hero";
 import { GoalCards } from "@/components/landing/GoalCards";
 import { Nav } from "@/components/landing/Nav";
 import { Pricing } from "@/components/landing/Pricing";
-import { Compare, FAQ, Features, FinalCTA, Footer, HowItWorks, Marquee, ThemeGallery } from "@/components/landing/Sections";
+import { Compare, FAQ, Features, FinalCTA, HowItWorks, Marquee, ThemeGallery } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { SITE_URL } from "@/lib/site";
 
 const jsonLd = [

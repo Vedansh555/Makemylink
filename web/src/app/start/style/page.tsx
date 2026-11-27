@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Footer } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { Nav } from "@/components/landing/Nav";
 import { PhoneFrame } from "@/components/landing/PhoneFrame";
 import { GOALS, isGoal, looksFor, previewFor } from "@/lib/templates";

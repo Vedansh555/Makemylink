@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
-import { Footer } from "@/components/landing/Sections";
+import { Footer } from "@/components/landing/Footer";
 import { Nav } from "@/components/landing/Nav";
 import { postBySlug, posts } from "@/content/blog";
 import { SITE_URL } from "@/lib/site";
