@@ -7,6 +7,7 @@ import { pageByHandle } from "@/lib/account";
 import { applyPlan, linkIsLive, publicProfile, type PlanId } from "@/lib/plans";
 import { linkForSlug } from "@/lib/share";
 import { latestVideo } from "@/lib/youtube";
+import { bookingBeingMoved } from "@/lib/reschedule";
 import { SITE_URL } from "@/lib/site";
 import type { Profile } from "@/lib/types";
 
@@ -23,12 +24,25 @@ async function load(handle: string): Promise<{ profile: Profile; plan: PlanId; l
   return demo ? { profile: demo, plan: "pro", live: false } : null;
 }
 
+type Query = { reschedule?: string | string[]; k?: string | string[] };
+
+/** The booking card a buyer is moving their session on, even if visitors can no longer see it. */
+async function movingLink(handle: string, item: string, q: Query) {
+  const moving = await bookingBeingMoved(q.reschedule, q.k).catch(() => null);
+  if (!moving) return undefined;
+  const page = await pageByHandle(handle);
+  if (page?.id !== moving.pageId) return undefined;
+  const link = page.profile.links.find((l) => l.id === moving.linkId && l.kind === "booking" && l.booking);
+  if (!link || (item !== "book" && item !== link.id)) return undefined;
+  return publicProfile({ ...page.profile, links: [link] }).links[0];
+}
+
 /** The page for one card or product only, in the creator's own theme. */
-async function focus(handle: string, item: string) {
+async function focus(handle: string, item: string, q: Query) {
   const found = await load(handle);
   if (!found) return null;
   const { profile } = found;
-  const link = linkForSlug(item, profile.links.filter((l) => linkIsLive(l)));
+  const link = (await movingLink(handle, item, q)) ?? linkForSlug(item, profile.links.filter((l) => linkIsLive(l)));
   const look = link ? undefined : profile.looks.find((l) => l.id === item);
   if (!link && !look) return null;
   let only: Profile = { ...profile, bio: "", location: undefined, socials: {}, showSubscribe: false, showMediaKit: false, looks: [], links: [] };
@@ -41,9 +55,11 @@ async function focus(handle: string, item: string) {
   return { only, booking: link?.kind === "booking" && link.booking ? link : null, plan: found.plan, live: found.live, title: link?.title ?? look!.title, name: profile.name, handle: profile.handle };
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ handle: string; item: string }> }): Promise<Metadata> {
+type Props = { params: Promise<{ handle: string; item: string }>; searchParams: Promise<Query> };
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { handle, item } = await params;
-  const f = await focus(handle, item);
+  const f = await focus(handle, item, await searchParams);
   if (!f) return {};
   const title = `${f.title} · ${f.name}`;
   return {
@@ -55,9 +71,9 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
   };
 }
 
-export default async function SharedItemPage({ params }: { params: Promise<{ handle: string; item: string }> }) {
+export default async function SharedItemPage({ params, searchParams }: Props) {
   const { handle, item } = await params;
-  const f = await focus(handle, item);
+  const f = await focus(handle, item, await searchParams);
   if (!f) notFound();
   if (f.booking) return <BookingPage profile={f.only} link={f.booking} live={f.live} />;
   return <BioPage profile={f.only} plan={f.plan} live={f.live} seeAll={`/${f.handle}`} />;

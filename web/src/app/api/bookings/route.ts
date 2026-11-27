@@ -12,11 +12,13 @@ import { payLinkHost } from "@/lib/payLink";
 import { SITE_URL } from "@/lib/site";
 import { sendBookingConfirmed } from "@/lib/bookingMail";
 import { rewardReferral } from "@/lib/referral";
+import { bookingBeingMoved } from "@/lib/reschedule";
 
 
-async function findConfig(handle: string, linkId: string) {
+// `moving` is set only when a buyer is changing the time of a session they already booked.
+async function findConfig(handle: string, linkId: string, moving?: { pageId: string; linkId: string } | null) {
   const page = await pageByHandle(handle);
-  if (!page || page.plan !== "pro") return null;
+  if (!page || (page.plan !== "pro" && !(moving?.pageId === page.id && moving.linkId === linkId))) return null;
   const link = page.profile.links.find((l) => l.id === linkId && l.kind === "booking" && l.booking);
   return link?.booking ? { page, link, cfg: link.booking } : null;
 }
@@ -24,7 +26,8 @@ async function findConfig(handle: string, linkId: string) {
 // GET /api/bookings?handle=&linkId=&date=YYYY-MM-DD — open slots for a day
 export async function GET(req: Request) {
   const u = new URL(req.url);
-  const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "");
+  const moving = await bookingBeingMoved(u.searchParams.get("reschedule"), u.searchParams.get("k"));
+  const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "", moving);
   if (!found) return NextResponse.json({ slots: [] });
   await settleHolds(found.page.id);
   const month = u.searchParams.get("month") ?? "";

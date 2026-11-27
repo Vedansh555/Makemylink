@@ -108,6 +108,8 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   // Reschedule & Status states
   const [resched, setResched] = useState<{ id: string; k: string; old: number } | null>(null);
   const [done, setDone] = useState<Result | null>(null);
+  // Sent with the time lookups, so a buyer can still move a session after the creator's Pro has ended.
+  const moving = resched ? `&reschedule=${encodeURIComponent(resched.id)}&k=${encodeURIComponent(resched.k)}` : "";
 
   const viewerTz = useMemo(() => {
     try {
@@ -178,7 +180,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       return;
     }
     fetch(
-      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&month=${monthKey}`,
+      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&month=${monthKey}${moving}`,
     )
       .then((r) => r.json())
       .then((d) => !cancelled && setDays(d.days ?? {}))
@@ -186,7 +188,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     return () => {
       cancelled = true;
     };
-  }, [monthKey, live, cfg, profile.handle, link.id, view.y, view.m]);
+  }, [monthKey, live, cfg, profile.handle, link.id, view.y, view.m, moving]);
 
   // Auto-select first available day if none selected
   useEffect(() => {
@@ -210,7 +212,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       return;
     }
     fetch(
-      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}`,
+      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}${moving}`,
     )
       .then((r) => r.json())
       .then((d) => !cancelled && setSlotData({ free: d.slots ?? [], all: d.all ?? d.slots ?? [] }))
@@ -218,7 +220,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
     return () => {
       cancelled = true;
     };
-  }, [day, live, cfg, profile.handle, link.id]);
+  }, [day, live, cfg, profile.handle, link.id, moving]);
 
   const fmtSlotTime = (ms: number, is24h = use24h, tz = cfg.timeZone) => {
     if (is24h) {
@@ -303,7 +305,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       setSlot(null);
       setSlotData(null);
       fetch(
-        `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}`,
+        `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&date=${day}${moving}`,
       )
         .then((r) => r.json())
         .then((x) => setSlotData({ free: x.slots ?? [], all: x.all ?? x.slots ?? [] }));
