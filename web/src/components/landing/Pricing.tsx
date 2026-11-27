@@ -25,7 +25,7 @@ export function Pricing() {
           <Toggle
             options={[
               ["monthly", "Monthly"],
-              ["yearly", "Yearly · save 33%"],
+              ["yearly", `Yearly · save ${yearlySaving(region)}%`],
             ]}
             value={billing}
             onChange={(v) => setBilling(v as Billing)}
@@ -90,6 +90,12 @@ export function Pricing() {
       </p>
     </section>
   );
+}
+
+/** How much a year costs less than twelve single months, rounded down so it is never overstated. */
+function yearlySaving(region: Region) {
+  const p = plans.find((x) => x.id === "pro")!.price[region];
+  return Math.floor((1 - p.yearly / (p.monthly * 12)) * 100);
 }
 
 function Toggle({ options, value, onChange }: { options: [string, string][]; value: string; onChange: (v: string) => void }) {
