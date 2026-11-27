@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { blankProfile, demoProfiles } from "@/lib/demo";
-import { loadDraft, readImage, saveDraft, storeImage, uid } from "@/lib/draft";
+import { loadDraft, readImage, saveDraft, storeImage, uid, type ImageKind } from "@/lib/draft";
 import { getTheme, themeList } from "@/lib/themes";
 
 const fontOptions: [string, string][] = [
@@ -87,7 +87,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   );
 }
 
-function ImagePick({ onPick, children, className = "", max = 640 }: { onPick: (dataUrl: string) => void; children: React.ReactNode; className?: string; max?: number }) {
+function ImagePick({ onPick, children, className = "", kind = "product" }: { onPick: (dataUrl: string) => void; children: React.ReactNode; className?: string; kind?: ImageKind }) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <>
@@ -101,7 +101,13 @@ function ImagePick({ onPick, children, className = "", max = 640 }: { onPick: (d
         hidden
         onChange={async (e) => {
           const f = e.target.files?.[0];
-          if (f) onPick(await storeImage(await readImage(f, max)));
+          if (f) {
+            try {
+              onPick(await storeImage(await readImage(f, kind)));
+            } catch {
+              alert("That picture could not be read. Try a JPG or PNG photo.");
+            }
+          }
           e.target.value = "";
         }}
       />
@@ -777,7 +783,7 @@ export function Editor() {
           <div className={`${tab === "content" ? "block" : "hidden"} order-[4]`}>
             <Panel title="Profile" hint="Your name, photo and bio. This is the top of your page.">
               <div className="flex items-center gap-4">
-                <ImagePick onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
+                <ImagePick kind="avatar" onPick={(v) => set("avatar", v)} className="group relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60">
                   {p.avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.avatar} alt="" className="h-full w-full object-cover" />
@@ -795,6 +801,7 @@ export function Editor() {
                 </div>
               </div>
               <ImagePick
+                kind="cover"
                 onPick={(v) => set("coverImage", v)}
                 className="group relative flex h-24 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-fg/25 bg-fg/5 hover:border-fg/60"
               >
@@ -904,7 +911,7 @@ export function Editor() {
                 <div key={l.id} className="flex flex-col gap-2 rounded-2xl border border-fg/10 bg-bg/20 p-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <div className="relative h-14 w-14 shrink-0" title="Add a small picture to this card">
-                      <ImagePick onPick={(v) => setLink(l.id, { image: v })} max={240} className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl border border-dashed border-fg/25 text-fg/40 transition hover:border-fg/50 hover:text-fg/70">
+                      <ImagePick onPick={(v) => setLink(l.id, { image: v })} kind="thumb" className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl border border-dashed border-fg/25 text-fg/40 transition hover:border-fg/50 hover:text-fg/70">
                         {l.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={l.image} alt="Card picture" className="h-full w-full object-cover" />

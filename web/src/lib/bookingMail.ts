@@ -81,3 +81,14 @@ export async function sendBookingReminder(b: BookingMailInput, hours: 24 | 1) {
     wrap(`<h2 style="margin:0 0 8px">${hours === 24 ? "Your session is tomorrow" : "Your session starts in an hour"}</h2><p><b>${esc(b.link.title)}</b> with ${esc(b.hostName)}<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${hours === 24 ? btn(resched, "Change the time", false) : ""}</p>`),
   );
 }
+
+/** The creator's own reminder, with who is coming and the join link. */
+export async function sendCreatorReminder(to: string, b: BookingMailInput, hours: 24 | 1) {
+  const cfg = b.link.booking!;
+  const when = new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: cfg.timeZone }).format(new Date(b.slot));
+  return sendMail(
+    to,
+    hours === 24 ? `Tomorrow: ${b.buyerName} (${b.link.title})` : `In 1 hour: ${b.buyerName} (${b.link.title})`,
+    wrap(`<h2 style="margin:0 0 8px">${hours === 24 ? "You have a session tomorrow" : "Your session starts in an hour"}</h2><p><b>${esc(b.link.title)}</b> with ${esc(b.buyerName)} (${esc(b.buyerEmail)})<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${btn(`${SITE_URL}/dashboard?tab=bookings`, "See your bookings", false)}</p>`),
+  );
+}
