@@ -1217,7 +1217,7 @@ export function Editor() {
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-3xl border border-fg/10 bg-bg p-7 shadow-2xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#c8431f]">Pro features</p>
             <h3 className="mt-2 font-display text-[34px] italic leading-none">Your page uses Pro</h3>
-            <p className="mt-3 text-[14px] text-fg/60">These are only live on Pro. On the free plan they are hidden, but they stay saved in your editor.</p>
+            <p className="mt-3 text-[14px] text-fg/60">These are only live on Pro. On the free plan visitors don&apos;t see them, but nothing is deleted: they stay saved and come back when you upgrade.</p>
             <ul className="mt-4 space-y-2 text-[14px]">
               {lockedItems.map((t) => (
                 <li key={t} className="flex gap-2.5">

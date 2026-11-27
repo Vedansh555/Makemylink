@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { run } from "@/lib/db";
 import { pageForUser, planForUser } from "@/lib/account";
-import { applyPlan } from "@/lib/plans";
 import type { Profile } from "@/lib/types";
 import { rateLimit, sameOriginOnly, sanitizeProfile } from "@/lib/security";
 import { pageUrls, unsafeUrls } from "@/lib/safebrowsing";
@@ -60,9 +59,9 @@ export async function PUT(req: Request) {
     } catch {
       return NextResponse.json({ error: "Invalid profile" }, { status: 400 });
     }
-    // Free plan limits are enforced here, not just in the editor.
+    // Everything the creator made is saved, whatever the plan. Free limits are applied when the page is shown
+    // (applyPlan), so nothing is lost when Pro ends and it all comes back on renewal.
     const plan = await planForUser(session.userId);
-    clean = applyPlan(clean, plan);
 
     // Known phishing links are refused before they go live (open-source Phishing.Database list).
     const bad = await unsafeUrls(pageUrls(clean));

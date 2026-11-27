@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { one, run } from "@/lib/db";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
-import { FREE_LIMITS } from "@/lib/plans";
+import { FREE_LIMITS, applyPlan } from "@/lib/plans";
 import { planForUser } from "@/lib/account";
 import { rewardReferral } from "@/lib/referral";
 import type { Profile } from "@/lib/types";
@@ -19,12 +19,13 @@ export async function POST(req: Request) {
 
   const page = await one<{ id: string; user_id: string; profile_json: string }>("SELECT id, user_id, profile_json FROM pages WHERE handle = $1 AND suspended = FALSE", [String(b.handle ?? "").toLowerCase()]);
   if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
-  const profile = JSON.parse(page.profile_json) as Profile;
+  const plan = await planForUser(page.user_id);
+  // Only cards that visitors can actually see on this plan.
+  const profile = applyPlan(JSON.parse(page.profile_json) as Profile, plan);
   const link = profile.links.find((l) => l.id === b.linkId && l.kind === "whatsapp" && l.whatsapp);
   const phone = (link?.whatsapp?.phone ?? "").replace(/\D/g, "");
   if (!link || phone.length < 8) return NextResponse.json({ error: "This chat link is not set up" }, { status: 404 });
 
-  const plan = await planForUser(page.user_id);
   const existing = await one("SELECT id FROM subscribers WHERE page_id = $1 AND email = $2", [page.id, email]);
   if (!existing && plan === "free") {
     const c = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM subscribers WHERE page_id = $1", [page.id]);
