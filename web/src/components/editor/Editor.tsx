@@ -583,7 +583,7 @@ export function Editor() {
               setMobileView("edit");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
+            className={`flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
               mobileView === "edit" ? "bg-fg text-bg shadow-sm" : "text-fg/70 hover:text-fg"
             }`}
           >
@@ -595,7 +595,7 @@ export function Editor() {
               setMobileView("preview");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
+            className={`flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition ${
               mobileView === "preview" ? "bg-fg text-bg shadow-sm" : "text-fg/70 hover:text-fg"
             }`}
           >
@@ -1026,7 +1026,7 @@ export function Editor() {
                       { id: uid(), title: "New piece", price: "", store: "LTK", url: "https://", art: arts[p.looks.length % arts.length]!, hue: Math.floor(Math.random() * 360) },
                     ])
                   }
-                  className="flex items-center gap-1 rounded-full bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg"
+                  className="flex min-h-[38px] items-center gap-1 rounded-full bg-fg px-3.5 py-1.5 text-[12px] font-semibold text-bg"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add product
                 </button>

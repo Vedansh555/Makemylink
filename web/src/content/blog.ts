@@ -1,3 +1,5 @@
+import { FREE_THEME_IDS } from "@/lib/plans";
+import { themeList } from "@/lib/themes";
 export interface Block {
   h2?: string;
   p?: string[];
@@ -46,7 +48,7 @@ export const posts: Post[] = [
     description: "Bento.me was shut down on 13 February 2026 after Linktree acquired it. Here is what to look for in a replacement, and how to move your page in a few minutes.",
     date: "2026-11-02",
     category: "Comparisons",
-    answer: "Showz is a link-in-bio builder with Bento-style grid cards and 135 designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.",
+    answer: `Showz is a link-in-bio builder with Bento-style grid cards and ${themeList.length} designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.`,
     body: [
       { h2: "What people liked about Bento.me", p: ["Bento pages were popular because they looked like a designed portfolio, not a list of buttons: cards of different sizes in a grid."] },
       { h2: "What to look for in a replacement", ul: ["Cards of different sizes (half-width and full-width tiles)", "Themes you can change without rebuilding", "A free plan so you can try before paying", "Export of your email list so you are never locked in"] },
@@ -54,7 +56,7 @@ export const posts: Post[] = [
       { h2: "Not locked in", p: ["Pro includes a CSV export of everyone who joined your email list, so you can take your audience with you at any time."] },
     ],
     faq: [
-      { q: "Is Showz free?", a: "Yes. There is a free plan with 8 links and 10 themes. Pro adds all 135 themes, bookings, grid card sizes, analytics and a custom badge-free page." },
+      { q: "Is Showz free?", a: `Yes. There is a free plan with 8 links and ${FREE_THEME_IDS.length} themes. Pro adds all ${themeList.length} themes, bookings, grid card sizes, analytics and a custom badge-free page.` },
       { q: "Can I import my existing links?", a: "You can import a public Linktree page by pasting its address. Other links can be added by hand." },
     ],
   },
@@ -68,7 +70,7 @@ export const posts: Post[] = [
     body: [
       { h2: "The problem with vertical button lists", p: ["For years, link-in-bio meant one thing: a centered avatar on top of fifteen stacked rectangular buttons. Every button looked identical, forcing visitors to read every line of text to find what they wanted.", "On a small screen, links far down a long list are easy to miss."] },
       { h2: "Why a card grid can read better on mobile", p: ["A card grid organizes links into modules: small half-width cards for quick links, full-width cards for a booking or a lead magnet, and tall cards for a featured product or video.", "This creates natural visual hierarchy. Your primary call-to-action—like booking a consultation or your newest YouTube video—commands immediate attention without scrolling."] },
-      { h2: "Feature comparison: button list vs card grid", ul: ["Visual hierarchy: a plain list treats every link the same; a card grid lets you make one card bigger and add a picture", "Bookings and products: on Showz a card can be a bookable session or a product photo, right in the grid", "Looks: Showz cards work in all 135 designer themes, and you can change the theme any time"] },
+      { h2: "Feature comparison: button list vs card grid", ul: ["Visual hierarchy: a plain list treats every link the same; a card grid lets you make one card bigger and add a picture", "Bookings and products: on Showz a card can be a bookable session or a product photo, right in the grid", `Looks: Showz cards work in all ${themeList.length} designer themes, and you can change the theme any time`] },
       { h2: "When to stick with a simple button list", p: ["If you only have two or three basic links (like a website and a contact form) and no products or bookings, a simple list is sufficient. But for creators with an active audience who sell services or recommend products, a card grid with one clear main card usually reads better."] },
     ],
     faq: [
@@ -85,8 +87,8 @@ export const posts: Post[] = [
     answer: "Stan Store is popular for creator e-commerce, but its $29/mo ($348/year) minimum price tag is steep for emerging and international creators. A flat-fee link-in-bio with 0% commission on 1:1 bookings lets you monetize your audience without expensive monthly software overhead.",
     body: [
       { h2: "The true cost of creator store builders", p: ["Tools like Stan Store bundle email capture, digital products, and calendar bookings into one dashboard, but charge a minimum of $29 per month (₹2,400+/mo in India) just to keep your store online, even during slow months.", "For creators starting out, high recurring software subscriptions eat directly into your profits before you even make your first sale."] },
-      { h2: "How the flat-fee model works", p: ["With Showz, you can start completely free with 8 links and 10 designer themes. When you are ready to take paid bookings, Pro is just ₹299 per month in India or $8 globally with 0% platform commission.", "Indian creators connect their own Razorpay (UPI, cards and netbanking) or share a payment link. For international clients, you connect your own PayPal or add your payment link. Showz takes no cut; your payment company charges its own fee."] },
-      { h2: "Key differences: Stan Store vs Showz", ul: ["Pricing: Stan Store starts at $29/mo (~₹2,400/mo); Showz Pro is ₹299/mo ($8/mo global) with a generous free-forever tier", "Design: Stan Store uses a standard list-style checkout template; Showz provides 135 aesthetic Bento themes", "Payments: Showz supports direct peer-to-peer UPI with 0% commission in India, plus global payment links"] },
+      { h2: "How the flat-fee model works", p: [`With Showz, you can start completely free with 8 links and ${FREE_THEME_IDS.length} designer themes. When you are ready to take paid bookings, Pro is just ₹299 per month in India or $8 globally with 0% platform commission.`, "Indian creators connect their own Razorpay (UPI, cards and netbanking) or share a payment link. For international clients, you connect your own PayPal or add your payment link. Showz takes no cut; your payment company charges its own fee."] },
+      { h2: "Key differences: Stan Store vs Showz", ul: ["Pricing: Stan Store starts at $29/mo (~₹2,400/mo); Showz Pro is ₹299/mo ($8/mo global) with a generous free-forever tier", `Design: Stan Store uses a standard list-style checkout template; Showz provides ${themeList.length} aesthetic Bento themes`, "Payments: Showz supports direct peer-to-peer UPI with 0% commission in India, plus global payment links"] },
       { h2: "Which one should you choose?", p: ["If you require complex multi-step course funnels and affiliate partner tiers, Stan Store is designed for high-volume US creators. If you want a stunning aesthetic link-in-bio to take paid 1:1 bookings, show off product recommendations, and grow an email list at a fair price, Showz is the leaner, more profitable choice."] },
     ],
     faq: [
@@ -107,7 +109,7 @@ export const posts: Post[] = [
       { h2: "3. Who owns your email list?", p: ["Your subscribers are your business. Look for a plan that lets you export them."] },
       { h2: "4. Fees on your sales", p: ["Some tools take a percentage of what you sell on lower plans. Read the pricing page for the plan you will actually use."] },
       { h2: "5. Does it look like you?", p: ["Themes and layout matter, especially for fashion, beauty and photography creators."] },
-      { h2: "Where Showz fits", p: ["Showz has rupee pricing (₹299 per month for Pro), bookings paid by UPI or card through your own Razorpay, a real email list with CSV export, and 135 themes. The free plan is enough to start."] },
+      { h2: "Where Showz fits", p: [`Showz has rupee pricing (₹299 per month for Pro), bookings paid by UPI or card through your own Razorpay, a real email list with CSV export, and ${themeList.length} themes. The free plan is enough to start.`] },
     ],
     faq: [
       { q: "What is the best link-in-bio tool for Indian creators?", a: "The best tool is the one that supports UPI, bills in rupees, lets you export your audience and does not take a commission on your sales. Showz is built around those four points." },

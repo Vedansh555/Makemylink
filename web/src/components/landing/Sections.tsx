@@ -1,5 +1,7 @@
 "use client";
 
+import { FREE_THEME_IDS } from "@/lib/plans";
+
 import { previewFor } from "@/lib/templates";
 import { SITE_URL, SITE_HOST } from "@/lib/site";
 import { OPERATOR } from "@/lib/legal";
@@ -40,7 +42,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function Marquee() {
-  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Card sizes", "Media kit", "135 themes"];
+  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Card sizes", "Media kit", `${themeList.length} themes`];
   return (
     <div className="relative z-20 -mt-16">
       {/* Solid page-colour block under the tilted band, so no phone shows below it */}
@@ -662,7 +664,7 @@ const faqs: [string, string][] = [
   ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
   ["Can I bring my existing page?", "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, or almost any public link page, and we copy your picture, links, groups, social handles and shop items. Some sites, like Beacons, block automated reading, so for those you add links by hand. Another tool's design can't be copied, so you pick one of our styles."],
   ["Can I sell digital products or courses?", "Not directly yet. Showz focuses on paid 1:1 bookings, product links and your email list. You can link to a store, a course site or a download from your page."],
-  ["Is the free plan really free?", "Yes, forever, with no card. Free includes 10 themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits."],
+  ["Is the free plan really free?", `Yes, forever, with no card. Free includes ${FREE_THEME_IDS.length} themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits.`],
 ];
 
 export function FAQ() {

@@ -1,3 +1,4 @@
+import { FREE_THEME_IDS } from "@/lib/plans";
 export interface Niche {
   slug: string;
   role: string;
@@ -92,7 +93,7 @@ export const niches: Niche[] = [
     ],
     faq: [
       { q: "Can I use a custom domain?", a: "Yes. Pro users can connect any custom domain (e.g. links.yourname.com or yourname.dev) with automatic SSL." },
-      { q: "Is there a free tier?", a: "Yes. Free includes 10 themes and 8 links forever with no credit card required." },
+      { q: "Is there a free tier?", a: `Yes. Free includes ${FREE_THEME_IDS.length} themes and 8 links forever with no credit card required.` },
     ],
   },
   {

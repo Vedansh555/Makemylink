@@ -75,10 +75,10 @@ export function Dashboard() {
       </header>
       <div className="mx-auto max-w-5xl px-4 pb-24 sm:px-6">
         <h1 className="font-display text-[40px] italic leading-none sm:text-[56px]">Dashboard</h1>
-        <p className="mt-2 text-[13px] text-fg/45">{email}</p>
+        <p className="mt-2 text-[13px] text-fg/45 [overflow-wrap:anywhere]">{email}</p>
         <nav className="no-scrollbar mt-6 flex gap-1 overflow-x-auto rounded-full border border-fg/10 bg-fg/5 p-1">
           {tabs.map(([id, label]) => (
-            <button key={id} onClick={() => setTab(id)} className={`shrink-0 rounded-full px-4 py-2 text-[13px] ${tab === id ? "bg-fg text-bg" : "text-fg/60 hover:text-fg"}`}>
+            <button key={id} ref={tab === id ? (el) => { const row = el?.parentElement; if (el && row) row.scrollLeft = el.offsetLeft - row.offsetLeft - (row.clientWidth - el.offsetWidth) / 2; } : undefined} onClick={() => setTab(id)} className={`shrink-0 rounded-full px-4 py-2 text-[13px] ${tab === id ? "bg-fg text-bg" : "text-fg/60 hover:text-fg"}`}>
               {label}
             </button>
           ))}
@@ -156,13 +156,13 @@ function PagesTab({ info, current, choose, reload, goBilling }: { info: { pages:
   }
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))]">
         {info.pages.map((pg) => (
-          <div key={pg.id} className={`${card} ${pg.id === current ? "border-[#ff5b37]/50" : ""}`}>
+          <div key={pg.id} className={`${card} min-w-0 ${pg.id === current ? "border-[#ff5b37]/50" : ""}`}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate text-[17px] font-semibold">{pg.name}</p>
-                <Link href={`/${pg.handle}`} className="text-[13px] text-fg/50 hover:text-fg">showz.me/{pg.handle}</Link>
+                <Link href={`/${pg.handle}`} className="block truncate text-[13px] text-fg/50 hover:text-fg">showz.me/{pg.handle}</Link>
               </div>
               {pg.primary && <span className="shrink-0 rounded-full bg-fg/10 px-2.5 py-1 text-[10px] uppercase tracking-wider text-fg/60">Main</span>}
             </div>
@@ -323,7 +323,7 @@ function AnnounceKit({ handle, booking, products, chat }: { handle: string; book
               key={ch}
               type="button"
               onClick={() => { setChannel(ch); setCopied(false); }}
-              className={`rounded-full px-3 py-1.5 capitalize transition ${channel === ch ? "bg-fg text-bg font-medium" : "text-fg/60 hover:text-fg"}`}
+              className={`min-h-[36px] rounded-full px-3 py-1.5 capitalize transition ${channel === ch ? "bg-fg text-bg font-medium" : "text-fg/60 hover:text-fg"}`}
             >
               {ch === "linkedin" ? "LinkedIn / X" : ch === "instagram" ? "Instagram" : "WhatsApp"}
             </button>
@@ -429,8 +429,8 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[12px] uppercase tracking-wider text-fg/50">{b.amount ? `${b.currency === "INR" ? "₹" : "$"}${b.amount}` : "Free"} · {b.status.replace("_", " ")}</span>
-              {b.status === "awaiting_payment" && <button onClick={() => setStatus(b.id, "confirmed")} className="rounded-lg bg-fg px-3 py-1.5 text-[12px] font-semibold text-bg">Mark paid</button>}
-              {b.status !== "cancelled" && <button onClick={() => setStatus(b.id, "cancelled")} className="rounded-lg border border-fg/20 px-3 py-1.5 text-[12px]">Cancel</button>}
+              {b.status === "awaiting_payment" && <button onClick={() => setStatus(b.id, "confirmed")} className="min-h-[38px] rounded-lg bg-fg px-3.5 py-1.5 text-[12px] font-semibold text-bg">Mark paid</button>}
+              {b.status !== "cancelled" && <button onClick={() => setStatus(b.id, "cancelled")} className="min-h-[38px] rounded-lg border border-fg/20 px-3.5 py-1.5 text-[12px]">Cancel</button>}
             </div>
           </li>
         ))}
@@ -729,7 +729,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
         <button disabled={busy} onClick={buy} className="rounded-xl bg-[#ff5b37] px-6 py-3 text-[14px] font-semibold text-[#111] disabled:opacity-50">
           {busy ? "Opening…" : `${d.plan === "pro" ? "Add" : "Get"} Pro · ${formatPrice(price, region)}`}
         </button>
-        <button onClick={() => setRegion(region === "IN" ? "GLOBAL" : "IN")} className="text-[12px] text-fg/45 underline">
+        <button onClick={() => setRegion(region === "IN" ? "GLOBAL" : "IN")} className="inline-flex min-h-[40px] items-center text-[12px] text-fg/45 underline">
           {region === "IN" ? "Pay in USD instead" : "Pay in ₹ (India) instead"}
         </button>
       </div>
@@ -839,7 +839,7 @@ function AccountTab({ email }: { email: string }) {
     <div className="space-y-4">
       <div className={card}>
         <p className="text-[11px] uppercase tracking-[0.2em] text-fg/45">Signed in as</p>
-        <p className="mt-2 text-[16px]">{email}</p>
+        <p className="mt-2 text-[16px] [overflow-wrap:anywhere]">{email}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button onClick={logout} className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Log out</button>
           <Link href="/forgot" className="rounded-xl border border-fg/20 px-5 py-2.5 text-[13px]">Change password</Link>

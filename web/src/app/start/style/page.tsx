@@ -1,3 +1,4 @@
+import { themeList } from "@/lib/themes";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -48,7 +49,7 @@ export default async function StylePage({ searchParams }: { searchParams: Promis
           </div>
 
           <p className="mt-12 text-[14px] text-fg/55">
-            Not sure? <Link href={`/create?goal=${goal}${q}`} className="text-fg underline underline-offset-4">Use the suggested look</Link>. There are 135 themes to try inside the editor.
+            Not sure? <Link href={`/create?goal=${goal}${q}`} className="text-fg underline underline-offset-4">Use the suggested look</Link>. There are {themeList.length} themes to try inside the editor.
           </p>
         </div>
       </main>

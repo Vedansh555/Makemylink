@@ -1,3 +1,4 @@
+import { themeList } from "@/lib/themes";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -114,7 +115,7 @@ export default async function NicheLandingPage({ params }: { params: Promise<{ n
               href="#themes"
               className="rounded-full border border-fg/15 bg-fg/[0.03] px-6 py-3.5 text-[15px] font-medium text-fg/80 transition hover:border-fg/40 hover:text-fg"
             >
-              View 135 designer styles
+              View {themeList.length} designer styles
             </Link>
           </div>
         </section>

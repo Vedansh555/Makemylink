@@ -1,3 +1,4 @@
+import { FREE_THEME_IDS } from "@/lib/plans";
 import { Hero } from "@/components/landing/Hero";
 import { GoalCards } from "@/components/landing/GoalCards";
 import { Nav } from "@/components/landing/Nav";
@@ -101,7 +102,7 @@ const jsonLd = [
         name: "Is the free plan really free?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes, forever, with no card. Free includes 10 themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits.",
+          text: `Yes, forever, with no card. Free includes ${FREE_THEME_IDS.length} themes, 8 links and a Showz badge. Pro is a prepaid month or year with no auto-renewal. If it ends, your page stays online with Free limits.`,
         },
       },
     ],

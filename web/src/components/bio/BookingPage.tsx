@@ -807,7 +807,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             <button
                               type="button"
                               onClick={() => setUse24h(false)}
-                              className={`rounded px-2 py-0.5 transition ${
+                              className={`min-h-[34px] min-w-[38px] rounded px-2 py-0.5 transition ${
                                 !use24h ? "bg-t-fg/20 text-t-fg font-semibold" : "hover:text-t-fg"
                               }`}
                             >
@@ -816,7 +816,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             <button
                               type="button"
                               onClick={() => setUse24h(true)}
-                              className={`rounded px-2 py-0.5 transition ${
+                              className={`min-h-[34px] min-w-[38px] rounded px-2 py-0.5 transition ${
                                 use24h ? "bg-t-fg/20 text-t-fg font-semibold" : "hover:text-t-fg"
                               }`}
                             >
@@ -874,7 +874,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
         )}
 
         {/* Footer Link & Branding */}
-        <div className="mt-6 text-center text-[12px] text-t-fg/40 space-x-2">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-2.5 text-center text-[12px] leading-relaxed text-t-fg/40 [overflow-wrap:anywhere]">
           <Link href={`/${profile.handle}`} className="hover:text-t-fg/80 underline underline-offset-4">
             {profile.name}
           </Link>
