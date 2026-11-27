@@ -3,9 +3,11 @@ import { all, run } from "@/lib/db";
 import { pageByHandle } from "@/lib/account";
 import { sendBookingReminder, sendCreatorReminder } from "@/lib/bookingMail";
 import { settleHolds } from "@/lib/bookingPaid";
+import { sendProReminders } from "@/lib/proReminder";
 
 // Call every 15 minutes from a scheduler (Render cron job or cron-job.org): GET /api/cron/reminders with "Authorization: Bearer $CRON_SECRET".
-// Emails the buyer and the creator a day before and an hour before each confirmed booking.
+// Emails the buyer and the creator a day before and an hour before each confirmed booking,
+// and tells creators when their Pro is about to end.
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -36,5 +38,9 @@ export async function GET(req: Request) {
       sent++;
     }
   }
-  return NextResponse.json({ sent, ...settled });
+  const pro = await sendProReminders().catch((e) => {
+    console.error("pro reminder error", e);
+    return 0;
+  });
+  return NextResponse.json({ sent, pro, ...settled });
 }
