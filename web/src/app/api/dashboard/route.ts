@@ -59,6 +59,8 @@ export async function GET(req: Request) {
     hasChat: profile.links.some((l) => l.kind === "whatsapp"),
     pageId: page.id,
     handle: page.handle,
+    name: profile.name || page.handle,
+    bookingCards: profile.links.filter((l) => l.kind === "booking" && l.booking).map((l) => ({ id: l.id, title: l.title, price: l.booking!.price, currency: l.booking!.currency, durationMin: l.booking!.durationMin })),
     days,
     daily,
     perLink: perLink.map((r) => ({ ...r, title: profile.links.find((l) => l.id === r.target)?.title ?? r.target })),

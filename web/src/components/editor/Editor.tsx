@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   AlignLeft,
+  Gift,
   ArrowDown,
   ArrowUp,
   CalendarDays,
@@ -330,6 +331,31 @@ function BookingFields({ b, onChange }: { b: BookingConfig; onChange: (b: Bookin
             </datalist>
           </Field>
         </div>
+      </BookingSection>
+
+      <BookingSection icon={<Gift className="h-[18px] w-[18px]" />} title="Package (optional)" hint="Sell several sessions together. The buyer books the first now and gets a code for the rest. Buyers can also book any session as a gift.">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Sessions in the package">
+            <select className={bkField} value={b.pack?.count ?? 0} onChange={(e) => { const count = +e.target.value; up({ pack: count >= 2 ? { count, price: b.pack?.price || Math.round(b.price * count * 0.9) } : undefined }); }}>
+              <option value={0}>No package</option>
+              {[2, 3, 4, 5, 6, 8, 10].map((n) => (
+                <option key={n} value={n}>{n} sessions</option>
+              ))}
+            </select>
+          </Field>
+          {b.pack && (
+            <Field label={`Package price (${b.currency === "INR" ? "₹" : "$"})`}>
+              <input className={bkField} inputMode="numeric" value={b.pack.price || ""} onChange={(e) => up({ pack: { count: b.pack!.count, price: Math.max(0, Math.round(+e.target.value.replace(/\D/g, "") || 0)) } })} aria-label="Package price" />
+            </Field>
+          )}
+        </div>
+        {b.pack && b.price > 0 && b.pack.price > 0 && (
+          <p className="text-[12px] text-fg/55">
+            {b.pack.price < b.price * b.pack.count
+              ? `Buyers save ${b.currency === "INR" ? "₹" : "$"}${(b.price * b.pack.count - b.pack.price).toLocaleString("en-IN")} compared with ${b.pack.count} single sessions.`
+              : "Tip: price the package a little below the single sessions so it's worth choosing."}
+          </p>
+        )}
       </BookingSection>
 
       <BookingSection icon={<AlignLeft className="h-[18px] w-[18px]" />} title="About this call" hint="One or two lines shown on your booking page. Optional.">

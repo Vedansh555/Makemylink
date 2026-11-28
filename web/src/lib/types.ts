@@ -41,6 +41,8 @@ export interface BookingConfig {
   timeZone: string;
   /** USD sessions are paid through the creator's own Stripe/PayPal payment link. */
   paymentUrl?: string;
+  /** Optional package: `count` sessions for `price` (same currency). The buyer books the first now and the rest later with a code. */
+  pack?: { count: number; price: number };
 }
 
 export interface BioLink {

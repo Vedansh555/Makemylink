@@ -4,11 +4,12 @@ import { esc, sendMail } from "./mail";
 import { pageByHandle } from "./account";
 import { sendBookingConfirmed } from "./bookingMail";
 import { SITE_URL } from "./site";
+import { afterConfirmed } from "./sessionExtras";
 
 // One-tap actions from emails, so a creator can confirm or cancel a booking without logging in,
 // and a buyer can say "I paid" when an automatic match didn't happen. Each link is signed for one booking and one action.
 
-export type Act = "confirm" | "cancel" | "claim";
+export type Act = "confirm" | "cancel" | "claim" | "review";
 
 export function actionKey(id: string, act: Act): string {
   const secret = process.env.SESSION_SECRET || "dev_makemylink_session_secret_default_key_32_bytes_min";
@@ -52,6 +53,7 @@ export async function setBookingStatus(row: Row, status: "confirmed" | "cancelle
   if (!page || !link?.booking) return;
   if (status === "confirmed") {
     await sendBookingConfirmed({ id: row.id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page.profile.name, link }, "paid");
+    await afterConfirmed(row.id).catch((e) => console.error("after confirmed", e));
   } else if (row.status === "awaiting_payment") {
     await sendMail(row.buyer_email, `Not confirmed: ${link.title}`, `<p>Hi ${esc(row.buyer_name)}, ${esc(page.profile.name)} could not find your payment for <b>${esc(link.title)}</b>, so the time was released. If you did pay, reply to the receipt from your payment app or contact ${esc(page.profile.name)} directly.</p>`);
   }

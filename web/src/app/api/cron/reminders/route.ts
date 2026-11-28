@@ -4,7 +4,9 @@ import { pageByHandle } from "@/lib/account";
 import { sendBookingReminder, sendCreatorReminder } from "@/lib/bookingMail";
 import { settleHolds } from "@/lib/bookingPaid";
 import { sendProReminders } from "@/lib/proReminder";
-import { bookingRow, emailWaiting } from "@/lib/bookingActions";
+import { actionKey, bookingRow, emailWaiting } from "@/lib/bookingActions";
+import { esc, sendMail } from "@/lib/mail";
+import { SITE_URL } from "@/lib/site";
 
 // Call every 15 minutes from a scheduler (Render cron job or cron-job.org): GET /api/cron/reminders with "Authorization: Bearer $CRON_SECRET".
 // Emails the buyer and the creator a day before and an hour before each confirmed booking,
@@ -45,6 +47,18 @@ export async function GET(req: Request) {
     const row = await bookingRow(w.id);
     if (row) await emailWaiting(row).catch(() => {});
     await run("UPDATE bookings SET nudged = TRUE WHERE id = $1", [w.id]);
+  }
+  // A few hours after a confirmed session: ask the buyer for a short review (the creator decides whether to show it).
+  const ended = await all<{ id: string; buyer_name: string; buyer_email: string; link_id: string; handle: string }>(
+    "SELECT b.id, b.buyer_name, b.buyer_email, b.link_id, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.status = 'confirmed' AND b.review_asked = FALSE AND b.slot_start < $1 AND b.slot_start > $2 LIMIT 30",
+    [now - 3 * 3_600_000, now - 7 * 86_400_000],
+  );
+  for (const e of ended) {
+    await run("UPDATE bookings SET review_asked = TRUE WHERE id = $1", [e.id]);
+    const page = await pageByHandle(e.handle);
+    const title = page?.profile.links.find((l) => l.id === e.link_id)?.title ?? "your session";
+    const url = `${SITE_URL}/review/${e.id}?k=${actionKey(e.id, "review")}`;
+    await sendMail(e.buyer_email, `How was ${title}?`, `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto;line-height:1.55;color:#111"><h2 style="margin:0 0 8px">How was your session?</h2><p>Hi ${esc(e.buyer_name)}, thanks for booking <b>${esc(title)}</b> with ${esc(page?.profile.name ?? "your host")}. A few honest words take a minute and help others decide.</p><p><a href="${url}" style="background:#111;color:#fff;padding:11px 18px;border-radius:10px;text-decoration:none;display:inline-block">Leave a review</a></p><p style="color:#888;font-size:12px;margin-top:24px">Booked with Showz</p></div>`).catch(() => {});
   }
   const pro = await sendProReminders().catch((e) => {
     console.error("pro reminder error", e);

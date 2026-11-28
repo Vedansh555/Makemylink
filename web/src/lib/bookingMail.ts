@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { esc, sendMail } from "./mail";
+import { one } from "./db";
 import { SITE_URL } from "./site";
 import type { BioLink } from "./types";
 
@@ -63,10 +64,12 @@ export async function sendBookingConfirmed(b: BookingMailInput, kind: "confirmed
   const resched = `${SITE_URL}/${b.handle}/${b.link.id}?reschedule=${b.id}&k=${rescheduleKey(b.id)}`;
   const lead = kind === "paid" ? "Payment received. You are booked" : kind === "rescheduled" ? "Your new time is booked" : "You are booked";
   const subject = kind === "rescheduled" ? `New time: ${b.link.title}` : `Confirmed: ${b.link.title}`;
+  const gift = await one<{ gift_from_name: string | null; gift_message: string | null }>("SELECT gift_from_name, gift_message FROM bookings WHERE id = $1", [b.id]).catch(() => null);
+  const giftLine = gift?.gift_from_name ? `<p style="background:#fff4ef;border-radius:10px;padding:10px 12px">🎁 A gift from <b>${esc(gift.gift_from_name)}</b>${gift.gift_message ? `: “${esc(gift.gift_message)}”` : ""}</p>` : "";
   return sendMail(
     b.buyerEmail,
     subject,
-    wrap(`<h2 style="margin:0 0 8px">${esc(lead)}</h2><p><b>${esc(b.link.title)}</b> with ${esc(b.hostName)}<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${btn(resched, "Change the time", false)}</p><p style="font-size:13px;color:#555">The attached calendar file adds it to Google, Apple or Outlook calendar. We will also remind you a day before and an hour before.</p>`),
+    wrap(`<h2 style="margin:0 0 8px">${esc(lead)}</h2>${giftLine}<p><b>${esc(b.link.title)}</b> with ${esc(b.hostName)}<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${btn(resched, "Change the time", false)}</p><p style="font-size:13px;color:#555">The attached calendar file adds it to Google, Apple or Outlook calendar. We will also remind you a day before and an hour before.</p>`),
     [{ filename: "booking.ics", text: calendarFile({ id: b.id, title: b.link.title, host: b.hostName, start: b.slot, minutes: cfg.durationMin, meetingUrl: cfg.meetingUrl }) }],
   );
 }

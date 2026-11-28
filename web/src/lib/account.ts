@@ -65,7 +65,7 @@ export async function deleteAccount(uid: string) {
   await transaction(async (tx) => {
     const pages = await tx.query("SELECT id FROM pages WHERE user_id = $1", [uid]);
     for (const p of pages as { id: string }[]) {
-      for (const t of ["subscribers", "bookings", "events", "link_health"]) await tx.query(`DELETE FROM ${t} WHERE page_id = $1`, [p.id]);
+      for (const t of ["subscribers", "bookings", "events", "link_health", "credits", "buyer_reviews"]) await tx.query(`DELETE FROM ${t} WHERE page_id = $1`, [p.id]);
     }
     await tx.query("DELETE FROM pages WHERE user_id = $1", [uid]);
     await tx.query("DELETE FROM password_resets WHERE user_id = $1", [uid]);

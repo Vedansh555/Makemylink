@@ -100,6 +100,12 @@ function cleanBooking(raw: unknown): BookingConfig | undefined {
     description: b.description ? str(b.description, 300) : undefined,
     meetingUrl,
     paymentUrl: b.paymentUrl && /^https:\/\//i.test(String(b.paymentUrl).trim()) && safeHref(str(b.paymentUrl, 2048)) !== "#" ? safeHref(str(b.paymentUrl, 2048)) : undefined,
+    pack: (() => {
+      const p = b.pack as { count?: unknown; price?: unknown } | undefined;
+      const count = intIn(p?.count, 0, 10, 0);
+      const price = intIn(p?.price, 0, 10_000_000, 0);
+      return count >= 2 && price > 0 ? { count, price } : undefined;
+    })(),
     days: days.length ? days : [1, 2, 3, 4, 5],
     startHour,
     endHour,

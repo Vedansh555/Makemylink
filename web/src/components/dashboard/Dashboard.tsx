@@ -1,6 +1,7 @@
 "use client";
 
 import { FREE_LIMITS } from "@/lib/plans";
+import { BookingKit, BuyerReviews, type KitCard } from "./GrowthKit";
 import { useConfirm } from "@/components/ui/Confirm";
 
 import Link from "next/link";
@@ -16,6 +17,8 @@ interface Data {
   plan: "free" | "pro";
   pageId: string;
   bookingPage?: boolean;
+  name?: string;
+  bookingCards?: KitCard[];
   /** Free plan only: paid bookings still allowed this month. */
   bookingsLeft?: number | null;
   hasProducts?: boolean;
@@ -408,6 +411,8 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
       </div>
     )}
     <GatewayCard />
+    {!!d.bookingCards?.length && <BookingKit handle={d.handle} name={d.name ?? d.handle} cards={d.bookingCards} />}
+    <BuyerReviews />
     {d.bookingPage ? (
       <div className={card}>
         <p className="text-[15px] font-semibold">Your booking page</p>
@@ -425,8 +430,8 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
         {d.bookings.map((b) => (
           <li key={b.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-[14px]">
             <div>
-              <p className="font-semibold">{b.title} · {b.buyer_name}</p>
-              <p className="text-fg/55">{new Date(b.slot_start).toLocaleString()} · {b.buyer_email}</p>
+              <p className="font-semibold [overflow-wrap:anywhere]">{b.title} · {b.buyer_name}</p>
+              <p className="text-fg/55 [overflow-wrap:anywhere]">{new Date(b.slot_start).toLocaleString()} · {b.buyer_email}</p>
               {b.note && <p className="text-fg/45">“{b.note}”</p>}
               {b.amount > 0 && b.status !== "cancelled" && (
                 <p className="text-[12px] text-fg/45">

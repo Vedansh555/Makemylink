@@ -10,6 +10,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Gift,
+  Package,
   Globe,
   Lock,
   Mail,
@@ -20,7 +22,7 @@ import {
 import type { BioLink, Profile } from "@/lib/types";
 import { slotsForDay } from "@/lib/booking";
 import { fontClass, getTheme, readableOn } from "@/lib/themes";
-import { bookingPrice } from "./BookingModal";
+import { bookingPrice, money } from "./BookingModal";
 import { ConsentCheck } from "./ConsentCheck";
 import { payLinkHost } from "@/lib/payLink";
 import { WhatsAppIcon } from "./WhatsAppModal";
@@ -103,6 +105,18 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [agree, setAgree] = useState(false);
+  // Package, gift and package-code booking
+  const [usePack, setUsePack] = useState(false);
+  const [isGift, setIsGift] = useState(false);
+  const [giftName, setGiftName] = useState("");
+  const [giftEmail, setGiftEmail] = useState("");
+  const [giftMsg, setGiftMsg] = useState("");
+  const [code, setCode] = useState("");
+  const [credit, setCredit] = useState<number | null>(null);
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("code");
+    if (c) setCode(c.toUpperCase().slice(0, 12));
+  }, []);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [payErr, setPayErr] = useState("");
@@ -184,15 +198,15 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       return;
     }
     fetch(
-      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&month=${monthKey}${moving}`,
+      `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&month=${monthKey}${moving}${code ? `&code=${encodeURIComponent(code)}` : ""}`,
     )
       .then((r) => r.json())
-      .then((d) => { if (cancelled) return; setMonthFull(!!d.full); setDays(d.days ?? {}); })
+      .then((d) => { if (cancelled) return; setMonthFull(!!d.full); setDays(d.days ?? {}); if (d.credit) setCredit(d.credit.remaining); })
       .catch(() => !cancelled && setDays({}));
     return () => {
       cancelled = true;
     };
-  }, [monthKey, live, cfg, profile.handle, link.id, view.y, view.m, moving]);
+  }, [monthKey, live, cfg, profile.handle, link.id, view.y, view.m, moving, code]);
 
   // Auto-select first available day if none selected
   useEffect(() => {
@@ -256,8 +270,10 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const lastAllowed = new Date(ty, tm - 1 + 3, 1);
   const canNext = new Date(view.y, view.m + 1, 1) <= lastAllowed;
 
-  const price = bookingPrice(link);
-  const free = cfg.price === 0;
+  const byCode = !!code && (credit ?? 0) > 0;
+  const packOn = usePack && !!cfg.pack && !byCode;
+  const price = packOn ? money(cfg.pack!.price, cfg.currency) : bookingPrice(link);
+  const free = cfg.price === 0 || byCode;
 
   // Selected day header in right column (e.g., "Tue 24th")
   const dayHeader = useMemo(() => {
@@ -301,6 +317,9 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
         email,
         note,
         consent: agree,
+        pack: packOn || undefined,
+        code: byCode ? code : undefined,
+        gift: isGift && !byCode ? { name: giftName, email: giftEmail, message: giftMsg } : undefined,
       }),
     });
     const d = await res.json().catch(() => ({}));
@@ -643,6 +662,27 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             </p>
                           )}
 
+                          {code && credit !== null && (
+                            <p className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-[13px] ${byCode ? "border-t-fg/15 bg-t-fg/[0.04] text-t-fg/80" : "border-red-400/40 text-red-400"}`}>
+                              <Package className="mt-0.5 h-4 w-4 shrink-0" />
+                              {byCode ? `Booking from your package: ${credit} session${credit === 1 ? "" : "s"} left. No payment needed.` : "This package code has no sessions left. You can still book and pay for a single session."}
+                            </p>
+                          )}
+
+                          {cfg.pack && !byCode && !resched && (
+                            <div role="radiogroup" aria-label="Choose an option" className="grid gap-2 sm:grid-cols-2">
+                              {[
+                                { on: !usePack, title: "Single session", sub: bookingPrice(link), pick: () => setUsePack(false) },
+                                { on: usePack, title: `Package of ${cfg.pack.count}`, sub: `${money(cfg.pack.price, cfg.currency)}${cfg.pack.price < cfg.price * cfg.pack.count ? ` · save ${money(cfg.price * cfg.pack.count - cfg.pack.price, cfg.currency)}` : ""}`, pick: () => setUsePack(true) },
+                              ].map((o) => (
+                                <button key={o.title} type="button" role="radio" aria-checked={o.on} onClick={o.pick} className={`min-h-[60px] rounded-xl border px-4 py-2.5 text-left transition ${o.on ? "border-t-fg bg-t-fg/[0.07]" : "border-t-fg/15 hover:border-t-fg/40"}`}>
+                                  <span className="block text-[14px] font-semibold text-t-fg">{o.title}</span>
+                                  <span className="block text-[12px] text-t-fg/60">{o.sub}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
                           <div>
                             <label className="block text-[12px] font-medium uppercase tracking-wider text-t-fg/60 mb-1.5">
                               Your Name *
@@ -677,7 +717,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                                 className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 pl-10 pr-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50 transition"
                               />
                             </div>
-                            <p className="mt-1 text-[11px] text-t-fg/40">Calendar invite and meeting link sent here</p>
+                            <p className="mt-1 text-[11px] text-t-fg/40">{isGift ? "Your receipt is sent here" : "Calendar invite and meeting link sent here"}</p>
                           </div>
 
                           <div>
@@ -696,6 +736,23 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                               />
                             </div>
                           </div>
+
+                          {!byCode && !resched && (
+                            <div className="rounded-xl border border-t-fg/15 bg-t-fg/[0.03]">
+                              <label className="flex min-h-[48px] cursor-pointer items-center gap-3 px-4 text-[14px] text-t-fg">
+                                <input type="checkbox" checked={isGift} onChange={(e) => setIsGift(e.target.checked)} className="h-4 w-4 accent-current" />
+                                <Gift className="h-4 w-4 text-t-fg/60" /> This is a gift for someone
+                              </label>
+                              {isGift && (
+                                <div className="space-y-3 border-t border-t-fg/10 p-4">
+                                  <p className="text-[12px] text-t-fg/55">They get the time, meeting link and reminders. You get the receipt.</p>
+                                  <input required value={giftName} onChange={(e) => setGiftName(e.target.value)} maxLength={80} placeholder="Their name" aria-label="Their name" className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 px-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50" />
+                                  <input required type="email" value={giftEmail} onChange={(e) => setGiftEmail(e.target.value)} placeholder="Their email" aria-label="Their email" className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 px-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50" />
+                                  <input value={giftMsg} onChange={(e) => setGiftMsg(e.target.value)} maxLength={300} placeholder="A short message (optional)" aria-label="Gift message" className="w-full rounded-xl border border-t-fg/15 bg-t-fg/5 px-4 py-3 text-[14px] text-t-fg outline-none placeholder:text-t-fg/30 focus:border-t-fg/50" />
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                           <div className="pt-1">
                             <ConsentCheck checked={agree} onChange={setAgree} className="text-t-fg/80" />

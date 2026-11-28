@@ -25,7 +25,7 @@ import { payLinkHost } from "@/lib/payLink";
 import { WhatsAppIcon } from "./WhatsAppModal";
 import { payWithRazorpay, type RazorpayPay } from "@/lib/razorpayClient";
 
-const money = (price: number, cur: "INR" | "USD") =>
+export const money = (price: number, cur: "INR" | "USD") =>
   price === 0 ? "Free" : cur === "INR" ? `₹${price.toLocaleString("en-IN")}` : `$${price}`;
 export const bookingPrice = (l: BioLink) => (l.booking ? money(l.booking.price, l.booking.currency) : "");
 
@@ -476,6 +476,10 @@ export function BookingModal({
                       </div>
 
                       <form onSubmit={submit} className="mt-5 space-y-3.5">
+                        <p className="text-[12px] text-white/55">
+                          {link.booking?.pack ? `Package of ${link.booking.pack.count} or a gift? ` : "Booking as a gift? "}
+                          <Link href={`/${handle}/${link.id}`} className="font-semibold text-white underline underline-offset-4">Open the full booking page</Link>
+                        </p>
                         {!live && (
                           <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[12px] text-white/70">
                             Demo mode: You can test the exact flow without paying or booking.

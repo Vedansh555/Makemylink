@@ -3,6 +3,7 @@ import { HOLD_MS, credsForUser, fetchOrder } from "./gateway";
 import { pageByHandle } from "./account";
 import { esc, sendMail } from "./mail";
 import { sendBookingConfirmed } from "./bookingMail";
+import { afterConfirmed } from "./sessionExtras";
 
 export interface PaidBooking {
   id: string;
@@ -52,6 +53,7 @@ export async function confirmPaidBooking(row: PaidBooking): Promise<{ ok: true; 
   const changed = await one("UPDATE bookings SET status = 'confirmed' WHERE id = $1 AND status <> 'confirmed' RETURNING id", [row.id]);
   if (!changed) return { ok: true, meetingUrl: cfg.meetingUrl };
   await sendBookingConfirmed({ id: row.id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page.profile.name, link }, "paid");
+  await afterConfirmed(row.id).catch((e) => console.error("after confirmed", e));
   if (owner) await sendMail(owner.email, `Paid booking: ${esc(row.buyer_name)}`, `<p>${esc(row.buyer_name)} (${esc(row.buyer_email)}) paid and booked <b>${esc(link.title)}</b> on ${esc(when)}. It is confirmed automatically.</p>`);
   return { ok: true, meetingUrl: cfg.meetingUrl };
 }

@@ -12,7 +12,7 @@ const page = (title: string, body: string) =>
     { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } },
   );
 
-const words: Record<Act, { title: string; button: string; done: string }> = {
+const words: Record<Exclude<Act, "review">, { title: string; button: string; done: string }> = {
   confirm: { title: "Confirm this booking?", button: "Yes, the money arrived", done: "Confirmed. The buyer has been emailed the meeting link and calendar file." },
   cancel: { title: "Cancel this booking?", button: "Yes, it wasn't paid", done: "Cancelled. The time is free again, and the buyer has been told." },
   claim: { title: "Tell the host you paid?", button: "Yes, I paid", done: "Done. The host has been asked to check and will confirm by email." },
