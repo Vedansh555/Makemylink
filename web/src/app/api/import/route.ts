@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     }
   }
   target ??= generic.match(input);
-  if (!target) return NextResponse.json({ error: "That doesn't look like a web address. Try something like yourname.carrd.co" }, { status: 400 });
+  if (!target) return NextResponse.json({ error: "That doesn't look like a web address. Try something like linktr.ee/yourname" }, { status: 400 });
 
   try {
     const page = await safeGetText(target);

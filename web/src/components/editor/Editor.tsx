@@ -1,6 +1,7 @@
 "use client";
 
 import { SITE_URL, SITE_HOST } from "@/lib/site";
+import { showNotice } from "@/components/ui/Confirm";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -105,7 +106,7 @@ function ImagePick({ onPick, children, className = "", kind = "product" }: { onP
             try {
               onPick(await storeImage(await readImage(f, kind)));
             } catch {
-              alert("That picture could not be read. Try a JPG or PNG photo.");
+              showNotice("That picture could not be read. Try a JPG or PNG photo.");
             }
           }
           e.target.value = "";
@@ -146,7 +147,7 @@ function ShareBtn({ url }: { url: string }) {
       label={done ? "Link copied" : "Copy a link to just this card"}
       active={done}
       onClick={() => {
-        navigator.clipboard?.writeText(url).then(() => { setDone(true); setTimeout(() => setDone(false), 2000); }).catch(() => window.prompt("Copy this link", url));
+        navigator.clipboard?.writeText(url).then(() => { setDone(true); setTimeout(() => setDone(false), 2000); }).catch(() => showNotice(`Copying didn't work. Here is the link: ${url}`));
       }}
     >
       <Share2 className="h-4 w-4" />
@@ -349,6 +350,11 @@ export function Editor() {
   const [publishOpen, setPublishOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email: string; handle?: string; plan?: PlanId } | null>(null);
   const [notice, setNotice] = useState("");
+  useEffect(() => {
+    const show = (e: Event) => setNotice(String((e as CustomEvent).detail ?? ""));
+    window.addEventListener("showz-notice", show);
+    return () => window.removeEventListener("showz-notice", show);
+  }, []);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [pulse, setPulse] = useState(false);
@@ -450,11 +456,11 @@ export function Editor() {
         setPublishOpen(true);
       } else {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
-        alert(res.status === 401 ? "You're logged out. Log in again, then publish." : `Not published: ${d.error ?? "something went wrong. Please try again."}`);
+        setNotice(res.status === 401 ? "You're logged out. Log in again, then publish." : `Not published: ${d.error ?? "something went wrong. Please try again."}`);
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to publish changes.");
+      setNotice("Not published: check your connection and try again.");
     } finally {
       setPublishing(false);
     }

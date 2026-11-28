@@ -1,6 +1,7 @@
 "use client";
 
 import { FREE_LIMITS } from "@/lib/plans";
+import { useConfirm } from "@/components/ui/Confirm";
 
 import Link from "next/link";
 import Script from "next/script";
@@ -137,6 +138,7 @@ function ReturnNotice() {
 }
 
 function PagesTab({ info, current, choose, reload, goBilling }: { info: { pages: PageInfo[]; limit: number; plan: "free" | "pro" } | null; current: string; choose: (id: string, tab: Tab) => void; reload: () => void; goBilling: () => void }) {
+  const [confirmUi, ask] = useConfirm();
   const [handle, setHandle] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
@@ -153,13 +155,14 @@ function PagesTab({ info, current, choose, reload, goBilling }: { info: { pages:
     window.location.href = `/create?page=${d.id}`;
   }
   async function remove(pg: PageInfo) {
-    if (!window.confirm(`Delete @${pg.handle}, its emails, bookings and stats? This cannot be undone.`)) return;
+    if (!(await ask({ message: `Delete @${pg.handle}, its emails, bookings and stats? This cannot be undone.`, confirmLabel: "Delete page", danger: true }))) return;
     const res = await fetch(`/api/pages?id=${pg.id}`, { method: "DELETE" });
     if (!res.ok) return setMsg((await res.json().catch(() => ({}))).error ?? "Could not delete");
     reload();
   }
   return (
     <div>
+      {confirmUi}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))]">
         {info.pages.map((pg) => (
           <div key={pg.id} className={`${card} min-w-0 ${pg.id === current ? "border-[#ff5b37]/50" : ""}`}>
@@ -491,6 +494,7 @@ function GatewayCard() {
 }
 
 function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; secret?: string; lastSeen?: number | null }; reload: () => void }) {
+  const [confirmUi, ask] = useConfirm();
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
   async function turnOn() {
@@ -500,7 +504,7 @@ function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; 
     reload();
   }
   async function turnOff() {
-    if (!confirm("Turn off automatic confirmation for your payment link? You will press Mark paid again. Also delete the webhook in Razorpay.")) return;
+    if (!(await ask({ message: "Turn off automatic confirmation for your payment link? You will confirm payments yourself again. Also delete the webhook in Razorpay.", confirmLabel: "Turn off" }))) return;
     await fetch("/api/gateway?provider=hook", { method: "DELETE" });
     reload();
   }
@@ -511,6 +515,7 @@ function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; 
   const box = "flex min-h-[44px] items-center gap-2 rounded-xl border border-fg/15 bg-bg px-3.5 py-2";
   return (
     <div className="py-4 last:pb-0">
+      {confirmUi}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-[14px] font-semibold">
@@ -566,6 +571,7 @@ function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; 
 }
 
 function GatewayRow({ title, sub, status, reload, provider, steps, fields, sandboxOption }: { title: string; sub: string; status?: GwStatus; reload: () => void; provider: "razorpay" | "paypal"; steps: string[]; fields: { name: string; label: string; secret?: boolean }[]; sandboxOption?: boolean }) {
+  const [confirmUi, ask] = useConfirm();
   const [open, setOpen] = useState(false);
   const [vals, setVals] = useState<Record<string, string>>({});
   const [sandbox, setSandbox] = useState(false);
@@ -586,13 +592,14 @@ function GatewayRow({ title, sub, status, reload, provider, steps, fields, sandb
     reload();
   }
   async function disconnect() {
-    if (!confirm(`Disconnect ${title}? New bookings go back to manual payment (your payment link).`)) return;
+    if (!(await ask({ message: `Disconnect ${title}? New bookings go back to your payment link, which you confirm yourself.`, confirmLabel: "Disconnect" }))) return;
     await fetch(`/api/gateway?provider=${provider}`, { method: "DELETE" });
     reload();
   }
 
   return (
     <div className="py-4 first:pt-0 last:pb-0">
+      {confirmUi}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-[14px] font-semibold">
@@ -892,6 +899,7 @@ function VerifyBanner() {
 }
 
 function AccountTab({ email }: { email: string }) {
+  const [confirmUi, ask] = useConfirm();
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -902,7 +910,7 @@ function AccountTab({ email }: { email: string }) {
     router.refresh();
   }
   async function del() {
-    if (!window.confirm("Delete your account, page, emails and bookings forever? This cannot be undone.")) return;
+    if (!(await ask({ message: "Delete your account, page, emails and bookings forever? This cannot be undone.", confirmLabel: "Delete account", danger: true }))) return;
     setBusy(true);
     setMsg("");
     const r = await fetch("/api/account", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
@@ -914,6 +922,7 @@ function AccountTab({ email }: { email: string }) {
   }
   return (
     <div className="space-y-4">
+      {confirmUi}
       <div className={card}>
         <p className="text-[11px] uppercase tracking-[0.2em] text-fg/45">Signed in as</p>
         <p className="mt-2 text-[16px] [overflow-wrap:anywhere]">{email}</p>

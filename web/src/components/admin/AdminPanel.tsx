@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useConfirm } from "@/components/ui/Confirm";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "../landing/Nav";
 
@@ -29,6 +30,7 @@ const card = "rounded-2xl border border-fg/10 bg-fg/[0.03] p-5";
 const btn = "min-h-[38px] rounded-lg border border-fg/20 px-3 py-1.5 text-[12px] hover:border-fg/50 disabled:opacity-40";
 
 export function AdminPanel() {
+  const [confirmUi, ask] = useConfirm();
   const [data, setData] = useState<Overview | null>(null);
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState("");
@@ -43,7 +45,7 @@ export function AdminPanel() {
   }, [load]);
 
   async function act(body: Record<string, unknown>, confirmText?: string) {
-    if (confirmText && !window.confirm(confirmText)) return;
+    if (confirmText && !(await ask({ message: confirmText }))) return;
     setBusy(true);
     setMsg("");
     const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -58,6 +60,7 @@ export function AdminPanel() {
 
   return (
     <main className="min-h-screen bg-bg text-fg">
+      {confirmUi}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-6">
         <Logo />
         <Link href="/dashboard" className="text-[13px] text-fg/55 hover:text-fg">My dashboard</Link>
