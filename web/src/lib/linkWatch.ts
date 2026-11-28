@@ -3,6 +3,7 @@ import { all, one, run } from "./db";
 import { lockSecret, unlockSecret } from "./secretbox";
 import { SITE_URL } from "./site";
 import { confirmPaidBooking, loadBooking } from "./bookingPaid";
+import { bookingRow, emailUnmatched } from "./bookingActions";
 
 /**
  * Automatic confirmation for bookings paid through a creator's Razorpay payment link (razorpay.me, Payment Links,
@@ -23,10 +24,10 @@ export interface Hook {
   secret: string;
 }
 
-export async function hookForUser(userId: string): Promise<Hook | null> {
-  const row = await one<{ key_id: string; secret_enc: string }>("SELECT key_id, secret_enc FROM creator_gateways WHERE user_id = $1 AND provider = 'rzp_hook'", [userId]);
+export async function hookForUser(userId: string): Promise<(Hook & { lastSeen: number | null }) | null> {
+  const row = await one<{ key_id: string; secret_enc: string; last_seen: number | null }>("SELECT key_id, secret_enc, last_seen FROM creator_gateways WHERE user_id = $1 AND provider = 'rzp_hook'", [userId]);
   const secret = row && unlockSecret(row.secret_enc);
-  return row && secret ? { userId, hookId: row.key_id, secret } : null;
+  return row && secret ? { userId, hookId: row.key_id, secret, lastSeen: row.last_seen ? Number(row.last_seen) : null } : null;
 }
 
 export async function hookById(hookId: string): Promise<Hook | null> {
@@ -45,6 +46,8 @@ export async function createHook(userId: string): Promise<Hook> {
   );
   return { userId, hookId, secret };
 }
+
+export const markSeen = (hookId: string) => run("UPDATE creator_gateways SET last_seen = $1 WHERE provider = 'rzp_hook' AND key_id = $2", [Date.now(), hookId]);
 
 export const hookUrl = (hookId: string) => `${SITE_URL}/api/webhooks/razorpay-link/${hookId}`;
 
@@ -96,7 +99,15 @@ export async function settleLinkPayment(userId: string, pay: Paid): Promise<"con
     // Fixed-price links: same price, and the payer's email matches the booking's email.
     hit = pay.email ? waiting.filter((w) => w.amount * 100 === pay.paise && w.buyer_email.toLowerCase() === pay.email) : [];
   }
-  if (hit.length !== 1) return "unmatched";
+  if (hit.length !== 1) {
+    // Probably for one of our bookings (same rupee price) but not certain: ask the creator with one tap per booking.
+    const near = waiting.filter((x) => pay.paise >= x.amount * 100 && pay.paise < x.amount * 100 + 100);
+    if (near.length) {
+      const rows = (await Promise.all(near.slice(0, 5).map((x) => bookingRow(x.id)))).filter((x) => !!x);
+      if (rows.length) await emailUnmatched(rows[0]!.owner_email, pay.paise, pay.email ?? pay.contact, rows);
+    }
+    return "unmatched";
+  }
   // Claim it for this payment first, so the same payment can never confirm two bookings.
   const claimed = await one("UPDATE bookings SET provider = 'razorpay_link', provider_ref = $1 WHERE id = $2 AND provider IS NULL AND status = 'awaiting_payment' RETURNING id", [pay.paymentId, hit[0]!.id]);
   if (!claimed) return "duplicate";

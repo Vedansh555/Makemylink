@@ -451,7 +451,7 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
 /** Lets a creator connect their own Razorpay (rupees) and PayPal (dollars) so paid bookings confirm by themselves. The money goes straight to them. */
 type GwStatus = { connected: boolean; keyId: string | null; mode: "test" | "live" };
 function GatewayCard() {
-  const [info, setInfo] = useState<{ razorpay: GwStatus; paypal: GwStatus; hook?: { connected: boolean; url?: string; secret?: string } } | null>(null);
+  const [info, setInfo] = useState<{ razorpay: GwStatus; paypal: GwStatus; hook?: { connected: boolean; url?: string; secret?: string; lastSeen?: number | null } } | null>(null);
   const load = useCallback(async () => {
     const r = await fetch("/api/gateway");
     if (r.ok) setInfo(await r.json());
@@ -490,7 +490,7 @@ function GatewayCard() {
   );
 }
 
-function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; secret?: string }; reload: () => void }) {
+function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; secret?: string; lastSeen?: number | null }; reload: () => void }) {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
   async function turnOn() {
@@ -514,7 +514,7 @@ function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-[14px] font-semibold">
-            Payment link{hook?.connected && <span className="ml-2 text-[12px] font-semibold text-emerald-500">Confirms automatically</span>}
+            Payment link{hook?.connected && (hook.lastSeen ? <span className="ml-2 text-[12px] font-semibold text-emerald-500">Confirms automatically</span> : <span className="ml-2 text-[12px] font-semibold text-amber-500">Finish setup</span>)}
           </p>
           <p className="text-[13px] text-fg/55">Add your razorpay.me link to a booking card. Turn on automatic confirmation so you never press Mark paid: no API keys or website needed.</p>
         </div>
@@ -527,10 +527,25 @@ function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; 
           )}
         </div>
       </div>
+      {!hook?.connected && (
+        <ul className="mt-3 space-y-1.5 text-[13px] text-fg/60">
+          <li>• Each buyer is shown their own exact amount, like ₹499.37.</li>
+          <li>• When that payment reaches your Razorpay, the booking confirms and the buyer gets the meeting link.</li>
+          <li>• If anything doesn&apos;t match, you get an email with one-tap Confirm and Cancel buttons.</li>
+        </ul>
+      )}
       {hook?.connected && (
         <div className="mt-4 space-y-3">
-          <ol className="list-decimal space-y-1 pl-5 text-[13px] text-fg/65">
-            <li>In your Razorpay dashboard (Live mode), open Account &amp; Settings, then Webhooks, then Add New Webhook.</li>
+          <div className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-[13px] ${hook.lastSeen ? "border-emerald-500/30 bg-emerald-500/[0.06]" : "border-amber-500/30 bg-amber-500/[0.06]"}`}>
+            <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${hook.lastSeen ? "bg-emerald-500" : "bg-amber-500"}`} />
+            <span className="text-fg/75">
+              {hook.lastSeen
+                ? <>Working. Last message from Razorpay: {new Date(hook.lastSeen).toLocaleString()}.</>
+                : <>Almost there: finish the 3 steps below. This turns green after your first payment reaches Razorpay. Until then, you confirm bookings with one tap from the email we send.</>}
+            </span>
+          </div>
+          <ol className="list-decimal space-y-1.5 pl-5 text-[13px] text-fg/65">
+            <li>Open <a href="https://dashboard.razorpay.com/app/webhooks" target="_blank" rel="noreferrer" className="font-medium text-fg underline underline-offset-4">Razorpay webhooks</a> (Live mode), then click Add New Webhook.</li>
             <li>Paste the address and the secret below.</li>
             <li>Tick the events <b>payment.captured</b> and <b>payment_link.paid</b>, then save.</li>
           </ol>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { hookById, paymentFrom, settleLinkPayment, signatureOk } from "@/lib/linkWatch";
+import { hookById, markSeen, paymentFrom, settleLinkPayment, signatureOk } from "@/lib/linkWatch";
 
 // A creator's own Razorpay account calls this when a payment arrives on their payment link.
 // Each creator has their own address and secret, set up from Dashboard > Bookings.
@@ -9,6 +9,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ hook: s
   const hook = await hookById((await params).hook);
   if (!hook) return NextResponse.json({ error: "Unknown" }, { status: 404 });
   if (!signatureOk(raw, req.headers.get("x-razorpay-signature"), hook.secret)) return NextResponse.json({ error: "Bad signature" }, { status: 400 });
+  await markSeen(hook.hookId).catch(() => {});
   let evt: Parameters<typeof paymentFrom>[0];
   try {
     evt = JSON.parse(raw);

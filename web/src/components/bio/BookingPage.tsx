@@ -34,6 +34,8 @@ type Pay =
 
 type Result = {
   status: "confirmed" | "awaiting_payment" | "demo";
+  id?: string;
+  claimKey?: string;
   meetingUrl?: string;
   pays: Pay[];
 };
@@ -109,6 +111,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   const [resched, setResched] = useState<{ id: string; k: string; old: number } | null>(null);
   const [done, setDone] = useState<Result | null>(null);
   const [monthFull, setMonthFull] = useState(false);
+  const [claimed, setClaimed] = useState(false);
   // Sent with the time lookups, so a buyer can still move a session after the creator's Pro has ended.
   const moving = resched ? `&reschedule=${encodeURIComponent(resched.id)}&k=${encodeURIComponent(resched.k)}` : "";
 
@@ -462,7 +465,25 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             <div className="mt-3 rounded-xl border border-t-fg/15 bg-t-fg/5 px-4 py-3 text-[13px] text-t-fg/75">
                               Enter exactly <b className="text-t-fg tabular-nums">₹{(p.exact / 100).toFixed(2)}</b>, paise included. That exact amount tells us it is your booking, so it confirms by itself and your meeting link arrives by email within a minute or two.
                             </div>
-                          ) : (
+                          ) : null}
+                          {done.claimKey && done.id ? (
+                            <button
+                              type="button"
+                              disabled={claimed}
+                              onClick={async () => {
+                                const f = new FormData();
+                                f.set("id", done.id!);
+                                f.set("a", "claim");
+                                f.set("k", done.claimKey!);
+                                const r = await fetch("/api/bookings/quick", { method: "POST", body: f, headers: { Accept: "application/json" } }).catch(() => null);
+                                if (r?.ok) setClaimed(true);
+                              }}
+                              className="mt-3 min-h-[40px] text-[13px] text-t-fg/60 underline underline-offset-4 disabled:no-underline"
+                            >
+                              {claimed ? "Sent. The host will check and email you." : "Paid but no email after a few minutes? Tell the host"}
+                            </button>
+                          ) : null}
+                          {p.exact ? null : (
                             <p className="mt-2 text-[12px] text-t-fg/50">Opens {payLinkHost(p.link) ?? "the creator's payment page"}. Pay exactly {price}; the host confirms it and emails your meeting link.</p>
                           )}
                         </div>

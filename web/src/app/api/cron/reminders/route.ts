@@ -4,6 +4,7 @@ import { pageByHandle } from "@/lib/account";
 import { sendBookingReminder, sendCreatorReminder } from "@/lib/bookingMail";
 import { settleHolds } from "@/lib/bookingPaid";
 import { sendProReminders } from "@/lib/proReminder";
+import { bookingRow, emailWaiting } from "@/lib/bookingActions";
 
 // Call every 15 minutes from a scheduler (Render cron job or cron-job.org): GET /api/cron/reminders with "Authorization: Bearer $CRON_SECRET".
 // Emails the buyer and the creator a day before and an hour before each confirmed booking,
@@ -37,6 +38,13 @@ export async function GET(req: Request) {
       await run("UPDATE bookings SET reminded_24 = TRUE WHERE id = $1", [r.id]);
       sent++;
     }
+  }
+  // Link payments that never matched: one email to the creator with Confirm / Cancel buttons.
+  const waiting = await all<{ id: string }>("SELECT id FROM bookings WHERE status = 'awaiting_payment' AND provider IS NULL AND amount > 0 AND nudged = FALSE AND created_at < $1 AND slot_start > $2 LIMIT 30", [now - 2 * 3_600_000, now]);
+  for (const w of waiting) {
+    const row = await bookingRow(w.id);
+    if (row) await emailWaiting(row).catch(() => {});
+    await run("UPDATE bookings SET nudged = TRUE WHERE id = $1", [w.id]);
   }
   const pro = await sendProReminders().catch((e) => {
     console.error("pro reminder error", e);

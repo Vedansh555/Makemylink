@@ -15,6 +15,7 @@ import { rewardReferral } from "@/lib/referral";
 import { bookingBeingMoved } from "@/lib/reschedule";
 import { FREE_LIMITS } from "@/lib/plans";
 import { exactAmount, hookForUser } from "@/lib/linkWatch";
+import { actionKey, actionUrl, bookingRow, setBookingStatus } from "@/lib/bookingActions";
 
 
 /** Free pages take FREE_LIMITS.bookings bookings per calendar month (UTC); Pro has no limit. */
@@ -138,17 +139,18 @@ export async function POST(req: Request) {
     }
   }
   if (owner) {
-    const online = pays.some((p) => p.kind !== "link" || p.exact);
+    const online = pays.some((p) => p.kind !== "link");
     const next = free
       ? ""
       : online
         ? "<p>It confirms by itself once they pay on your page.</p>"
         : pays.length
-          ? "<p>Check the money has arrived, then press <b>Mark paid</b> in your dashboard. The buyer is then emailed the meeting link.</p>"
+          ? `<p>${pays.some((p) => p.kind === "link" && p.exact) ? "It should confirm by itself when the payment reaches your Razorpay. If it doesn't, check your payment app and tap:" : "Check your payment app, then tap:"}</p><p><a href="${actionUrl(id, "confirm")}" style="background:#111;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;display:inline-block;margin:4px 6px 4px 0">Money arrived: confirm</a><a href="${actionUrl(id, "cancel")}" style="border:1px solid #111;color:#111;padding:10px 16px;border-radius:10px;text-decoration:none;display:inline-block;margin:4px 0">Not paid: cancel</a></p>`
           : "<p><b>They had no way to pay on your page.</b> Send them your payment details, then press Mark paid in your dashboard. To fix this, connect Razorpay or PayPal, or add a payment link to the booking card.</p>";
     await sendMail(owner.email, `New booking request: ${esc(name)}`, `<p>${esc(name)} (${esc(email)}) booked <b>${esc(link.title)}</b> on ${esc(when)} (${esc(cfg.timeZone)}).</p>${next}`);
   }
-  return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pays });
+  const claimKey = !free && pays.some((p) => p.kind === "link") ? actionKey(id, "claim") : undefined;
+  return NextResponse.json({ ok: true, id, status: free ? "confirmed" : "awaiting_payment", meetingUrl: free ? cfg.meetingUrl : undefined, pays, claimKey });
 }
 
 // PATCH /api/bookings {id, status} — the page owner marks a booking paid/confirmed or cancelled.
@@ -159,18 +161,9 @@ export async function PATCH(req: Request) {
   if (blocked) return blocked;
   const { id, status } = (await req.json().catch(() => ({}))) as { id?: string; status?: string };
   if (!id || (status !== "confirmed" && status !== "cancelled")) return NextResponse.json({ error: "Bad request" }, { status: 400 });
-  const row = await one<{ buyer_name: string; buyer_email: string; slot_start: number; link_id: string; handle: string; status: string }>(
-    `SELECT b.buyer_name, b.buyer_email, b.slot_start, b.link_id, b.status, p.handle FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.id = $1 AND p.user_id = $2`,
-    [id, session.userId],
-  );
+  const mine = await one("SELECT b.id FROM bookings b JOIN pages p ON p.id = b.page_id WHERE b.id = $1 AND p.user_id = $2", [id, session.userId]);
+  const row = mine && (await bookingRow(id));
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  await run("UPDATE bookings SET status = $1 WHERE id = $2", [status, id]);
-  if (status === "confirmed" && row.status !== "confirmed") {
-    const page = await pageByHandle(row.handle);
-    const link = page?.profile.links.find((l) => l.id === row.link_id);
-    if (link?.booking) {
-      await sendBookingConfirmed({ id, buyerName: row.buyer_name, buyerEmail: row.buyer_email, slot: row.slot_start, handle: row.handle, hostName: page!.profile.name, link }, "paid");
-    }
-  }
+  await setBookingStatus(row, status);
   return NextResponse.json({ ok: true });
 }

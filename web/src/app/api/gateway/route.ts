@@ -19,7 +19,7 @@ export async function GET() {
   const hook = await hookForUser(session.userId);
   return NextResponse.json({
     // The webhook secret is the creator's to paste into their own Razorpay, so it is shown back to them.
-    hook: hook ? { connected: true, url: hookUrl(hook.hookId), secret: hook.secret } : { connected: false },
+    hook: hook ? { connected: true, url: hookUrl(hook.hookId), secret: hook.secret, lastSeen: hook.lastSeen } : { connected: false },
     razorpay: razorpay ? { connected: true, keyId: razorpay.key_id, mode: razorpay.key_id.startsWith("rzp_test_") ? "test" : "live" } satisfies Status : none,
     paypal: paypal ? { connected: true, keyId: paypal.key_id, mode: paypal.provider === "paypal_sandbox" ? "test" : "live" } satisfies Status : none,
   });
