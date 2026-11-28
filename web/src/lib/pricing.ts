@@ -23,6 +23,7 @@ export const plans: Plan[] = [
       `${FREE_THEME_IDS.length} designer themes`,
       `Up to ${FREE_LIMITS.links} links and ${FREE_LIMITS.looks} products`,
       `Collect up to ${FREE_LIMITS.subscribers} emails`,
+      `${FREE_LIMITS.bookings} paid bookings a month, 0% commission`,
       `${FREE_LIMITS.analyticsDays}-day visits and clicks`,
       "WhatsApp chat card and latest-YouTube card",
       "QR code for your page",
@@ -37,7 +38,7 @@ export const plans: Plan[] = [
     price: { GLOBAL: { monthly: 8, yearly: 79 }, IN: { monthly: 299, yearly: 2999 } },
     features: [
       `All ${themeList.length} themes, including 3D chrome`,
-      "Paid 1:1 bookings, 0% commission",
+      "Unlimited paid bookings, 0% commission",
       "Your own domain, like links.yourname.com",
       "Card sizes: half, full or tall",
       "Unlimited links and products",

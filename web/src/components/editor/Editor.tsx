@@ -490,8 +490,6 @@ export function Editor() {
 
   // What a Free page would lose at publish time, so the upgrade screen can list it.
   const lockedItems: string[] = [];
-  const bookingCount = p.links.filter((l) => l.kind === "booking").length;
-  if (bookingCount) lockedItems.push(`${bookingCount} paid booking card${bookingCount === 1 ? "" : "s"}`);
   if (p.links.some((l) => l.size)) lockedItems.push("Card sizes (half, full, tall)");
   if (!isFreeTheme(p.theme)) lockedItems.push("Your chosen theme");
   if (p.accentOverride || p.fontOverride) lockedItems.push("Custom colour or font");
@@ -869,7 +867,7 @@ export function Editor() {
               action={
                 <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end">
                   <button
-                    onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) proNote("Paid bookings"); }}
+                    onClick={() => { set("links", [...p.links, newBooking()]); if (!isPro) setNotice(`Free includes ${FREE_LIMITS.bookings} paid bookings a month. Pro has no limit.`); }}
                     className={`flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full sm:w-auto border px-3.5 py-2 text-[12px] font-semibold ${pulse ? "animate-pulse border-[#ff5b37] bg-[#ff5b37]/15" : "border-fg/20"}`}
                   >
                     <Plus className="h-3.5 w-3.5" /> Booking

@@ -11,7 +11,7 @@ import type { BioLink, Look, Profile } from "./types";
 export type Goal = "booking" | "products" | "email" | "import";
 
 export const GOALS: { id: Goal; title: string; blurb: string; who: string }[] = [
-  { id: "booking", title: "Get booked", blurb: "Followers pick a time and pay you for a 1:1 call. You keep 100%.", who: "Coaches, mentors, consultants" },
+  { id: "booking", title: "Get booked", blurb: "Followers pick a time and pay you for a 1:1 call. 0% Showz commission.", who: "Coaches, mentors, consultants" },
   { id: "products", title: "Show my products", blurb: "A photo grid of what you sell or recommend, each one a tap to the store.", who: "Creators, stylists, small shops" },
   { id: "email", title: "Grow my email list", blurb: "A sign-up box on a clean page, so every follower can become a subscriber.", who: "Writers, educators, anyone with a newsletter" },
   { id: "import", title: "Bring my existing page", blurb: "Paste the link of your Linktree or similar page. We copy everything over.", who: "Already have a link page" },

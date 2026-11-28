@@ -13,14 +13,23 @@ import { SITE_URL } from "@/lib/site";
 import { sendBookingConfirmed } from "@/lib/bookingMail";
 import { rewardReferral } from "@/lib/referral";
 import { bookingBeingMoved } from "@/lib/reschedule";
+import { FREE_LIMITS } from "@/lib/plans";
 
+
+/** Free pages take FREE_LIMITS.bookings bookings per calendar month (UTC); Pro has no limit. */
+async function freeBookingsLeft(page: { id: string; plan: string }) {
+  if (page.plan === "pro") return Infinity;
+  const d = new Date();
+  const row = await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM bookings WHERE page_id = $1 AND status <> 'cancelled' AND created_at >= $2", [page.id, Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)]);
+  return FREE_LIMITS.bookings - (row?.n ?? 0);
+}
 
 // `moving` is set only when a buyer is changing the time of a session they already booked.
 async function findConfig(handle: string, linkId: string, moving?: { pageId: string; linkId: string } | null) {
   const page = await pageByHandle(handle);
-  if (!page || (page.plan !== "pro" && !(moving?.pageId === page.id && moving.linkId === linkId))) return null;
+  if (!page) return null;
   const link = page.profile.links.find((l) => l.id === linkId && l.kind === "booking" && l.booking);
-  return link?.booking ? { page, link, cfg: link.booking } : null;
+  return link?.booking ? { page, link, cfg: link.booking, full: !moving && (await freeBookingsLeft(page)) <= 0 } : null;
 }
 
 // GET /api/bookings?handle=&linkId=&date=YYYY-MM-DD — open slots for a day
@@ -29,6 +38,7 @@ export async function GET(req: Request) {
   const moving = await bookingBeingMoved(u.searchParams.get("reschedule"), u.searchParams.get("k"));
   const found = await findConfig(u.searchParams.get("handle") ?? "", u.searchParams.get("linkId") ?? "", moving);
   if (!found) return NextResponse.json({ slots: [] });
+  if (found.full) return NextResponse.json({ slots: [], all: [], days: {}, full: true });
   await settleHolds(found.page.id);
   const month = u.searchParams.get("month") ?? "";
   if (/^\d{4}-\d{2}$/.test(month)) {
@@ -69,6 +79,7 @@ export async function POST(req: Request) {
   }
   const found = await findConfig(b.handle ?? "", b.linkId ?? "");
   if (!found) return NextResponse.json({ error: "This session is not available" }, { status: 404 });
+  if (found.full) return NextResponse.json({ error: "This calendar is full for this month. Please contact the host directly." }, { status: 403 });
   const { page, link, cfg } = found;
   await settleHolds(page.id);
 

@@ -9,6 +9,8 @@ export const FREE_LIMITS = {
   looks: 6,
   subscribers: 100,
   analyticsDays: 7,
+  /** Paid bookings a Free page can take each calendar month. */
+  bookings: 3,
 };
 
 /** How many pages one account can have. */
@@ -43,10 +45,11 @@ export function applyPlan(profile: Profile, plan: PlanId): Profile {
     fontOverride: undefined,
     hideBadge: false,
     showMediaKit: false,
-    links: profile.links
-      .filter((l) => l.kind !== "booking")
-      .map((l) => ({ ...l, size: undefined }))
-      .slice(0, FREE_LIMITS.links),
+    // Booking cards stay (Free takes a few bookings a month) and don't count towards the link limit.
+    links: (() => {
+      let plain = 0;
+      return profile.links.map((l) => ({ ...l, size: undefined })).filter((l) => l.kind === "booking" || ++plain <= FREE_LIMITS.links);
+    })(),
     looks: profile.looks.slice(0, FREE_LIMITS.looks),
   };
 }

@@ -40,7 +40,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function Marquee() {
-  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% commission on Pro", "UPI & cards", "Card sizes", "Media kit", `${themeList.length} themes`];
+  const words = ["Paid bookings", "Links", "Products", "Email list", "Analytics", "0% Showz commission", "UPI & cards", "Card sizes", "Media kit", `${themeList.length} themes`];
   return (
     <div className="relative z-20 -mt-16">
       {/* Solid page-colour block under the tilted band, so no phone shows below it */}
@@ -326,7 +326,7 @@ export function Features() {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="text-[22px] font-semibold">Keep more of every sale</h3>
-                <span className="shrink-0 whitespace-nowrap rounded-full bg-[#ff5b37] px-3 py-1 text-[11px] font-bold text-[#111]">0% on Pro</span>
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-[#ff5b37] px-3 py-1 text-[11px] font-bold text-[#111]">0% commission</span>
               </div>
               <p className="mt-2 text-fg/55">Many tools keep up to 12% of every sale on their cheaper plans. We keep nothing. Pro is a flat ₹299 or $8 a month.</p>
             </div>
@@ -423,7 +423,7 @@ export function Features() {
               ))}
             </div>
             <p className="mt-4 text-[12px] text-fg/45">
-              {selectedCurrency}: no platform commission on Pro. The payment company charges its own small fee.
+              {selectedCurrency}: no Showz commission. The payment company charges its own small fee.
             </p>
           </Card>
         </Reveal>
@@ -471,7 +471,7 @@ export function Features() {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-[22px] font-semibold">Paid 1:1 bookings</h3>
-                <p className="mt-2 text-fg/55">Followers pick a time and pay you directly. You keep 100%, with no commission.</p>
+                <p className="mt-2 text-fg/55">Followers pick a time and pay you directly. 0% Showz commission; only the payment company&apos;s small fee applies.</p>
               </div>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -657,7 +657,7 @@ export function Compare() {
 
 const faqs: [string, string][] = [
   ["Who is Showz for?", "People who earn from their audience: creators, mentors, coaches, consultants, photographers, stylists and small shops. If you want followers to book, buy or subscribe, it is for you."],
-  ["How do paid bookings work?", "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays you directly. Connect your own Razorpay or PayPal and the booking confirms by itself, or add your payment link and confirm it yourself. They get your meeting link by email. We take no cut."],
+  ["How do paid bookings work?", "Add a booking card with your days, hours and price. A follower picks a time and pays you directly. Connect your own Razorpay or PayPal and the booking confirms by itself, or add your payment link and confirm it yourself. They get your meeting link by email. We take no cut."],
   ["Why is the price different in India?", "We set prices for each country so they're fair. In India you pay in rupees with UPI, cards or netbanking. Everywhere else you pay in US dollars."],
   ["Do you take a cut of my sales?", "No. Zero commission on bookings and sales. If a payment company is involved it charges its own normal fee."],
   ["Can I bring my existing page?", "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, or almost any public link page, and we copy your picture, links, groups, social handles and shop items. Some sites, like Beacons, block automated reading, so for those you add links by hand. Another tool's design can't be copied, so you pick one of our styles."],

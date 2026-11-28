@@ -108,6 +108,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
   // Reschedule & Status states
   const [resched, setResched] = useState<{ id: string; k: string; old: number } | null>(null);
   const [done, setDone] = useState<Result | null>(null);
+  const [monthFull, setMonthFull] = useState(false);
   // Sent with the time lookups, so a buyer can still move a session after the creator's Pro has ended.
   const moving = resched ? `&reschedule=${encodeURIComponent(resched.id)}&k=${encodeURIComponent(resched.k)}` : "";
 
@@ -183,7 +184,7 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
       `/api/bookings?handle=${encodeURIComponent(profile.handle)}&linkId=${encodeURIComponent(link.id)}&month=${monthKey}${moving}`,
     )
       .then((r) => r.json())
-      .then((d) => !cancelled && setDays(d.days ?? {}))
+      .then((d) => { if (cancelled) return; setMonthFull(!!d.full); setDays(d.days ?? {}); })
       .catch(() => !cancelled && setDays({}));
     return () => {
       cancelled = true;
@@ -829,7 +830,11 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
 
                         {/* Time slots vertical column */}
                         <div className="mt-4 flex-1">
-                          {!day ? (
+                          {monthFull ? (
+                            <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-t-fg/10 px-6 text-center text-[13px] text-t-fg/55">
+                              No times left this month. Please contact {profile.name} directly.
+                            </div>
+                          ) : !day ? (
                             <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-t-fg/10 text-[13px] text-t-fg/40">
                               Choose a date from the calendar
                             </div>

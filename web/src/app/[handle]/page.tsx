@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { BioPage } from "@/components/bio/BioPage";
 import { getDemoProfile } from "@/lib/demo";
 import { hasContent, pageByHandle } from "@/lib/account";
@@ -85,6 +86,11 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      {!found.pageId && (
+        <Link href="/start" className="fixed left-1/2 top-3 z-[60] -translate-x-1/2 whitespace-nowrap rounded-full border border-black/10 bg-white/90 px-3.5 py-1.5 text-[12px] font-medium text-[#111] shadow-sm backdrop-blur">
+          Example page, not a real person · Make yours
+        </Link>
+      )}
       <BioPage profile={profile} plan={plan} live={!!found.pageId} verified={found.verifiedLabel} />
     </>
   );

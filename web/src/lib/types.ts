@@ -23,7 +23,7 @@ export type Store = "LTK" | "ShopMy" | "Amazon" | "Myntra" | "Nykaa" | "Own stor
 
 export type BlockSize = "1x1" | "2x1" | "2x2";
 
-/** A bookable 1:1 session. Pro only. */
+/** A bookable 1:1 session. Free: 3 bookings a month; Pro: unlimited. */
 export interface BookingConfig {
   /** Whole rupees (INR) or whole dollars (USD). */
   price: number;

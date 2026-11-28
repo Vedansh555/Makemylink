@@ -54,6 +54,7 @@ export async function GET(req: Request) {
     checklist,
     plan,
     bookingPage: hasBooking,
+    bookingsLeft: plan === "pro" ? null : Math.max(0, FREE_LIMITS.bookings - ((await one<{ n: number }>("SELECT COUNT(*)::int AS n FROM bookings WHERE page_id = $1 AND status <> 'cancelled' AND created_at >= $2", [pid, Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)]))?.n ?? 0)),
     hasProducts: profile.looks.length > 0,
     hasChat: profile.links.some((l) => l.kind === "whatsapp"),
     pageId: page.id,

@@ -25,7 +25,7 @@ export const niches: Niche[] = [
     ],
     faq: [
       { q: "Can I show full-resolution images?", a: "Yes. Cards support uploaded images with aspect ratios optimized for mobile viewports." },
-      { q: "How do client shoot bookings work?", a: "Add a booking block with your pricing and calendar slots. Clients book directly and you keep 100% of the session fee." },
+      { q: "How do client shoot bookings work?", a: "Add a booking block with your pricing and calendar slots. Clients book directly and you keep the session fee, minus only the payment company's small charge." },
     ],
   },
   {
@@ -53,7 +53,7 @@ export const niches: Niche[] = [
     badge: "For Consultants, Advisors & Mentors",
     goal: "bookings",
     benefits: [
-      { title: "0% Commission on Calls", desc: "Keep 100% of your consulting earnings. On Pro, a ₹5,000 or $150 session costs you ₹0 in platform cuts." },
+      { title: "0% Commission on Calls", desc: "0% Showz commission on your consulting fees. A ₹5,000 or $150 session costs you nothing in Showz cuts; only the payment company's fee applies." },
       { title: "Automated Calendar Slots", desc: "Sync your working hours across any time zone. Meeting links (Google Meet, Zoom) are confirmed automatically." },
       { title: "Verified Social Proof", desc: "Include client endorsements, follower metrics, and past speaking engagements directly on your page." },
     ],

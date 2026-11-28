@@ -44,7 +44,7 @@ export function AuthError({ children }: { children: React.ReactNode }) {
   );
 }
 
-const POINTS = ["Free to start, no card needed", "Paid bookings with 0% commission on Pro", "Download your page whenever you like"];
+const POINTS = ["Free to start, no card needed", "Paid bookings with 0% Showz commission", "Download your page whenever you like"];
 
 /** Shared shell for sign up, log in and password pages: the form on one side, the product on the other. */
 export function AuthShell({ title, intro, children, footer }: { title: string; intro?: string; children: React.ReactNode; footer?: React.ReactNode }) {

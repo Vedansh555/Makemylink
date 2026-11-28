@@ -71,7 +71,7 @@ const jsonLd = [
         name: "How do paid bookings work?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "On Pro you add a booking card with your days, hours and price. A follower picks a time and pays you directly. Connect your own Razorpay or PayPal and the booking confirms by itself, or add your payment link and confirm it yourself. They get your meeting link by email. We take no cut.",
+          text: "Add a booking card with your days, hours and price. A follower picks a time and pays you directly. Connect your own Razorpay or PayPal and the booking confirms by itself, or add your payment link and confirm it yourself. They get your meeting link by email. We take no cut.",
         },
       },
       {

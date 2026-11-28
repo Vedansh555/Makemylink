@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const DOES = [
   { icon: Link2, title: "One page for everything", text: "Links, products, a WhatsApp chat card and your latest YouTube video, in a design that already looks finished." },
-  { icon: CalendarCheck, title: "Paid 1:1 bookings", text: "On Pro, people pick a time and pay you directly. We take no commission." },
+  { icon: CalendarCheck, title: "Paid 1:1 bookings", text: "People pick a time and pay you directly. We take no commission. Free includes 3 paid bookings a month." },
   { icon: Mail, title: "Your audience", text: "Collect emails from visitors who agree to share them, and see what they tap." },
   { icon: Download, title: "Yours to keep", text: "Download your page and your data whenever you like, plus a backup web page that works anywhere." },
 ];

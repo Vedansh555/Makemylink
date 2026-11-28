@@ -29,7 +29,7 @@ export const posts: Post[] = [
     description: "Mentors and consultants who book 1:1 calls through a marketplace pay a cut of every session. Here is how a flat-fee page with its own booking card compares.",
     date: "2026-11-02",
     category: "Comparisons",
-    answer: "If you already have an audience, you can take paid 1:1 bookings on your own page for a flat monthly fee and keep 100% of each session, instead of paying a commission to a marketplace on every call.",
+    answer: "If you already have an audience, you can take paid 1:1 bookings on your own page for a flat monthly fee and keep each session's fee, minus only the payment company's small charge, instead of paying a commission to a marketplace on every call.",
     body: [
       { h2: "How marketplace booking pages make money", p: ["Booking marketplaces typically take a percentage of each paid session. That is fair when the marketplace sends you the customer. It is expensive when your own audience on Instagram, LinkedIn or YouTube is the one booking you.", "A percentage also grows with your success: the more you earn, the more you pay, for the same software."] },
       { h2: "What a flat fee changes", p: ["With a flat monthly plan, a ₹3,000 session costs you the same to host as a ₹300 one. Showz Pro is ₹299 a month in India and $8 elsewhere, with 0% commission on bookings."] },

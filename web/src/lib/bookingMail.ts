@@ -53,7 +53,7 @@ export interface BookingMailInput {
   link: BioLink;
 }
 
-const wrap = (body: string) => `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto;line-height:1.55;color:#111">${body}<p style="color:#888;font-size:12px;margin-top:28px">Booked with Showz</p></div>`;
+const wrap = (body: string, buyer = true) => `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:auto;line-height:1.55;color:#111">${body}<p style="color:#888;font-size:12px;margin-top:28px">${buyer ? `Booked with Showz. Want to take paid sessions like this? <a href="${SITE_URL}/start" style="color:#888">${new URL(SITE_URL).host}</a>` : "Sent by Showz"}</p></div>`;
 const btn = (href: string, label: string, dark = true) => `<a href="${href}" style="background:${dark ? "#111" : "#fff"};color:${dark ? "#fff" : "#111"};border:1px solid #111;padding:11px 18px;border-radius:10px;text-decoration:none;display:inline-block;margin:4px 6px 4px 0">${label}</a>`;
 
 /** The email a buyer gets once a booking is confirmed: when, the join link, a calendar file, and a reschedule link. */
@@ -89,6 +89,6 @@ export async function sendCreatorReminder(to: string, b: BookingMailInput, hours
   return sendMail(
     to,
     hours === 24 ? `Tomorrow: ${b.buyerName} (${b.link.title})` : `In 1 hour: ${b.buyerName} (${b.link.title})`,
-    wrap(`<h2 style="margin:0 0 8px">${hours === 24 ? "You have a session tomorrow" : "Your session starts in an hour"}</h2><p><b>${esc(b.link.title)}</b> with ${esc(b.buyerName)} (${esc(b.buyerEmail)})<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${btn(`${SITE_URL}/dashboard?tab=bookings`, "See your bookings", false)}</p>`),
+    wrap(`<h2 style="margin:0 0 8px">${hours === 24 ? "You have a session tomorrow" : "Your session starts in an hour"}</h2><p><b>${esc(b.link.title)}</b> with ${esc(b.buyerName)} (${esc(b.buyerEmail)})<br>${esc(when)} (${esc(cfg.timeZone)})</p><p>${btn(esc(cfg.meetingUrl), "Join the call")}${btn(`${SITE_URL}/dashboard?tab=bookings`, "See your bookings", false)}</p>`, false),
   );
 }

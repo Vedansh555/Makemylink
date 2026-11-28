@@ -50,7 +50,7 @@ export function Hero() {
           </h1>
 
           <p className="rise mx-auto mt-7 max-w-[480px] text-[18px] leading-relaxed text-fg/85 [animation-delay:.12s]">
-            Paid bookings, products and leads on one beautiful page. 0% commission on Pro, free to start.
+            Paid bookings, products and leads on one beautiful page. 0% Showz commission, free to start.
           </p>
 
           <div className="rise mx-auto mt-9 flex w-full max-w-[860px] flex-col items-stretch justify-center gap-3 [animation-delay:.24s] [text-shadow:none] sm:flex-row sm:items-center">

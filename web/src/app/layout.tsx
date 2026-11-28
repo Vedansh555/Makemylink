@@ -35,10 +35,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Showz: your whole business in one link",
   description:
-    "Take paid bookings, show off your products and grow your email list from one beautiful page. 0% commission on Pro, UPI and cards, free to start.",
+    "Take paid bookings, show off your products and grow your email list from one beautiful page. 0% Showz commission, UPI and cards, free to start.",
   openGraph: {
     title: "Showz: your whole business in one link",
-    description: "Paid bookings, products and an email list on one beautiful page. 0% commission on Pro.",
+    description: "Paid bookings, products and an email list on one beautiful page. 0% Showz commission.",
     type: "website",
     siteName: "Showz",
   },

@@ -1,5 +1,7 @@
 "use client";
 
+import { FREE_LIMITS } from "@/lib/plans";
+
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,6 +15,8 @@ interface Data {
   plan: "free" | "pro";
   pageId: string;
   bookingPage?: boolean;
+  /** Free plan only: paid bookings still allowed this month. */
+  bookingsLeft?: number | null;
   hasProducts?: boolean;
   hasChat?: boolean;
   handle: string;
@@ -392,10 +396,14 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
     await fetch("/api/bookings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
     reload();
   }
-  if (d.plan !== "pro") return <Locked>Paid 1:1 bookings are a Pro feature. Upgrade on the Plan tab.</Locked>;
   const bookUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${d.handle}/book`;
   return (
     <div className="space-y-4">
+    {d.plan !== "pro" && (
+      <div className={`${card} text-[14px] text-fg/70`}>
+        Free includes {FREE_LIMITS.bookings} paid bookings a month. <b className="text-fg">{d.bookingsLeft ?? FREE_LIMITS.bookings} left</b> this month. Pro has no limit.
+      </div>
+    )}
     <GatewayCard />
     {d.bookingPage ? (
       <div className={card}>
@@ -716,7 +724,7 @@ function Billing({ d, email, reload }: { d: Data; email: string; reload: () => v
       {d.plan === "pro" ? (
         <p className="mt-3 text-[14px] text-fg/60">Pro is active. Pay again any time to add more time. It is added to what you have left.</p>
       ) : (
-        <p className="mt-3 text-[14px] text-fg/60">Bookings, card sizes, all themes, CSV export, 30-day analytics and link checks are on Pro.</p>
+        <p className="mt-3 text-[14px] text-fg/60">Unlimited bookings, card sizes, all themes, CSV export, 30-day analytics and link checks are on Pro.</p>
       )}
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <div className="flex rounded-full border border-fg/10 bg-fg/5 p-1 text-[13px]">

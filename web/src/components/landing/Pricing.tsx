@@ -1,5 +1,7 @@
 "use client";
 
+import { FREE_LIMITS } from "@/lib/plans";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
@@ -128,7 +130,8 @@ function SavingsCalculator({ region, billing }: { region: Region; billing: Billi
 
   const price = plans.find((p) => p.id === "pro")!.price[region][billing];
   const showzYear = billing === "yearly" ? price : price * 12;
-  const cutYear = Math.round(monthly * 0.1) * 12;
+  // India: Topmate's own-link 10% commission plus 18% GST on it (topmate.io/fees, Nov 2026). Elsewhere: a plain 10% cut.
+  const cutYear = Math.round(monthly * (region === "IN" ? 0.118 : 0.1)) * 12;
   const keptYear = Math.max(0, cutYear - showzYear);
   const money = (v: number) => formatPrice(Math.round(v), region);
   const fill = ((monthly - r.min) / (r.max - r.min)) * 100;
@@ -166,7 +169,7 @@ function SavingsCalculator({ region, billing }: { region: Region; billing: Billi
 
         <dl className="mt-9 space-y-5">
           {[
-            { label: "A platform that takes 10%", value: cutYear, bar: "bg-fg/25" },
+            { label: region === "IN" ? "Topmate: 10% commission + GST" : "A platform that takes 10%", value: cutYear, bar: "bg-fg/25" },
             { label: "Showz Pro, flat price", value: showzYear, bar: "bg-[#ff5b37]" },
           ].map((row) => (
             <div key={row.label}>
@@ -194,7 +197,7 @@ function SavingsCalculator({ region, billing }: { region: Region; billing: Billi
           Create your free page
         </Link>
         <p className="mt-6 max-w-[300px] text-[12px] leading-relaxed text-[#141414]/70">
-          Compared with a 10% cut on every sale, with Pro billed {billing}. Payment-company fees apply on any platform and are left out of both.
+          {region === "IN" ? "Compared with Topmate's 10% own-link commission plus GST (its fee page, Nov 2026)" : "Compared with a 10% cut on every sale"}, with Pro billed {billing}. Payment fees (about 2%) apply on every platform and are left out of both. Free includes {FREE_LIMITS.bookings} paid bookings a month.
         </p>
       </div>
     </div>
