@@ -58,7 +58,7 @@ export const niches: Niche[] = [
       { title: "Verified Social Proof", desc: "Include client endorsements, follower metrics, and past speaking engagements directly on your page." },
     ],
     faq: [
-      { q: "Why switch from Topmate or Superpeer?", a: "Marketplaces take a cut of every session your audience books. Showz gives you a flat monthly fee with 0% commission, saving thousands every month." },
+      { q: "How is this different from a booking marketplace?", a: "Marketplaces usually take a percentage of each session, which can be worth it when they bring you the client. Showz takes 0% commission: Free includes 3 paid bookings a month and Pro is a flat monthly fee. Payment company fees apply either way, so compare at your own sales level." },
       { q: "How are meeting links delivered?", a: "As soon as you confirm payment in your dashboard, your Google Meet or Zoom link is emailed to the client automatically." },
     ],
   },
