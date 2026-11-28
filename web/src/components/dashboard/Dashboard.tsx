@@ -451,7 +451,7 @@ function Bookings({ d, reload }: { d: Data; reload: () => void }) {
 /** Lets a creator connect their own Razorpay (rupees) and PayPal (dollars) so paid bookings confirm by themselves. The money goes straight to them. */
 type GwStatus = { connected: boolean; keyId: string | null; mode: "test" | "live" };
 function GatewayCard() {
-  const [info, setInfo] = useState<{ razorpay: GwStatus; paypal: GwStatus } | null>(null);
+  const [info, setInfo] = useState<{ razorpay: GwStatus; paypal: GwStatus; hook?: { connected: boolean; url?: string; secret?: string } } | null>(null);
   const load = useCallback(async () => {
     const r = await fetch("/api/gateway");
     if (r.ok) setInfo(await r.json());
@@ -484,14 +484,68 @@ function GatewayCard() {
           fields={[{ name: "clientId", label: "Client ID" }, { name: "clientSecret", label: "Secret", secret: true }]}
           sandboxOption
         />
-        <div className="flex flex-wrap items-center justify-between gap-2 py-4 last:pb-0">
-          <div>
-            <p className="text-[14px] font-semibold">Payment link</p>
-            <p className="text-[13px] text-fg/55">No keys needed: paste a link such as razorpay.me or paypal.me into a booking card. You confirm each payment.</p>
-          </div>
-          <Link href="/create?focus=booking" className="rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Add in editor</Link>
+        <HookRow hook={info?.hook} reload={load} />
+      </div>
+    </div>
+  );
+}
+
+function HookRow({ hook, reload }: { hook?: { connected: boolean; url?: string; secret?: string }; reload: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState("");
+  async function turnOn() {
+    setBusy(true);
+    await fetch("/api/gateway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: "hook" }) });
+    setBusy(false);
+    reload();
+  }
+  async function turnOff() {
+    if (!confirm("Turn off automatic confirmation for your payment link? You will press Mark paid again. Also delete the webhook in Razorpay.")) return;
+    await fetch("/api/gateway?provider=hook", { method: "DELETE" });
+    reload();
+  }
+  const copy = (label: string, v?: string) => {
+    if (!v) return;
+    navigator.clipboard?.writeText(v).then(() => setCopied(label)).catch(() => {});
+  };
+  const box = "flex min-h-[44px] items-center gap-2 rounded-xl border border-fg/15 bg-bg px-3.5 py-2";
+  return (
+    <div className="py-4 last:pb-0">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-[14px] font-semibold">
+            Payment link{hook?.connected && <span className="ml-2 text-[12px] font-semibold text-emerald-500">Confirms automatically</span>}
+          </p>
+          <p className="text-[13px] text-fg/55">Add your razorpay.me link to a booking card. Turn on automatic confirmation so you never press Mark paid: no API keys or website needed.</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/create?focus=booking" className="rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Add link</Link>
+          {hook?.connected ? (
+            <button onClick={turnOff} className="rounded-xl border border-fg/20 px-4 py-2 text-[13px]">Turn off</button>
+          ) : (
+            <button onClick={turnOn} disabled={busy} className="rounded-xl bg-fg px-4 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-50">{busy ? "Setting up…" : "Turn on"}</button>
+          )}
         </div>
       </div>
+      {hook?.connected && (
+        <div className="mt-4 space-y-3">
+          <ol className="list-decimal space-y-1 pl-5 text-[13px] text-fg/65">
+            <li>In your Razorpay dashboard (Live mode), open Account &amp; Settings, then Webhooks, then Add New Webhook.</li>
+            <li>Paste the address and the secret below.</li>
+            <li>Tick the events <b>payment.captured</b> and <b>payment_link.paid</b>, then save.</li>
+          </ol>
+          {[["Webhook address", hook.url], ["Secret", hook.secret]].map(([label, v]) => (
+            <div key={label}>
+              <p className="mb-1 text-[12px] text-fg/50">{label}</p>
+              <div className={box}>
+                <span className="min-w-0 flex-1 break-all font-mono text-[12px]">{v}</span>
+                <button type="button" onClick={() => copy(label!, v)} className="shrink-0 rounded-lg border border-fg/20 px-3 py-1.5 text-[12px]">{copied === label ? "Copied" : "Copy"}</button>
+              </div>
+            </div>
+          ))}
+          <p className="text-[12px] text-fg/45">Each buyer is asked to pay their own exact amount (for example ₹499.37), which tells us whose payment it is. Works best with a razorpay.me link, where the buyer types the amount. If a payment can&apos;t be matched, the booking waits for you to press Mark paid.</p>
+        </div>
+      )}
     </div>
   );
 }

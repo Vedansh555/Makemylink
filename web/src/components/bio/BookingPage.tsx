@@ -30,7 +30,7 @@ import { Background } from "./BioPage";
 type Pay =
   | RazorpayPay
   | { kind: "paypal"; url: string }
-  | { kind: "link"; link: string };
+  | { kind: "link"; link: string; exact?: number };
 
 type Result = {
   status: "confirmed" | "awaiting_payment" | "demo";
@@ -456,9 +456,15 @@ export function BookingPage({ profile, link, live }: { profile: Profile; link: B
                             rel="noreferrer"
                             className={done.pays.length > 1 ? "block rounded-xl border border-t-fg/20 bg-t-fg/5 px-5 py-3 font-semibold text-t-fg hover:bg-t-fg/10" : "block w-full rounded-xl bg-t-fg px-5 py-3.5 font-bold text-t-bg transition hover:bg-t-fg/90"}
                           >
-                            {done.pays.length > 1 ? "Or pay with the creator's payment link" : `Pay ${price}`}
+                            {done.pays.length > 1 ? "Or pay with the creator's payment link" : `Pay ${p.exact ? `₹${(p.exact / 100).toFixed(2)}` : price}`}
                           </a>
-                          <p className="mt-2 text-[12px] text-t-fg/50">Opens {payLinkHost(p.link) ?? "the creator's payment page"}. Pay exactly {price}; the host confirms it and emails your meeting link.</p>
+                          {p.exact ? (
+                            <div className="mt-3 rounded-xl border border-t-fg/15 bg-t-fg/5 px-4 py-3 text-[13px] text-t-fg/75">
+                              Enter exactly <b className="text-t-fg tabular-nums">₹{(p.exact / 100).toFixed(2)}</b>, paise included. That exact amount tells us it is your booking, so it confirms by itself and your meeting link arrives by email within a minute or two.
+                            </div>
+                          ) : (
+                            <p className="mt-2 text-[12px] text-t-fg/50">Opens {payLinkHost(p.link) ?? "the creator's payment page"}. Pay exactly {price}; the host confirms it and emails your meeting link.</p>
+                          )}
                         </div>
                       ),
                     )}

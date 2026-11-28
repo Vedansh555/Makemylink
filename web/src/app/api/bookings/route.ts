@@ -14,6 +14,7 @@ import { sendBookingConfirmed } from "@/lib/bookingMail";
 import { rewardReferral } from "@/lib/referral";
 import { bookingBeingMoved } from "@/lib/reschedule";
 import { FREE_LIMITS } from "@/lib/plans";
+import { exactAmount, hookForUser } from "@/lib/linkWatch";
 
 
 /** Free pages take FREE_LIMITS.bookings bookings per calendar month (UTC); Pro has no limit. */
@@ -102,7 +103,7 @@ export async function POST(req: Request) {
   if (free) await sendBookingConfirmed({ id, buyerName: name, buyerEmail: email, slot: b.slot, handle: page.handle, hostName: page.profile.name, link });
 
   // How the buyer can pay: the creator's own Razorpay or PayPal (confirms by itself), and/or the creator's payment link.
-  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "link"; link: string })[] = [];
+  const pays: ({ kind: "razorpay"; keyId: string; orderId: string; amount: number; bookingId: string } | { kind: "paypal"; url: string } | { kind: "link"; link: string; exact?: number })[] = [];
   if (!free) {
     // If the creator connected their own Razorpay, the buyer can pay on the spot and the booking confirms itself.
     const creds = cfg.currency === "INR" ? await credsForUser(page.user_id) : null;
@@ -126,10 +127,18 @@ export async function POST(req: Request) {
         console.error("creator paypal order", e);
       }
     }
-    if (payLinkHost(cfg.paymentUrl)) pays.push({ kind: "link", link: cfg.paymentUrl! });
+    if (payLinkHost(cfg.paymentUrl)) {
+      // With the creator's Razorpay webhook on, this booking gets its own exact amount so the payment confirms it by itself.
+      const watched = cfg.currency === "INR" && !pays.length && (await hookForUser(page.user_id));
+      if (watched) {
+        const paise = await exactAmount(page.user_id, cfg.price);
+        await run("UPDATE bookings SET pay_paise = $1 WHERE id = $2", [paise, id]);
+        pays.push({ kind: "link", link: cfg.paymentUrl!, exact: paise });
+      } else pays.push({ kind: "link", link: cfg.paymentUrl! });
+    }
   }
   if (owner) {
-    const online = pays.some((p) => p.kind !== "link");
+    const online = pays.some((p) => p.kind !== "link" || p.exact);
     const next = free
       ? ""
       : online

@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { clientIp, rateLimit, sameOriginOnly } from "@/lib/security";
 import { keysWork, paypalKeysWork } from "@/lib/gateway";
 import { lockSecret } from "@/lib/secretbox";
+import { createHook, hookForUser, hookUrl } from "@/lib/linkWatch";
 
 type Status = { connected: boolean; keyId: string | null; mode: "test" | "live" };
 const none: Status = { connected: false, keyId: null, mode: "live" };
@@ -15,7 +16,10 @@ export async function GET() {
   const rows = await all<{ provider: string; key_id: string }>("SELECT provider, key_id FROM creator_gateways WHERE user_id = $1", [session.userId]);
   const razorpay = rows.find((r) => r.provider === "razorpay");
   const paypal = rows.find((r) => r.provider === "paypal") ?? rows.find((r) => r.provider === "paypal_sandbox");
+  const hook = await hookForUser(session.userId);
   return NextResponse.json({
+    // The webhook secret is the creator's to paste into their own Razorpay, so it is shown back to them.
+    hook: hook ? { connected: true, url: hookUrl(hook.hookId), secret: hook.secret } : { connected: false },
     razorpay: razorpay ? { connected: true, keyId: razorpay.key_id, mode: razorpay.key_id.startsWith("rzp_test_") ? "test" : "live" } satisfies Status : none,
     paypal: paypal ? { connected: true, keyId: paypal.key_id, mode: paypal.provider === "paypal_sandbox" ? "test" : "live" } satisfies Status : none,
   });
@@ -29,6 +33,11 @@ export async function POST(req: Request) {
   const blocked = sameOriginOnly(req) ?? rateLimit(`gateway:${clientIp(req)}`, 10, 60 * 60 * 1000);
   if (blocked) return blocked;
   const b = (await req.json().catch(() => ({}))) as { provider?: string; keyId?: string; keySecret?: string; clientId?: string; clientSecret?: string; sandbox?: boolean };
+
+  if (b.provider === "hook") {
+    const h = await createHook(session.userId);
+    return NextResponse.json({ ok: true, url: hookUrl(h.hookId), secret: h.secret });
+  }
 
   if (b.provider === "paypal") {
     const clientId = String(b.clientId ?? "").trim();
@@ -67,7 +76,8 @@ export async function DELETE(req: Request) {
   const blocked = sameOriginOnly(req);
   if (blocked) return blocked;
   const provider = new URL(req.url).searchParams.get("provider");
-  if (provider === "paypal") await run("DELETE FROM creator_gateways WHERE user_id = $1 AND provider IN ('paypal','paypal_sandbox')", [session.userId]);
+  if (provider === "hook") await run("DELETE FROM creator_gateways WHERE user_id = $1 AND provider = 'rzp_hook'", [session.userId]);
+  else if (provider === "paypal") await run("DELETE FROM creator_gateways WHERE user_id = $1 AND provider IN ('paypal','paypal_sandbox')", [session.userId]);
   else await run("DELETE FROM creator_gateways WHERE user_id = $1 AND provider = 'razorpay'", [session.userId]);
   return NextResponse.json({ ok: true });
 }
