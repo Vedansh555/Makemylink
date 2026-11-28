@@ -23,6 +23,16 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   serverExternalPackages: ["pg", "@electric-sql/pglite"],
+  async redirects() {
+    const moved: [string, string][] = [
+      ["topmate-alternative-zero-commission", "paid-calls-without-commission"],
+      ["bento-me-alternative", "card-grid-link-in-bio"],
+      ["linktree-vs-bento-grid", "button-list-vs-card-grid"],
+      ["stan-store-alternative-zero-commission", "creator-store-vs-booking-page"],
+      ["linktree-fees-explained", "link-in-bio-fees-explained"],
+    ];
+    return moved.map(([from, to]) => ({ source: `/blog/${from}`, destination: `/blog/${to}`, permanent: true }));
+  },
   async headers() {
     return [
       {

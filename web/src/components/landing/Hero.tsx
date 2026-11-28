@@ -68,10 +68,10 @@ export function Hero() {
                 id="hero-import"
                 type="text"
                 inputMode="url"
-                aria-label="Link to your Linktree or Carrd page"
+                aria-label="Link to your Linktree or other link page"
                 value={pasted}
                 onChange={(e) => setPasted(e.target.value)}
-                placeholder="Paste your Linktree or Carrd link"
+                placeholder="Paste your Linktree or other link"
                 className="h-full min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-[#111] outline-none placeholder:text-[#111]/45"
               />
               <button type="submit" className="h-full min-h-[44px] shrink-0 rounded-lg bg-[#ff5b37] px-5 text-[14px] font-semibold text-[#111] transition hover:bg-[#ff6f4f]">

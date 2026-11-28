@@ -87,7 +87,7 @@ const jsonLd = [
         name: "Can I bring my existing page?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes. Paste the link of your page from Linktree, Carrd, Solo.to, Hoo.be, Bio.site, Linkin.bio, Campsite, Taplink, Milkshake or Instabio, and we copy your picture, links, groups, social handles and shop items.",
+          text: "Yes. Paste the link of your page from Linktree or most other link pages, and we copy your picture, links, groups, social handles and shop items.",
         },
       },
       {

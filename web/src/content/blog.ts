@@ -24,8 +24,8 @@ export interface Post {
  */
 export const posts: Post[] = [
   {
-    slug: "topmate-alternative-zero-commission",
-    title: "Topmate alternative: take bookings without a per-session commission",
+    slug: "paid-calls-without-commission",
+    title: "Take paid 1:1 calls without a per-session commission",
     description: "Mentors and consultants who book 1:1 calls through a marketplace pay a cut of every session. Here is how a flat-fee page with its own booking card compares.",
     date: "2026-11-02",
     category: "Comparisons",
@@ -43,25 +43,25 @@ export const posts: Post[] = [
     ],
   },
   {
-    slug: "bento-me-alternative",
-    title: "Bento.me alternative: a designer link-in-bio page that is still here",
-    description: "Bento.me was shut down on 13 February 2026 after Linktree acquired it. Here is what to look for in a replacement, and how to move your page in a few minutes.",
+    slug: "card-grid-link-in-bio",
+    title: "A card-grid link-in-bio page you own",
+    description: "What to look for in a designer card-grid page, and how to make sure you never lose your page or your audience if a tool closes.",
     date: "2026-11-02",
     category: "Comparisons",
-    answer: `Showz is a link-in-bio builder with Bento-style grid cards and ${themeList.length} designer themes. You can rebuild a Bento.me page in minutes and start on a free plan.`,
+    answer: `Showz is a link-in-bio builder with grid cards and ${themeList.length} designer themes. You can set up a page in minutes, start on a free plan, and download your data any time.`,
     body: [
-      { h2: "What people liked about Bento.me", p: ["Bento pages were popular because they looked like a designed portfolio, not a list of buttons: cards of different sizes in a grid."] },
-      { h2: "What to look for in a replacement", ul: ["Cards of different sizes (half-width and full-width tiles)", "Themes you can change without rebuilding", "A free plan so you can try before paying", "Export of your email list so you are never locked in"] },
-      { h2: "Moving over", p: ["Create an account, pick a theme, and add your links. If you have a Linktree, you can import it from its public page. Pro users can set each card to a half, full or tall tile."] },
+      { h2: "Why people like card grids", p: ["A card grid looks like a designed portfolio, not a list of buttons: cards of different sizes, so the most important one stands out."] },
+      { h2: "What to look for", ul: ["Cards of different sizes (half-width and full-width tiles)", "Themes you can change without rebuilding", "A free plan so you can try before paying", "Export of your email list so you are never locked in"] },
+      { h2: "Moving over", p: ["Create an account, pick a theme, and add your links. If you already have a link page, paste its public address to import it. Pro users can set each card to a half, full or tall tile."] },
       { h2: "Not locked in", p: ["Pro includes a CSV export of everyone who joined your email list, so you can take your audience with you at any time."] },
     ],
     faq: [
-      { q: "Is Showz free?", a: `Yes. There is a free plan with 8 links and ${FREE_THEME_IDS.length} themes. Pro adds all ${themeList.length} themes, bookings, grid card sizes, analytics and a custom badge-free page.` },
-      { q: "Can I import my existing links?", a: "You can import a public Linktree page by pasting its address. Other links can be added by hand." },
+      { q: "Is Showz free?", a: `Yes. There is a free plan with 8 links and ${FREE_THEME_IDS.length} themes. Free also includes 3 paid bookings a month. Pro adds all ${themeList.length} themes, unlimited bookings, grid card sizes, analytics and a badge-free page.` },
+      { q: "Can I import my existing links?", a: "Yes. Paste the public address of your current link page to import it. Anything missing can be added by hand." },
     ],
   },
   {
-    slug: "linktree-vs-bento-grid",
+    slug: "button-list-vs-card-grid",
     title: "Button list or card grid: which link-in-bio layout fits you?",
     description: "A plain vertical list of buttons against a grid of mixed-size cards: how visual hierarchy and mobile layout differ, and how to choose.",
     date: "2026-11-04",
@@ -75,20 +75,20 @@ export const posts: Post[] = [
     ],
     faq: [
       { q: "Do card grids with pictures load slower than a plain list?", a: "Pictures add some weight, so Showz shrinks the pictures you upload to a small size. Keep to a few pictures if speed matters most." },
-      { q: "Can I switch from Linktree to a card grid without starting from scratch?", a: "Yes. You can paste your public Linktree URL into Showz to import your profile picture, links, and social icons in seconds." },
+      { q: "Can I switch to a card grid without starting from scratch?", a: "Yes. Paste the public address of your current link page and Showz imports your picture, links and social icons." },
     ],
   },
   {
-    slug: "stan-store-alternative-zero-commission",
-    title: "Stan Store alternative: sell products & take bookings with 0% commission",
-    description: "Stan Store's plans are listed at $29 and $99 a month (Nov 2026). Here is how a ₹299 or $8 a month page with 0% commission on bookings compares.",
+    slug: "creator-store-vs-booking-page",
+    title: "Full creator store or a simple booking page?",
+    description: "Full creator stores bundle courses, downloads and email tools. Here is when a page with paid bookings, at ₹299 or $8 a month, is all you need.",
     date: "2026-11-04",
     category: "Comparisons",
-    answer: "Stan Store is a full creator store with plans listed from $29 a month (Nov 2026). If you mainly need a page that takes paid 1:1 bookings, a lower flat fee with 0% commission may cost less. Compare both at your own sales level.",
+    answer: "If you sell courses and downloads, a full creator store may suit you. If you mainly take paid 1:1 calls, a simpler page with 0% commission usually costs less. Compare at your own sales level.",
     body: [
-      { h2: "What each one is built for", p: ["Stan Store bundles a store, digital products, courses, email tools and bookings in one place. Its pricing page listed a $29 and a $99 monthly plan when we checked in November 2026. Check stan.store for current prices.", "Showz is built around a designed link page with paid 1:1 bookings, product links and an email list."] },
+      { h2: "What each one is built for", p: ["Full creator stores bundle a storefront, digital products, courses, email tools and bookings in one place, usually at a higher monthly price. Check each tool's own pricing page.", "Showz is built around a designed link page with paid 1:1 bookings, product links and an email list."] },
       { h2: "Differences at a glance", ul: ["Price: Showz is free to start (3 paid bookings a month); Pro is ₹299 a month in India or $8 elsewhere", `Design: Showz has ${themeList.length} themes and cards in mixed sizes`, "Payments: on Showz buyers pay you directly through your own Razorpay (rupees, including UPI) or PayPal, or your payment link; Showz takes 0% commission"] },
-      { h2: "Which one should you choose?", p: ["If you sell courses, digital downloads and need built-in email tools, a full store like Stan Store may suit you better. If you mainly take paid calls and want a designed page at a lower monthly price, Showz may fit. Payment company fees apply on both."] },
+      { h2: "Which one should you choose?", p: ["If you sell courses, digital downloads and need built-in email tools, a full creator store may suit you better. If you mainly take paid calls and want a designed page at a lower monthly price, Showz may fit. Payment company fees apply on both."] },
     ],
     faq: [
       { q: "Does Showz charge a percentage of my bookings?", a: "No. Showz charges 0% commission on bookings and sales on both Free and Pro plans." },
@@ -150,7 +150,7 @@ export const posts: Post[] = [
     ],
   },
   {
-    slug: "linktree-fees-explained",
+    slug: "link-in-bio-fees-explained",
     title: "Link-in-bio fees explained: subscription vs commission",
     description: "Link-in-bio tools charge in two ways: a monthly subscription, a cut of your sales, or both. Here is how to compare them.",
     date: "2026-11-02",

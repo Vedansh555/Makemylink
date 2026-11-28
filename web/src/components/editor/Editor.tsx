@@ -678,7 +678,7 @@ export function Editor() {
             <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#ff5b37]/40 bg-[#ff5b37]/[0.06] p-4 sm:flex-row sm:items-center">
               <div className="flex-1">
                 <p className="text-[14px] font-semibold">Already have a link page?</p>
-                <p className="text-[12px] text-fg/55">Paste its link (Linktree, Carrd, Solo.to, Hoo.be, Bio.site and more). We copy your picture, links, socials and shop items.</p>
+                <p className="text-[12px] text-fg/55">Paste its link (Linktree or most other link pages). We copy your picture, links, socials and shop items.</p>
               </div>
               <input className={`${inputCls} sm:!w-56`} value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="Paste your page link" />
               <button disabled={!importUrl || importing} onClick={() => importLinktree()} className="rounded-xl bg-fg px-5 py-2.5 text-[13px] font-semibold text-bg disabled:opacity-40">
